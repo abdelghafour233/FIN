@@ -8,13 +8,21 @@ const AppState = {
     isUnlocked: sessionStorage.getItem('storimage-unlocked') === 'true',
     adminPass: localStorage.getItem('storimage-admin-pass') || '1234',
     stats: JSON.parse(localStorage.getItem('storimage-stats') || '{"total":0,"saved":0}'),
-    // الإعدادات الافتراضية مع أكواد Adsterra المقدمة من المستخدم
+    // الإعدادات الافتراضية مع أكواد Adsterra الصحيحة
     settings: JSON.parse(localStorage.getItem('storimage-settings') || JSON.stringify({
         fb: '', 
         tt: '', 
         adPop: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
-        adSocial: '', 
-        adCustom: `<script>\n  atOptions = {\n    'key' : '0295263cf4ed8d9e3a97b6a2490864ee',\n    'format' : 'iframe',\n    'height' : 250,\n    'width' : 300,\n    'params' : {}\n  };\n</script>\n<script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
+        adCustom: `<script type="text/javascript">
+	atOptions = {
+		'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+		'format' : 'iframe',
+		'height' : 250,
+		'width' : 300,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`
     }))
 };
 
@@ -37,22 +45,24 @@ const initLucide = () => {
 
 // وظيفة لحقن السكربتات في الصفحة (لتفعيل الإعلانات)
 const injectScripts = () => {
-    const { adPop, adCustom, adSocial } = AppState.settings;
+    const { adPop, adCustom } = AppState.settings;
     const container = document.getElementById('ads-injection-container');
     if (container) {
-        // تنظيف الحاوية أولاً
+        // تنظيف الحاوية
         container.innerHTML = '';
         
-        // تجميع كل السكربتات
-        const combinedHTML = adPop + adCustom + (adSocial || '');
+        // دمج الأكواد
+        const combinedHTML = (adPop || '') + (adCustom || '');
         
-        // استخدام Range لإنشاء Fragment يدعم السكربتات
-        const range = document.createRange();
-        const fragment = range.createContextualFragment(combinedHTML);
-        
-        // حقن المحتوى (سيقوم المتصفح بتنفيذ السكربتات تلقائياً هنا)
-        container.appendChild(fragment);
-        console.log("Ads scripts injected successfully.");
+        // استخدام Range لضمان تنفيذ السكربتات
+        try {
+            const range = document.createRange();
+            const fragment = range.createContextualFragment(combinedHTML);
+            container.appendChild(fragment);
+            console.log("Scripts Injected Successfully");
+        } catch (e) {
+            console.error("Error injecting scripts:", e);
+        }
     }
 };
 
@@ -62,14 +72,22 @@ const switchView = (viewId: string) => {
         return;
     }
     AppState.currentView = viewId;
+    
+    // Desktop Nav
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`nav-${viewId}`)?.classList.add('active');
+    
+    // Mobile Nav
     document.querySelectorAll('.mobile-nav-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`m-nav-${viewId}`)?.classList.add('active');
+    
+    // Views
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     document.getElementById(`view-${viewId}`)?.classList.add('active');
+    
     if(viewId === 'stats') updateStatsUI();
     if(viewId === 'settings') loadSettings();
+    
     initLucide();
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
@@ -104,6 +122,7 @@ const lockDashboard = () => {
     showToast('تم قفل الإعدادات');
 };
 
+// Global Exports
 (window as any).switchView = switchView;
 (window as any).toggleTheme = toggleTheme;
 (window as any).openAuth = openAuth;
@@ -155,7 +174,7 @@ function renderQueue() {
     document.getElementById('btn-download-all')?.classList.toggle('hidden', !hasDone);
     document.getElementById('btn-process-all')?.classList.toggle('hidden', !hasIdle);
     queue.innerHTML = AppState.files.map(f => `
-        <div class="glass p-5 rounded-3xl flex items-center gap-5 transition-all">
+        <div class="glass p-5 rounded-3xl flex items-center gap-5 transition-all hover:bg-white/5">
             <div class="relative w-16 h-16 shrink-0">
                 <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl shadow-md">
                 ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
@@ -218,16 +237,15 @@ function renderQueue() {
 
 function loadSettings() {
     const s = AppState.settings;
-    const fields: any = {
-        'fb-pixel': s.fb,
-        'tt-pixel': s.tt,
-        'ads-popunder': s.adPop,
-        'ads-custom-script': s.adCustom
-    };
-    Object.entries(fields).forEach(([id, val]: [string, any]) => {
-        const el = document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement;
-        if(el) el.value = val || '';
-    });
+    const fb = document.getElementById('fb-pixel') as HTMLInputElement;
+    const tt = document.getElementById('tt-pixel') as HTMLInputElement;
+    const adPop = document.getElementById('ads-popunder') as HTMLTextAreaElement;
+    const adCustom = document.getElementById('ads-custom-script') as HTMLTextAreaElement;
+
+    if(fb) fb.value = s.fb || '';
+    if(tt) tt.value = s.tt || '';
+    if(adPop) adPop.value = s.adPop || '';
+    if(adCustom) adCustom.value = s.adCustom || '';
 }
 
 (window as any).saveSettings = () => {
@@ -239,7 +257,7 @@ function loadSettings() {
     AppState.settings = { fb, tt, adPop, adCustom };
     localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
     
-    // إعادة حقن السكربتات لتفعيل التغييرات فوراً
+    // إعادة حقن السكربتات فوراً لتفعيل الإعلانات
     injectScripts();
     
     showToast('تم حفظ الإعدادات');
@@ -270,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateStatsUI();
     initLucide();
     
-    // حقن الإعلانات عند التحميل
+    // حقن السكربتات عند بدء التشغيل
     injectScripts();
     
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
