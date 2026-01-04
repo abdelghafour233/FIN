@@ -12,7 +12,8 @@ const AppState = {
     settings: JSON.parse(localStorage.getItem('storimage-settings') || JSON.stringify({
         fb: '', 
         tt: '', 
-        adPop: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>', 
+        adPop: '<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>',
+        adSocial: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>',
         adCustom: `<script type="text/javascript">
 	atOptions = {
 		'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
@@ -45,21 +46,21 @@ const initLucide = () => {
 
 // وظيفة لحقن السكربتات في الصفحة (لتفعيل الإعلانات)
 const injectScripts = () => {
-    const { adPop, adCustom } = AppState.settings;
+    const { adPop, adCustom, adSocial } = AppState.settings;
     const container = document.getElementById('ads-injection-container');
     if (container) {
         // تنظيف الحاوية
         container.innerHTML = '';
         
         // دمج الأكواد
-        const combinedHTML = (adPop || '') + (adCustom || '');
+        const combinedHTML = (adPop || '') + (adCustom || '') + (adSocial || '');
         
         // استخدام Range لضمان تنفيذ السكربتات
         try {
             const range = document.createRange();
             const fragment = range.createContextualFragment(combinedHTML);
             container.appendChild(fragment);
-            console.log("Scripts Injected Successfully");
+            console.log("Scripts Injected Successfully (Popunder + SocialBar + Banner)");
         } catch (e) {
             console.error("Error injecting scripts:", e);
         }
@@ -240,11 +241,13 @@ function loadSettings() {
     const fb = document.getElementById('fb-pixel') as HTMLInputElement;
     const tt = document.getElementById('tt-pixel') as HTMLInputElement;
     const adPop = document.getElementById('ads-popunder') as HTMLTextAreaElement;
+    const adSocial = document.getElementById('ads-social') as HTMLTextAreaElement;
     const adCustom = document.getElementById('ads-custom-script') as HTMLTextAreaElement;
 
     if(fb) fb.value = s.fb || '';
     if(tt) tt.value = s.tt || '';
     if(adPop) adPop.value = s.adPop || '';
+    if(adSocial) adSocial.value = s.adSocial || '';
     if(adCustom) adCustom.value = s.adCustom || '';
 }
 
@@ -252,9 +255,10 @@ function loadSettings() {
     const fb = (document.getElementById('fb-pixel') as HTMLInputElement).value;
     const tt = (document.getElementById('tt-pixel') as HTMLInputElement).value;
     const adPop = (document.getElementById('ads-popunder') as HTMLTextAreaElement).value;
+    const adSocial = (document.getElementById('ads-social') as HTMLTextAreaElement).value;
     const adCustom = (document.getElementById('ads-custom-script') as HTMLTextAreaElement).value;
 
-    AppState.settings = { fb, tt, adPop, adCustom };
+    AppState.settings = { fb, tt, adPop, adSocial, adCustom };
     localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
     
     // إعادة حقن السكربتات فوراً لتفعيل الإعلانات
