@@ -32,6 +32,19 @@
         .view-section.hidden { display: none; }
         .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         input[type="range"] { accent-color: #3b82f6; cursor: pointer; }
+        
+        /* تجميل حاوية الإعلانات */
+        #ad-slot-container {
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: rgba(0,0,0,0.05);
+        }
+        .dark #ad-slot-container { background: rgba(255,255,255,0.05); }
     </style>
 </head>
 <body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen">
@@ -61,6 +74,12 @@
 
     <main class="max-w-5xl mx-auto px-6 pt-32 pb-24">
         
+        <!-- Ad Slot At Top -->
+        <div id="ad-slot-container" class="max-w-[300px] mx-auto shadow-sm">
+            <!-- Adsterra will inject here -->
+            <p class="text-[10px] opacity-20 font-bold uppercase">إعلان</p>
+        </div>
+
         <!-- View: Upload/Editor -->
         <section id="view-upload" class="view-section space-y-12">
             <header class="text-center space-y-4">
@@ -143,7 +162,7 @@
             </div>
         </section>
 
-        <!-- View: Settings (Control Panel) -->
+        <!-- View: Settings -->
         <section id="view-settings" class="view-section hidden max-w-2xl mx-auto">
             <div class="glass p-10 rounded-[3rem] shadow-2xl border border-black/5 dark:border-white/5 space-y-8">
                 <div class="text-center space-y-2">
@@ -163,11 +182,10 @@
                         </div>
                     </div>
 
-                    <!-- Adsterra Codes Area -->
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-brand-primary uppercase tracking-widest">أكواد Adsterra (Ad Scripts)</label>
                         <textarea name="adsterra" id="input-adsterra" rows="5" placeholder="قم بلصق أكواد Adsterra هنا..." class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-mono text-xs"></textarea>
-                        <p class="text-[9px] opacity-40">يمكنك وضع أكواد البوب-أندر أو الإعلانات الصورية هنا ليتم حفظها.</p>
+                        <p class="text-[9px] opacity-40">تم وضع الأكواد الخاصة بك افتراضياً. يمكنك تعديلها في أي وقت.</p>
                     </div>
 
                     <button type="submit" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black shadow-xl hover:scale-[1.01] active:scale-95 transition-all">حفظ الإعدادات بالكامل</button>

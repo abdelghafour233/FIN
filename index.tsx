@@ -12,13 +12,66 @@ interface ImageFile {
     status: 'idle' | 'processing' | 'done' | 'error';
 }
 
+// الكود الذي زودتني به
+const DEFAULT_ADSTERRA = `<script type="text/javascript">
+	atOptions = {
+		'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+		'format' : 'iframe',
+		'height' : 250,
+		'width' : 300,
+		'params' : {}
+	};
+</script>
+<script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`;
+
 // --- Global State ---
 const AppState = {
     view: 'upload',
     theme: localStorage.getItem('storimage_theme') || 'dark',
     files: [] as ImageFile[],
     stats: JSON.parse(localStorage.getItem('storimage_stats') || '{"total":0, "saved":0}'),
-    settings: JSON.parse(localStorage.getItem('storimage_settings') || '{"fb":"","tt":"","adsterra":""}')
+    settings: JSON.parse(localStorage.getItem('storimage_settings') || `{"fb":"","tt":"","adsterra":"${DEFAULT_ADSTERRA.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"}`)
+};
+
+// --- Script Injection Logic (Adsterra Support) ---
+
+const injectAdsterraScripts = () => {
+    const code = AppState.settings.adsterra;
+    if (!code) return;
+
+    // استهداف الحاوية المخصصة في HTML لظهور الإعلان
+    const container = document.getElementById('ad-slot-container');
+    if (!container) return;
+
+    // تنظيف الحاوية قبل الحقن الجديد
+    container.innerHTML = '';
+    
+    // إنشاء عنصر مؤقت لتحويل النص إلى Nodes
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = code;
+    
+    // حقن العناصر وتنفيذ السكريبتات
+    const fragments = document.createDocumentFragment();
+    const children = Array.from(tempDiv.childNodes);
+    
+    children.forEach(node => {
+        if (node.nodeName === 'SCRIPT') {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            const oldScript = node as HTMLScriptElement;
+            if (oldScript.src) {
+                script.src = oldScript.src;
+            } else {
+                script.text = oldScript.text;
+            }
+            fragments.appendChild(script);
+        } else {
+            fragments.appendChild(node.cloneNode(true));
+        }
+    });
+
+    container.appendChild(fragments);
+    console.log('Adsterra Ads Injected to Slot');
 };
 
 // --- Core Functions ---
@@ -50,7 +103,6 @@ const switchView = (viewId: string) => {
     if (viewId === 'stats') updateStatsUI();
     if (viewId === 'settings') loadSettingsToUI();
     
-    // Update active state on nav buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
         btn.classList.remove('text-brand-primary', 'bg-brand-primary/10');
         if (btn.getAttribute('onclick')?.includes(viewId)) {
@@ -196,12 +248,17 @@ const initLucide = () => {
         adsterra: formData.get('adsterra') as string
     };
     localStorage.setItem('storimage_settings', JSON.stringify(AppState.settings));
-    alert('تم حفظ الإعدادات وأكواد Adsterra بنجاح ✅');
+    injectAdsterraScripts();
+    alert('تم حفظ الإعدادات وتنشيط إعلانات Adsterra بنجاح ✅');
 };
 
 // --- Init on Load ---
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
+    
+    // تأخير طفيف للحقن للتأكد من بناء الـ DOM
+    setTimeout(injectAdsterraScripts, 1000);
+    
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
     if (fileInput) {
         fileInput.onchange = (e: any) => {
@@ -220,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // Sliders Listeners
     ['quality', 'bright', 'contrast', 'saturate'].forEach(id => {
         const slider = document.getElementById(`${id}-slider`) as HTMLInputElement;
         const val = document.getElementById(`${id}-val`);
@@ -232,5 +288,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initLucide();
-    console.log('StorImage Studio Ready');
 });
