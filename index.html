@@ -40,9 +40,9 @@
         #modal-auth { display: none; }
         #modal-auth.open { display: flex; }
 
-        /* منطقة الإعلانات السفلية حصراً */
+        /* حاوية الإعلانات السفلية */
         .ads-footer-container {
-            margin-top: 80px;
+            margin-top: 60px;
             padding: 40px 20px;
             text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05);
@@ -150,15 +150,24 @@
     <footer class="ads-footer-container">
         <div class="max-w-4xl mx-auto">
             <p class="text-[10px] text-slate-500 font-black mb-4 uppercase tracking-[0.4em]">مساحة إعلانية مدعومة</p>
-            <div id="ads-injection-container" class="min-h-[120px] flex items-center justify-center overflow-hidden bg-white/5 rounded-2xl border border-white/5">
-                <!-- Adsterra script goes here -->
-                <span class="text-slate-600 text-xs italic">سيظهر الإعلان هنا عند تفعيل الكود</span>
+            <div id="ads-injection-container" class="min-h-[120px] flex items-center justify-center overflow-hidden">
+                <!-- Adsterra Script Fixed in Footer -->
+                <script type="text/javascript">
+                    atOptions = {
+                        'key' : '15385b7c751e6c7d59d59fb7f34e2934',
+                        'format' : 'iframe',
+                        'height' : 90,
+                        'width' : 728,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="//www.highperformanceformat.com/15385b7c751e6c7d59d59fb7f34e2934/invoke.js"></script>
             </div>
             <p class="mt-8 text-[10px] text-slate-600 font-medium">© 2024 StorImage - جميع الحقوق محفوظة</p>
         </div>
     </footer>
 
-    <!-- Auth Modal -->
+    <!-- Auth Modal (Settings) -->
     <div id="modal-auth" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl items-center justify-center p-6">
         <div class="glass p-8 md:p-12 rounded-[3rem] w-full max-w-xl space-y-8 border border-white/10">
             <div class="flex justify-between items-center">
@@ -168,9 +177,9 @@
             <div class="space-y-6">
                 <div class="space-y-2">
                     <label class="text-[10px] font-black uppercase text-slate-400 px-1">كود Adsterra / الإعلانات السفلية</label>
-                    <textarea id="ad-scripts" placeholder="الصق كود السكربت هنا... سيظهر حصراً في أسفل الموقع." class="w-full bg-black/40 p-5 rounded-2xl outline-none h-48 font-mono text-xs border border-white/5 focus:border-brand-primary text-slate-300"></textarea>
+                    <textarea id="ad-scripts" placeholder="الصق كود السكربت هنا..." class="w-full bg-black/40 p-5 rounded-2xl outline-none h-48 font-mono text-xs border border-white/5 focus:border-brand-primary text-slate-300"></textarea>
                 </div>
-                <button onclick="window.saveAdminSettings()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg hover:brightness-110 transition-all">حفظ وتحديث الإعلانات</button>
+                <button onclick="window.saveAdminSettings()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg hover:brightness-110 transition-all">تحديث الكود</button>
             </div>
         </div>
     </div>

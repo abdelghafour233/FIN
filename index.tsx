@@ -7,7 +7,7 @@ const AppState = {
     files: [] as any[],
     stats: JSON.parse(localStorage.getItem('storimage-stats') || '{"total":0,"saved":0}'),
     settings: JSON.parse(localStorage.getItem('storimage-settings') || JSON.stringify({
-        scripts: '<script type="text/javascript">\natOptions = {\n\t\'key\' : \'15385b7c751e6c7d59d59fb7f34e2934\',\n\t\'format\' : \'iframe\',\n\t\'height\' : 90,\n\t\'width\' : 728,\n\t\'params\' : {}\n};\n</script>\n<script type="text/javascript" src="//www.highperformanceformat.com/15385b7c751e6c7d59d59fb7f34e2934/invoke.js"></script>'
+        scripts: '' // سيتم استخدامه إذا أراد المستخدم تغيير الكود من لوحة التحكم
     }))
 };
 
@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     setupDropZone();
     updateStatsUI();
-    injectAds();
     initLucide();
     
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
@@ -25,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
         slider.addEventListener('input', (e: any) => {
             qVal.innerText = e.target.value + '%';
         });
+    }
+
+    // حقن الكود المخصص إذا كان موجوداً في الإعدادات
+    if (AppState.settings.scripts) {
+        injectCustomAds(AppState.settings.scripts);
     }
 });
 
@@ -50,19 +54,14 @@ const applyTheme = () => {
     initLucide();
 };
 
-// --- Ads Injection (FOOTER ONLY) ---
-const injectAds = () => {
+// --- Ads Injection Logic ---
+const injectCustomAds = (scriptCode: string) => {
     const container = document.getElementById('ads-injection-container');
-    if (container && AppState.settings.scripts) {
+    if (container && scriptCode.trim() !== "") {
         container.innerHTML = '';
-        try {
-            const range = document.createRange();
-            const fragment = range.createContextualFragment(AppState.settings.scripts);
-            container.appendChild(fragment);
-            console.log("Adsterra scripts injected into footer container.");
-        } catch (e) {
-            console.error("Ad injection error:", e);
-        }
+        const range = document.createRange();
+        const fragment = range.createContextualFragment(scriptCode);
+        container.appendChild(fragment);
     }
 };
 
@@ -119,14 +118,14 @@ function renderQueue() {
     document.getElementById('btn-process-all')?.classList.toggle('hidden', !hasIdle);
 
     queue.innerHTML = AppState.files.map(f => `
-        <div class="glass p-5 rounded-3xl flex items-center gap-5 transition-all hover:bg-white/5 border border-white/5">
+        <div class="glass p-5 rounded-3xl flex items-center gap-5 border border-white/5">
             <div class="relative w-16 h-16 shrink-0">
                 <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl">
                 ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
             </div>
             <div class="flex-grow overflow-hidden text-right">
                 <h4 class="text-xs font-black truncate">${f.name}</h4>
-                <p class="text-[9px] text-slate-500 font-bold mt-1 uppercase">${(f.size/1024).toFixed(1)} KB</p>
+                <p class="text-[9px] text-slate-500 font-bold uppercase">${(f.size/1024).toFixed(1)} KB</p>
             </div>
             <div class="flex items-center gap-2">
                 ${f.status === 'idle' ? 
@@ -174,13 +173,13 @@ function renderQueue() {
 (window as any).downloadAll = () => {
     const ready = AppState.files.filter(f => f.status === 'done');
     ready.forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 300));
-    showToast('جاري بدء التحميل...');
+    showToast('جاري التحميل...');
 };
 
 (window as any).removeFile = (id: string) => { AppState.files = AppState.files.filter(f => f.id !== id); renderQueue(); };
 (window as any).clearQueue = () => { AppState.files = []; renderQueue(); showToast('تم تنظيف القائمة'); };
 
-// --- Admin & Settings ---
+// --- Settings Management ---
 (window as any).openAuth = () => {
     const pass = prompt('كلمة السر (1234):');
     if (pass === '1234') {
@@ -195,8 +194,8 @@ function renderQueue() {
     const scripts = (document.getElementById('ad-scripts') as HTMLTextAreaElement).value;
     AppState.settings.scripts = scripts;
     localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
-    injectAds();
-    showToast('تم حفظ إعدادات الإعلانات');
+    if (scripts) injectCustomAds(scripts);
+    showToast('تم تحديث الإعدادات');
     (window as any).closeAuth();
 };
 
