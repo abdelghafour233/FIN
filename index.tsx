@@ -20,7 +20,7 @@ const init = () => {
     updateStatsUI();
     initLucide();
     setupSliders();
-    applyAdsterra(); // حقن إعلانات أدستيرا عند بدء التشغيل
+    applyAdsterra(); // حقن إعلانات أدستيرا عند بدء التشغيل في الأسفل
     console.log("ImgPro Initialized: Adsterra injected at footer");
 };
 
@@ -44,16 +44,20 @@ function applyAdsterra() {
     const container = document.getElementById('adsterra-footer-container');
     if (!container) return;
 
-    // تنظيف الحاوية قبل الإضافة الجديدة
+    // تنظيف الحاوية قبل الإضافة الجديدة لضمان عدم التكرار
     container.innerHTML = '';
 
-    const adUrl = AppState.settings.adsterra;
+    // استخدام الرابط المقدم من المستخدم كقيمة افتراضية إذا كان الحقل فارغاً
+    const defaultAd = 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js';
+    const adUrl = AppState.settings.adsterra || defaultAd;
+
     if (adUrl && adUrl.startsWith('http')) {
         const script = document.createElement('script');
         script.src = adUrl;
         script.async = true;
+        // وضع الإعلان داخل الحاوية الموجودة في أسفل الـ HTML حصراً
         container.appendChild(script);
-        console.log("Adsterra Script Loaded:", adUrl);
+        console.log("Adsterra Script Loaded at Footer:", adUrl);
     }
 }
 
@@ -306,6 +310,7 @@ function loadSettings() {
     
     if(fb) fb.value = s.fb || '';
     if(tt) tt.value = s.tt || '';
+    // تحميل الرابط الافتراضي في الواجهة إذا كان فارغاً
     if(adsterra) adsterra.value = s.adsterra || 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js';
     if(domain) domain.value = s.domain || '';
     if(gsheets) gsheets.value = s.sheets || '';
@@ -334,8 +339,8 @@ function loadSettings() {
     };
     localStorage.setItem('imgpro-settings', JSON.stringify(AppState.settings));
     
-    applyAdsterra(); // إعادة تطبيق الحقن بعد الحفظ
-    showToast('تم حفظ كافة الإعدادات وتطبيق الإعلانات');
+    applyAdsterra(); // إعادة تطبيق الحقن بعد الحفظ لضمان التحديث الفوري
+    showToast('تم حفظ كافة الإعدادات وتفعيل الإعلانات في الأسفل');
 };
 
 // --- Helpers ---
