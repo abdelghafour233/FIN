@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إيميج برو | منصة معالجة الصور الاحترافية</title>
+    <title>إيميج برو | المنصة الاحترافية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,81 +28,146 @@
         }
     </script>
     <style>
-        body { transition: background-color 0.4s ease, color 0.4s ease; font-family: 'Cairo', sans-serif; }
+        body { transition: background-color 0.4s ease; font-family: 'Cairo', sans-serif; overflow-x: hidden; }
         .dark body { background-color: #0a0a0a; color: #ffffff; }
         .light body { background-color: #f8fafc; color: #0f172a; }
 
-        .neon-glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .neon-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .dark .neon-card { background: #121212; border: 1px solid rgba(16, 185, 129, 0.1); }
         .light .neon-card { background: #ffffff; border: 1px solid #e2e8f0; }
         
-        .drop-zone { border: 2px dashed rgba(16, 185, 129, 0.3); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .drop-zone { border: 2px dashed rgba(16, 185, 129, 0.3); transition: all 0.3s ease; }
         .drop-zone.active { border-color: #10b981; background: rgba(16, 185, 129, 0.05); transform: scale(1.01); }
         
-        .view-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .view-content { display: none; opacity: 0; transform: translateY(15px); transition: all 0.4s ease; }
         .view-content.active { display: block; opacity: 1; transform: translateY(0); }
         
         .nav-link.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .btn-neon { background: #10b981; color: #000; font-weight: 900; transition: all 0.3s; }
         .btn-neon:hover { background: #00ff66; box-shadow: 0 0 20px rgba(0, 255, 102, 0.4); transform: translateY(-2px); }
         
-        .btn-outline-neon { border: 1px solid #10b981; color: #10b981; font-weight: 700; transition: all 0.3s; }
-        .btn-outline-neon:hover { background: rgba(16, 185, 129, 0.1); transform: translateY(-2px); }
-
         .image-ready { position: relative; }
-        .image-ready::after { content: ''; position: absolute; inset: -4px; border: 2px solid #10b981; border-radius: 1.2rem; animation: pulse-neon 2s infinite; }
-        @keyframes pulse-neon { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
+        .image-ready::after { content: ''; position: absolute; inset: -4px; border: 2px solid #10b981; border-radius: 1.5rem; animation: pulse-neon 2s infinite; pointer-events: none; }
+        @keyframes pulse-neon { 0%, 100% { opacity: 0.8; } 50% { opacity: 0.3; } }
+
+        #mobile-menu { transform: translateX(100%); transition: transform 0.3s ease; }
+        #mobile-menu.open { transform: translateX(0); }
+
+        #auth-overlay { display: none; opacity: 0; transition: all 0.3s ease; }
+        #auth-overlay.active { display: flex; opacity: 1; }
     </style>
 </head>
 <body class="min-h-screen">
 
-    <!-- Sidebar / Nav -->
-    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-brand-green/10 bg-brand-black/80 backdrop-blur-xl dark:bg-brand-black/80 light:bg-white/80">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
+    <!-- Header / Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-[60] border-b border-brand-green/10 bg-brand-black/90 backdrop-blur-xl">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.switchView('upload')">
                 <div class="w-10 h-10 bg-brand-green rounded-xl flex items-center justify-center text-black shadow-lg shadow-brand-green/20">
-                    <i data-lucide="image" class="w-6 h-6"></i>
+                    <i data-lucide="zap" class="w-6 h-6"></i>
                 </div>
                 <h1 class="text-xl font-black tracking-tighter">إيميج<span class="text-brand-green">برو</span></h1>
             </div>
 
-            <div class="hidden md:flex items-center gap-2 bg-slate-800/50 dark:bg-slate-800/50 light:bg-slate-200/50 p-1 rounded-2xl">
-                <button onclick="switchView('upload')" id="nav-upload" class="nav-link active px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">رفع الصور</button>
-                <button onclick="switchView('stats')" id="nav-stats" class="nav-link px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">الإحصائيات</button>
-                <button onclick="switchView('settings')" id="nav-settings" class="nav-link px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">لوحة التحكم</button>
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-2 bg-slate-900/50 p-1 rounded-2xl border border-white/5">
+                <button onclick="window.switchView('upload')" id="nav-upload" class="nav-link active px-6 py-2 rounded-xl font-bold text-sm transition-all">مركز الرفع</button>
+                <button onclick="window.switchView('stats')" id="nav-stats" class="nav-link px-6 py-2 rounded-xl font-bold text-sm transition-all">الإحصائيات</button>
+                <button onclick="window.switchView('settings')" id="nav-settings" class="nav-link px-6 py-2 rounded-xl font-bold text-sm transition-all flex items-center gap-2">
+                    <i data-lucide="lock" class="w-3.5 h-3.5 opacity-50"></i>
+                    لوحة التحكم
+                </button>
             </div>
 
             <div class="flex items-center gap-3">
-                <button onclick="toggleTheme()" id="theme-btn" class="w-11 h-11 flex items-center justify-center rounded-xl border border-brand-green/20 hover:bg-brand-green/10 text-brand-green transition-all">
+                <button onclick="window.toggleTheme()" class="w-11 h-11 flex items-center justify-center rounded-xl border border-brand-green/20 text-brand-green hover:bg-brand-green/10 transition-all">
                     <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                     <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <button onclick="window.toggleMobileMenu()" class="md:hidden w-11 h-11 flex items-center justify-center rounded-xl bg-brand-green text-black">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-4 pt-32 pb-20">
+    <!-- Mobile Sidebar Menu -->
+    <div id="mobile-menu" class="fixed inset-y-0 right-0 w-72 bg-brand-black border-r border-brand-green/10 z-[70] shadow-2xl p-8 flex flex-col gap-8 md:hidden">
+        <div class="flex items-center justify-between">
+            <span class="font-black text-brand-green">القائمة</span>
+            <button onclick="window.toggleMobileMenu()" class="text-slate-500"><i data-lucide="x" class="w-6 h-6"></i></button>
+        </div>
+        <div class="flex flex-col gap-4">
+            <button onclick="window.switchView('upload'); window.toggleMobileMenu();" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-brand-green/10 text-right font-bold transition-all">
+                <i data-lucide="upload-cloud" class="w-5 h-5 text-brand-green"></i> رفع الصور
+            </button>
+            <button onclick="window.switchView('stats'); window.toggleMobileMenu();" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-brand-green/10 text-right font-bold transition-all">
+                <i data-lucide="bar-chart-3" class="w-5 h-5 text-brand-green"></i> الإحصائيات
+            </button>
+            <button onclick="window.switchView('settings'); window.toggleMobileMenu();" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-brand-green/10 text-right font-bold transition-all">
+                <i data-lucide="settings" class="w-5 h-5 text-brand-green"></i> لوحة التحكم
+            </button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-overlay" class="fixed inset-0 z-[100] bg-brand-black/90 backdrop-blur-md items-center justify-center px-6">
+        <div class="neon-card bg-brand-dark p-8 md:p-12 rounded-[2.5rem] w-full max-w-md space-y-8 text-center border-2 border-brand-green/20">
+            <div class="w-20 h-20 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-brand-green/10">
+                <i data-lucide="shield-check" class="w-10 h-10"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-2xl font-black">الدخول المحمي</h3>
+                <p class="text-slate-500 font-bold text-sm">أدخل كلمة السر للوصول إلى لوحة التحكم</p>
+            </div>
+            <div class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="admin-pass" placeholder="••••" class="w-full bg-brand-black/50 border border-brand-green/20 p-5 pl-14 rounded-2xl text-center text-2xl font-black tracking-[0.5em] outline-none focus:border-brand-green transition-all placeholder:tracking-normal placeholder:text-slate-700">
+                    <button type="button" onclick="window.togglePasswordVisibility('admin-pass', 'pass-eye-icon')" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-brand-green p-2 transition-colors">
+                        <i id="pass-eye-icon" data-lucide="eye" class="w-6 h-6"></i>
+                    </button>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="window.closeAuth()" class="flex-1 bg-white/5 hover:bg-white/10 p-5 rounded-2xl font-black transition-all">إلغاء</button>
+                    <button onclick="window.verifyPass()" class="flex-1 btn-neon p-5 rounded-2xl">دخول</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-6xl mx-auto px-6 pt-32 pb-20">
         
         <!-- View: Upload -->
-        <section id="view-upload" class="view-content active space-y-12">
+        <section id="view-upload" class="view-content active space-y-10">
             <div class="text-center space-y-4">
-                <h2 class="text-4xl md:text-5xl font-black leading-tight">مركز رفع <span class="text-brand-green">الصور الذكي</span></h2>
-                <p class="text-slate-500 max-w-xl mx-auto font-bold">معالجة فورية، تحويل الصيغ، وتحميل جماعي بضغطة زر.</p>
+                <h2 class="text-4xl md:text-6xl font-black leading-tight">معالج الصور <span class="text-brand-green italic">النيوني</span></h2>
+                <p class="text-slate-500 font-bold max-w-lg mx-auto">تحكم كامل في الجودة، الأسماء، والصيغ بضغطة واحدة.</p>
             </div>
 
-            <!-- Options Bar -->
-            <div class="flex flex-wrap items-center justify-between gap-4 px-4">
-                <div class="flex items-center gap-4 bg-brand-dark/50 p-2 rounded-2xl border border-brand-green/10">
-                    <span class="text-xs font-black text-slate-500 px-2">صيغة التنزيل:</span>
-                    <select id="export-format" class="bg-transparent text-brand-green font-bold text-sm outline-none cursor-pointer">
-                        <option value="webp">WebP (أفضل ضغط)</option>
-                        <option value="png">PNG (أعلى جودة)</option>
-                        <option value="jpg">JPG (متوافق)</option>
-                    </select>
+            <!-- Advanced Controls Bar -->
+            <div class="neon-card p-6 md:p-8 rounded-[2.5rem] flex flex-wrap items-center justify-between gap-8">
+                <div class="flex flex-wrap items-center gap-8">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase mr-1">الصيغة النهائية</label>
+                        <select id="export-format" class="block bg-brand-black/50 border border-brand-green/20 text-brand-green font-black rounded-xl px-4 py-2 outline-none">
+                            <option value="webp">WebP</option>
+                            <option value="png">PNG</option>
+                            <option value="jpg">JPG</option>
+                        </select>
+                    </div>
+                    <div class="space-y-2 min-w-[150px]">
+                        <label class="text-[10px] font-black text-slate-500 uppercase flex justify-between">
+                            الجودة <span id="quality-val" class="text-brand-green">85%</span>
+                        </label>
+                        <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full accent-brand-green cursor-pointer">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-500 uppercase mr-1">بادئة الاسم (Prefix)</label>
+                        <input type="text" id="name-prefix" placeholder="imgpro_" class="bg-brand-black/50 border border-brand-green/20 text-brand-green font-black rounded-xl px-4 py-2 outline-none text-xs w-32">
+                    </div>
                 </div>
-                <button onclick="clearQueue()" class="text-red-500 text-xs font-black flex items-center gap-2 hover:opacity-70 transition-all">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    مسح كافة الصور
+                <button onclick="window.clearQueue()" class="text-red-500 text-xs font-black flex items-center gap-2 hover:bg-red-500/10 px-4 py-2 rounded-xl transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i> مسح القائمة
                 </button>
             </div>
 
@@ -110,113 +175,112 @@
             <div id="drop-area" class="drop-zone neon-card relative group rounded-[3rem] p-16 md:p-24 text-center overflow-hidden">
                 <input type="file" id="file-input" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                 <div class="relative z-0 space-y-6">
-                    <div class="w-24 h-24 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-500">
-                        <i data-lucide="upload-cloud" class="w-12 h-12"></i>
+                    <div class="w-24 h-24 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-500 shadow-xl shadow-brand-green/5">
+                        <i data-lucide="image-plus" class="w-12 h-12"></i>
                     </div>
                     <div>
-                        <h3 class="text-2xl font-black mb-2">اسحب وأفلت الصور هنا</h3>
-                        <p class="text-slate-400 font-bold">أو انقر لتصفح ملفات جهازك</p>
+                        <h3 class="text-2xl font-black mb-2">قم بسحب صورك هنا</h3>
+                        <p class="text-slate-500 font-bold">أو انقر لاختيار الملفات من جهازك</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Queue Area -->
-            <div id="file-queue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Items injected via JS -->
-            </div>
+            <div id="file-queue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-            <div id="action-bar" class="hidden flex flex-wrap justify-center gap-4 mt-12">
-                <button onclick="processAll()" id="btn-process-all" class="btn-neon px-12 py-5 rounded-2xl flex items-center gap-3">
-                    <i data-lucide="zap" class="w-6 h-6"></i>
+            <div id="action-bar" class="hidden flex flex-wrap justify-center gap-6 mt-12">
+                <button onclick="window.processAll()" id="btn-process-all" class="btn-neon px-16 py-6 rounded-3xl flex items-center gap-4 shadow-2xl shadow-brand-green/20">
+                    <i data-lucide="play-circle" class="w-7 h-7"></i>
                     بدء المعالجة
                 </button>
-                <button onclick="downloadAll()" id="btn-download-all" class="hidden btn-outline-neon px-12 py-5 rounded-2xl flex items-center gap-3">
-                    <i data-lucide="download-cloud" class="w-6 h-6"></i>
-                    تحميل كافة الصور الجاهزة
+                <button onclick="window.downloadAll()" id="btn-download-all" class="hidden border-2 border-brand-green text-brand-green px-16 py-6 rounded-3xl flex items-center gap-4 font-black hover:bg-brand-green/10 transition-all">
+                    <i data-lucide="download-cloud" class="w-7 h-7"></i>
+                    تحميل كافة الصور
                 </button>
             </div>
         </section>
 
         <!-- View: Stats -->
-        <section id="view-stats" class="view-content space-y-10">
-            <h2 class="text-3xl font-black flex items-center gap-4">
-                <span class="w-2 h-10 bg-brand-green rounded-full"></span>
-                إحصائيات المنصة
-            </h2>
+        <section id="view-stats" class="view-content space-y-12">
+            <h2 class="text-4xl font-black text-center">أرقام <span class="text-brand-green">المنصة</span></h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="neon-card p-10 rounded-[2.5rem] space-y-4">
-                    <div class="text-brand-green"><i data-lucide="files" class="w-10 h-10"></i></div>
-                    <h4 class="text-slate-500 font-bold">إجمالي الصور المعالجة</h4>
-                    <p class="text-5xl font-black" id="stat-total">0</p>
+                <div class="neon-card p-12 rounded-[3rem] text-center space-y-4">
+                    <div class="w-16 h-16 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto"><i data-lucide="layers" class="w-8 h-8"></i></div>
+                    <p class="text-slate-500 font-bold">إجمالي الصور</p>
+                    <p class="text-6xl font-black" id="stat-total">0</p>
                 </div>
-                <div class="neon-card p-10 rounded-[2.5rem] space-y-4">
-                    <div class="text-brand-green"><i data-lucide="shield-check" class="w-10 h-10"></i></div>
-                    <h4 class="text-slate-500 font-bold">المساحة الموفرة</h4>
-                    <p class="text-5xl font-black" id="stat-saved">0 <span class="text-xl">KB</span></p>
+                <div class="neon-card p-12 rounded-[3rem] text-center space-y-4">
+                    <div class="w-16 h-16 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto"><i data-lucide="zap" class="w-8 h-8"></i></div>
+                    <p class="text-slate-500 font-bold">المساحة الموفرة</p>
+                    <p class="text-6xl font-black" id="stat-saved">0 <span class="text-xl">KB</span></p>
                 </div>
-                <div class="neon-card p-10 rounded-[2.5rem] space-y-4">
-                    <div class="text-brand-green"><i data-lucide="clock" class="w-10 h-10"></i></div>
-                    <h4 class="text-slate-500 font-bold">سرعة المعالجة</h4>
-                    <p class="text-5xl font-black" id="stat-speed">0.4 <span class="text-xl">ث/ص</span></p>
+                <div class="neon-card p-12 rounded-[3rem] text-center space-y-4">
+                    <div class="w-16 h-16 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto"><i data-lucide="activity" class="w-8 h-8"></i></div>
+                    <p class="text-slate-500 font-bold">كفاءة الضغط</p>
+                    <p class="text-6xl font-black text-brand-green">45%</p>
                 </div>
             </div>
         </section>
 
-        <!-- View: Settings (Dashboard) -->
-        <section id="view-settings" class="view-content space-y-8">
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <h2 class="text-3xl font-black flex items-center gap-4">
-                    <span class="w-2 h-10 bg-brand-green rounded-full"></span>
-                    لوحة التحكم والإعدادات
-                </h2>
-                <button onclick="saveSettings()" class="btn-neon px-10 py-4 rounded-xl">حفظ كافة الإعدادات</button>
+        <!-- View: Settings -->
+        <section id="view-settings" class="view-content space-y-12">
+            <div class="flex items-center justify-between gap-6 border-b border-white/5 pb-8">
+                <h2 class="text-3xl font-black">إعدادات <span class="text-brand-green">المدير</span></h2>
+                <div class="flex gap-4">
+                    <button onclick="window.lockDashboard()" class="bg-white/5 text-slate-400 px-6 py-4 rounded-2xl flex items-center gap-2 hover:bg-white/10 transition-all font-bold">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        قفل اللوحة
+                    </button>
+                    <button onclick="window.saveSettings()" class="btn-neon px-8 py-4 rounded-2xl shadow-lg shadow-brand-green/10">حفظ كافة التغييرات</button>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Tracking Pixels -->
-                <div class="neon-card p-8 md:p-12 rounded-[3rem] space-y-8">
-                    <h3 class="text-xl font-black text-brand-green flex items-center gap-3">
-                        <i data-lucide="code" class="w-6 h-6"></i>
-                        أكواد التتبع (Pixels)
-                    </h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <!-- Section: Tracking -->
+                <div class="neon-card p-10 rounded-[3rem] space-y-8">
+                    <h3 class="text-xl font-black flex items-center gap-3 text-brand-green"><i data-lucide="fingerprint"></i> تتبع الزوار (Pixels)</h3>
                     <div class="space-y-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">Facebook Pixel ID</label>
-                            <input type="text" id="fb-pixel" placeholder="مثال: 1234567890" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold">
+                            <label class="text-xs font-bold text-slate-500 px-1">Facebook Pixel</label>
+                            <input type="text" id="fb-pixel" placeholder="ID فقط" class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">TikTok Pixel ID</label>
-                            <input type="text" id="tt-pixel" placeholder="مثال: ABC123XYZ" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold">
+                            <label class="text-xs font-bold text-slate-500 px-1">TikTok Pixel</label>
+                            <input type="text" id="tt-pixel" placeholder="ID فقط" class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">Google Analytics (G-ID)</label>
-                            <input type="text" id="ga-id" placeholder="مثال: G-XXXXXXX" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold">
+                            <label class="text-xs font-bold text-slate-500 px-1">Adsterra Key</label>
+                            <input type="text" id="adsterra-pixel" placeholder="ID أو كود التتبع" class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold">
                         </div>
                     </div>
                 </div>
 
-                <!-- Domain & Technical -->
-                <div class="neon-card p-8 md:p-12 rounded-[3rem] space-y-8">
-                    <h3 class="text-xl font-black text-brand-green flex items-center gap-3">
-                        <i data-lucide="globe" class="w-6 h-6"></i>
-                        إعدادات الدومين والربط
-                    </h3>
+                <!-- Section: Security -->
+                <div class="neon-card p-10 rounded-[3rem] space-y-8">
+                    <h3 class="text-xl font-black flex items-center gap-3 text-brand-green"><i data-lucide="shield-check"></i> الأمان والوصول</h3>
                     <div class="space-y-6">
                         <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">اسم النطاق (Domain)</label>
-                            <input type="text" id="domain-name" placeholder="www.example.com" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
+                            <label class="text-xs font-bold text-slate-500 px-1">كلمة سر لوحة التحكم</label>
+                            <div class="relative">
+                                <input type="password" id="setting-admin-pass" placeholder="اتركها كما هي إذا لم ترغب بالتغيير" class="w-full bg-brand-black/50 border border-white/5 p-5 pl-14 rounded-2xl focus:border-brand-green outline-none transition-all font-bold">
+                                <button type="button" onclick="window.togglePasswordVisibility('setting-admin-pass', 'setting-eye-icon')" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-brand-green p-2 transition-colors">
+                                    <i id="setting-eye-icon" data-lucide="eye" class="w-6 h-6"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Domain & Sheets -->
+                <div class="neon-card p-10 rounded-[3rem] space-y-8 lg:col-span-2">
+                    <h3 class="text-xl font-black flex items-center gap-3 text-brand-green"><i data-lucide="globe"></i> النطاق والربط السحابي</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-slate-500 px-1">الدومين (Domain)</label>
+                            <input type="text" id="domain-name" placeholder="example.com" class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold ltr">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">Name Server 1</label>
-                            <input type="text" id="ns1" placeholder="ns1.provider.com" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">Name Server 2</label>
-                            <input type="text" id="ns2" placeholder="ns2.provider.com" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm font-black text-slate-500 mr-2">رابط Google Sheets للطلبات</label>
-                            <input type="text" id="gsheets" placeholder="https://docs.google.com/spreadsheets/..." class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
+                            <label class="text-xs font-bold text-slate-500 px-1">رابط Google Sheets</label>
+                            <input type="text" id="gsheets" placeholder="https://docs.google.com/..." class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold ltr">
                         </div>
                     </div>
                 </div>
@@ -225,14 +289,12 @@
 
     </main>
 
-    <!-- Global Toast -->
     <div id="toast" class="fixed bottom-10 left-10 z-[100] transform translate-y-20 opacity-0 transition-all duration-500">
         <div class="bg-brand-green text-black px-10 py-5 rounded-2xl shadow-2xl flex items-center gap-4 font-black">
-            <i data-lucide="check-circle" class="w-6 h-6"></i>
+            <i data-lucide="sparkles" class="w-6 h-6"></i>
             <span id="toast-msg">تمت العملية بنجاح</span>
         </div>
     </div>
 
-    <script src="app.js"></script>
 </body>
 </html>
