@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>StorImage Studio | معالجة وضغط الصور</title>
+    <title>StorImage Studio | استوديو معالجة الصور</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -32,9 +32,11 @@
         .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .upload-zone { border: 2px dashed rgba(255,255,255,0.1); transition: all 0.3s ease; }
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
+        .main-preview-box { background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         .hidden { display: none; }
+        .active-thumb { border: 2px solid #3b82f6; transform: scale(1.05); }
     </style>
 </head>
 <body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen">
@@ -47,57 +49,107 @@
                 </div>
                 <h1 class="text-xl font-black">Stor<span class="gradient-text">Image</span></h1>
             </div>
-            <button onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center">
+            <button onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center transition-transform active:scale-90">
                 <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                 <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
             </button>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto px-6 pt-32 pb-24">
-        <header class="text-center mb-12">
-            <h2 class="text-4xl font-black mb-4">استوديو <span class="gradient-text">الصور</span> الذكي</h2>
-            <p class="text-slate-500 font-bold">ارفع صورك، اضغطها، وغير صيغتها بضغطة زر واحدة.</p>
-        </header>
+    <main class="max-w-5xl mx-auto px-6 pt-28 pb-24">
+        
+        <!-- View: Initial Upload -->
+        <section id="upload-view" class="text-center py-12">
+            <header class="mb-12">
+                <h2 class="text-4xl font-black mb-4 tracking-tight">استوديو <span class="gradient-text">الصور</span> الذكي</h2>
+                <p class="text-slate-500 font-bold max-w-lg mx-auto leading-relaxed">أداة احترافية لضغط الصور وتحويل صيغها بجودة عالية وبسرعة فائقة.</p>
+            </header>
 
-        <!-- Drop Zone -->
-        <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone p-12 rounded-[2.5rem] text-center cursor-pointer mb-10 group active:scale-[0.98]">
-            <input type="file" id="file-input" multiple class="hidden" accept="image/*">
-            <div class="w-20 h-20 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <i data-lucide="upload-cloud" class="w-10 h-10"></i>
-            </div>
-            <h3 class="text-2xl font-black mb-2">اضغط هنا أو اسحب الصور</h3>
-            <p class="text-sm opacity-50">JPG, PNG, WebP, GIF - حتى 20 ميجابايت للصور</p>
-        </div>
-
-        <!-- Controls (Visible when files are added) -->
-        <div id="controls-panel" class="hidden bg-brand-card/50 p-8 rounded-[2rem] border border-white/5 mb-8 space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="text-xs font-bold opacity-50 block mb-3 text-right">جودة الضغط: <span id="quality-val" class="text-brand-primary">85%</span></label>
-                    <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-primary">
+            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone p-16 rounded-[3rem] text-center cursor-pointer group active:scale-[0.98]">
+                <input type="file" id="file-input" multiple class="hidden" accept="image/*">
+                <div class="w-24 h-24 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="image-plus" class="w-12 h-12"></i>
                 </div>
-                <div>
-                    <label class="text-xs font-bold opacity-50 block mb-3 text-right">تحويل إلى صيغة</label>
-                    <select id="format-select" class="w-full bg-brand-dark p-3 rounded-xl border border-white/10 outline-none text-sm focus:border-brand-primary transition-colors text-right">
-                        <option value="image/webp">WebP (أفضل ضغط)</option>
-                        <option value="image/jpeg">JPEG (صيغة قياسية)</option>
-                        <option value="image/png">PNG (بدون فقدان جودة)</option>
-                    </select>
+                <h3 class="text-2xl font-black mb-2">اختر الصور أو اسحبها هنا</h3>
+                <p class="text-sm opacity-50">يدعم WebP, JPG, PNG - حتى 20 ميجابايت</p>
+            </div>
+        </section>
+
+        <!-- View: Workspace (Hidden by default) -->
+        <section id="workspace-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left: Main Preview Area -->
+            <div class="lg:col-span-8 space-y-6">
+                <div class="main-preview-box relative bg-brand-card/30 border border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center min-h-[400px] p-4 group">
+                    <div id="active-image-container" class="w-full h-full flex items-center justify-center">
+                        <!-- Big Image Injected Here -->
+                        <img id="main-preview-img" src="" class="max-w-full max-h-[500px] object-contain rounded-2xl shadow-2xl transition-all duration-500">
+                    </div>
+                    
+                    <!-- Overlay Info -->
+                    <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div class="text-right">
+                            <p id="active-name" class="text-sm font-bold text-white truncate max-w-[200px]"></p>
+                            <p id="active-size" class="text-[10px] text-white/60 font-mono"></p>
+                        </div>
+                        <div id="status-badge" class="px-3 py-1 bg-brand-primary/20 text-brand-primary text-[10px] font-black rounded-full uppercase tracking-tighter">جاهز للمعالجة</div>
+                    </div>
+                </div>
+
+                <!-- Thumbnails Strip -->
+                <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 px-2 scroll-smooth no-scrollbar">
+                    <!-- Tiny thumbs injected here -->
                 </div>
             </div>
-            <button id="process-all-btn" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-black shadow-lg transition-all active:scale-95">بدء معالجة الكل</button>
-        </div>
 
-        <!-- Queue -->
-        <div id="files-list" class="space-y-4">
-            <!-- Dynamic Files -->
-        </div>
+            <!-- Right: Controls Area -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-brand-card/50 p-8 rounded-[2rem] border border-white/5 space-y-8 sticky top-28">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <label class="text-xs font-black opacity-50">جودة الضغط</label>
+                            <span id="quality-val" class="text-brand-primary font-black text-sm">85%</span>
+                        </div>
+                        <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-primary">
+                        <div class="flex justify-between mt-2 text-[9px] font-bold opacity-30">
+                            <span>جودة عالية</span>
+                            <span>ضغط أكبر</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="text-xs font-black opacity-50 block mb-3">الصيغة المطلوبة</label>
+                        <select id="format-select" class="w-full bg-brand-dark p-4 rounded-xl border border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-colors text-right cursor-pointer">
+                            <option value="image/webp">WebP (موصى به)</option>
+                            <option value="image/jpeg">JPEG (قياسي)</option>
+                            <option value="image/png">PNG (شفافية)</option>
+                        </select>
+                    </div>
+
+                    <div class="pt-4 space-y-3">
+                        <button id="process-active-btn" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
+                            <i data-lucide="zap" class="w-5 h-5"></i>
+                            معالجة الصورة الحالية
+                        </button>
+                        <button id="process-all-btn" class="w-full bg-white/5 hover:bg-white/10 text-slate-300 py-4 rounded-xl font-bold transition-all active:scale-95 border border-white/5">
+                            معالجة جميع الصور
+                        </button>
+                    </div>
+
+                    <div id="download-zone" class="hidden border-t border-white/5 pt-6 animate-pulse">
+                        <a id="final-download-link" href="#" download class="w-full bg-brand-success text-white py-4 rounded-xl font-black shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
+                            <i data-lucide="download" class="w-5 h-5"></i>
+                            تحميل الملف المعالج
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
 
     </main>
 
-    <footer class="text-center py-10 opacity-30 text-xs font-bold">
-        &copy; 2024 StorImage Studio - نسخة معالجة الصور الاحترافية
+    <footer class="text-center py-12 opacity-30 text-xs font-bold">
+        &copy; 2024 StorImage Studio - تجربة معالجة صور ذكية
     </footer>
 
     <script type="module" src="index.tsx"></script>
