@@ -48,6 +48,11 @@
 
         #auth-modal { display: none; }
         #auth-modal.open { display: flex; }
+
+        /* Custom scrollbar for textareas */
+        textarea::-webkit-scrollbar { width: 5px; }
+        textarea::-webkit-scrollbar-track { background: transparent; }
+        textarea::-webkit-scrollbar-thumb { background: rgba(59, 130, 246, 0.2); border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 selection:bg-brand-primary selection:text-white">
@@ -184,24 +189,49 @@
         <!-- View: Settings -->
         <section id="view-settings" class="view-section space-y-8">
             <div class="flex items-center justify-between">
-                <h2 class="text-3xl font-black">الإعدادات</h2>
+                <h2 class="text-3xl font-black">الإعدادات المتقدمة</h2>
                 <div class="flex gap-4">
                     <button onclick="window.lockDashboard()" class="px-6 py-3 rounded-2xl bg-slate-200 dark:bg-white/5 font-black text-sm transition-all hover:bg-red-500 hover:text-white">قفل</button>
-                    <button onclick="window.saveSettings()" class="px-10 py-3 rounded-2xl bg-brand-primary text-white font-black text-sm shadow-xl">حفظ</button>
+                    <button onclick="window.saveSettings()" class="px-10 py-3 rounded-2xl bg-brand-primary text-white font-black text-sm shadow-xl">حفظ الكل</button>
                 </div>
             </div>
 
-            <div class="glass p-10 rounded-[3rem] space-y-10">
-                <div class="space-y-6">
-                    <h3 class="text-xl font-black flex items-center gap-3"><i data-lucide="link" class="text-brand-primary"></i> التتبع (Pixel)</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <input type="text" id="fb-pixel" placeholder="Facebook Pixel ID" class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none border border-transparent focus:border-brand-primary transition-all font-bold">
-                        <input type="text" id="tt-pixel" placeholder="TikTok Pixel ID" class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none border border-transparent focus:border-brand-primary transition-all font-bold">
+            <div class="space-y-8">
+                <!-- Social & Tracking -->
+                <div class="glass p-10 rounded-[3rem] space-y-10">
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-black flex items-center gap-3"><i data-lucide="link" class="text-brand-primary"></i> التتبع (Pixel)</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <input type="text" id="fb-pixel" placeholder="Facebook Pixel ID" class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none border border-transparent focus:border-brand-primary transition-all font-bold">
+                            <input type="text" id="tt-pixel" placeholder="TikTok Pixel ID" class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none border border-transparent focus:border-brand-primary transition-all font-bold">
+                        </div>
                     </div>
                 </div>
 
-                <div class="space-y-6 pt-6 border-t dark:border-white/10">
-                    <h3 class="text-xl font-black flex items-center gap-3"><i data-lucide="shield" class="text-brand-primary"></i> تغيير الدخول</h3>
+                <!-- Adsterra Section -->
+                <div class="glass p-10 rounded-[3rem] space-y-10 border-2 border-brand-primary/10">
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-black flex items-center gap-3"><i data-lucide="layout-template" class="text-brand-primary"></i> إعلانات Adsterra</h3>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">كود Popunder</label>
+                                <textarea id="ads-popunder" placeholder="ألصق كود Adsterra Popunder هنا..." class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none font-mono text-xs h-28 border border-transparent focus:border-brand-primary transition-all"></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">كود Social Bar</label>
+                                <textarea id="ads-socialbar" placeholder="ألصق كود Adsterra Social Bar هنا..." class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none font-mono text-xs h-28 border border-transparent focus:border-brand-primary transition-all"></textarea>
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 px-2">كود Banner (إعلان ثابت)</label>
+                                <textarea id="ads-banner" placeholder="ألصق كود إعلان البانر هنا..." class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none font-mono text-xs h-28 border border-transparent focus:border-brand-primary transition-all"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="glass p-10 rounded-[3rem] space-y-6">
+                    <h3 class="text-xl font-black flex items-center gap-3"><i data-lucide="shield" class="text-brand-primary"></i> حماية اللوحة</h3>
                     <div class="relative max-w-sm">
                         <input type="password" id="setting-admin-pass" placeholder="كلمة سر جديدة" class="w-full bg-slate-100 dark:bg-black/40 p-5 rounded-2xl outline-none font-bold">
                         <button onclick="window.togglePass('setting-admin-pass')" class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400">

@@ -8,7 +8,7 @@ const AppState = {
     isUnlocked: sessionStorage.getItem('storimage-unlocked') === 'true',
     adminPass: localStorage.getItem('storimage-admin-pass') || '1234',
     stats: JSON.parse(localStorage.getItem('storimage-stats') || '{"total":0,"saved":0}'),
-    settings: JSON.parse(localStorage.getItem('storimage-settings') || '{"fb":"","tt":""}')
+    settings: JSON.parse(localStorage.getItem('storimage-settings') || '{"fb":"","tt":"","adPop":"","adSocial":"","adBanner":""}')
 };
 
 // --- Toast & UI Helpers ---
@@ -169,7 +169,7 @@ function renderQueue() {
                 <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl shadow-xl">
                 ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1.5 rounded-full shadow-lg"><i data-lucide="check" class="w-4 h-4"></i></div>' : ''}
             </div>
-            <div class="flex-grow overflow-hidden">
+            <div class="flex-grow overflow-hidden text-right">
                 <h4 class="text-sm font-black truncate">${f.name}</h4>
                 <p class="text-[10px] text-slate-500 font-black mt-1 uppercase tracking-widest">${(f.size/1024).toFixed(1)} KB • ${f.status === 'done' ? '<span class="text-brand-success font-black">جاهز للتحميل</span>' : f.status === 'processing' ? '<span class="text-brand-primary animate-pulse">جاري المعالجة...</span>' : 'بانتظار البدء'}</p>
                 ${f.status === 'processing' ? '<div class="w-full h-1.5 bg-slate-200 dark:bg-white/5 rounded-full mt-3 overflow-hidden"><div class="h-full bg-brand-primary animate-[shimmer_2s_infinite]" style="width: 60%"></div></div>' : ''}
@@ -243,13 +243,23 @@ function loadSettings() {
     const s = AppState.settings;
     const fb = document.getElementById('fb-pixel') as HTMLInputElement;
     const tt = document.getElementById('tt-pixel') as HTMLInputElement;
+    const adPop = document.getElementById('ads-popunder') as HTMLTextAreaElement;
+    const adSocial = document.getElementById('ads-socialbar') as HTMLTextAreaElement;
+    const adBanner = document.getElementById('ads-banner') as HTMLTextAreaElement;
+
     if(fb) fb.value = s.fb || '';
     if(tt) tt.value = s.tt || '';
+    if(adPop) adPop.value = s.adPop || '';
+    if(adSocial) adSocial.value = s.adSocial || '';
+    if(adBanner) adBanner.value = s.adBanner || '';
 }
 
 (window as any).saveSettings = () => {
     const fbInput = document.getElementById('fb-pixel') as HTMLInputElement;
     const ttInput = document.getElementById('tt-pixel') as HTMLInputElement;
+    const adPopInput = document.getElementById('ads-popunder') as HTMLTextAreaElement;
+    const adSocialInput = document.getElementById('ads-socialbar') as HTMLTextAreaElement;
+    const adBannerInput = document.getElementById('ads-banner') as HTMLTextAreaElement;
     const passInput = document.getElementById('setting-admin-pass') as HTMLInputElement;
 
     if(passInput.value.trim()) {
@@ -257,9 +267,15 @@ function loadSettings() {
         localStorage.setItem('storimage-admin-pass', AppState.adminPass);
     }
     
-    AppState.settings = { fb: fbInput.value, tt: ttInput.value };
+    AppState.settings = { 
+        fb: fbInput.value, 
+        tt: ttInput.value,
+        adPop: adPopInput.value,
+        adSocial: adSocialInput.value,
+        adBanner: adBannerInput.value
+    };
     localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
-    showToast('تم الحفظ');
+    showToast('تم حفظ جميع الإعدادات');
 };
 
 function updateStatsUI() {
