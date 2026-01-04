@@ -19,6 +19,7 @@
                         brand: {
                             primary: '#2563eb',
                             success: '#10b981',
+                            dark: '#0f172a'
                         }
                     }
                 }
@@ -39,41 +40,37 @@
         #modal-auth { display: none; }
         #modal-auth.open { display: flex; }
 
-        /* حاوية الإعلانات السفلية فقط */
-        .ads-bottom-container {
-            margin-top: 60px;
-            padding: 20px;
+        /* منطقة الإعلانات السفلية حصراً */
+        .ads-footer-container {
+            margin-top: 80px;
+            padding: 40px 20px;
             text-align: center;
             border-top: 1px solid rgba(255,255,255,0.05);
-            background: rgba(0,0,0,0.1);
+            background: rgba(0,0,0,0.2);
             width: 100%;
         }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-10">
+<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
 
-    <!-- Header Navbar -->
+    <!-- Header -->
     <nav class="fixed top-0 left-0 right-0 z-50 glass border-b dark:border-white/5 px-6 py-4">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="window.switchView('upload')">
                 <div class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
                     <i data-lucide="image" class="w-6 h-6"></i>
                 </div>
-                <h1 class="text-xl font-black">Stor<span class="text-brand-primary">Image</span></h1>
+                <h1 class="text-xl font-black italic">Stor<span class="text-brand-primary">Image</span></h1>
             </div>
             
-            <div class="hidden md:flex items-center gap-8 font-bold text-sm">
-                <button onclick="window.switchView('upload')" class="hover:text-brand-primary transition-colors">التحويل</button>
-                <button onclick="window.switchView('stats')" class="hover:text-brand-primary transition-colors">الإحصائيات</button>
-            </div>
-
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-4">
+                <button onclick="window.switchView('stats')" class="text-sm font-bold hover:text-brand-primary transition-colors hidden md:block">الإحصائيات</button>
                 <button onclick="window.toggleTheme()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-white/5 text-slate-600 dark:text-slate-400">
                     <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                     <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
                 </button>
                 <button onclick="window.openAuth()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-white/5 text-slate-600 dark:text-slate-400">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <i data-lucide="shield-check" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
@@ -83,14 +80,15 @@
         <!-- View: Upload -->
         <section id="view-upload" class="view-section active space-y-8">
             <div class="text-center space-y-4">
-                <h2 class="text-4xl font-black">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
-                <p class="text-slate-500 font-bold">أفضل أداة لضغط وتحويل الصور مجاناً وبدون إعلانات منبثقة.</p>
+                <h2 class="text-4xl font-black">حوّل صورك <span class="text-brand-primary">بذكاء</span></h2>
+                <p class="text-slate-500 font-bold">أداة احترافية لتحويل وضغط الصور مجاناً وبأعلى دقة.</p>
             </div>
 
-            <div class="glass p-6 md:p-8 rounded-[2rem] flex flex-wrap items-center justify-between gap-6">
+            <!-- Image Settings -->
+            <div class="glass p-6 rounded-[2rem] flex flex-wrap items-center justify-between gap-6">
                 <div class="flex flex-wrap items-center gap-6">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase text-slate-400">الصيغة</label>
+                        <label class="text-[10px] font-black uppercase text-slate-400">الصيغة المطلوبة</label>
                         <select id="export-format" class="block bg-slate-100 dark:bg-slate-800 p-3 rounded-xl outline-none font-bold">
                             <option value="webp">WebP</option>
                             <option value="png">PNG</option>
@@ -98,73 +96,81 @@
                         </select>
                     </div>
                     <div class="space-y-2 min-w-[200px]">
-                        <label class="text-[10px] font-black uppercase text-slate-400 flex justify-between">الجودة <span id="quality-val" class="text-brand-primary">85%</span></label>
+                        <label class="text-[10px] font-black uppercase text-slate-400 flex justify-between">نسبة الضغط <span id="quality-val" class="text-brand-primary">85%</span></label>
                         <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full accent-brand-primary">
                     </div>
                 </div>
-                <button onclick="window.clearQueue()" class="text-red-500 font-black text-sm px-6 py-3 rounded-xl hover:bg-red-500/10 transition-all">مسح القائمة</button>
+                <button onclick="window.clearQueue()" class="text-red-500 font-black text-sm px-6 py-3 rounded-xl hover:bg-red-500/10 transition-all">مسح الصور</button>
             </div>
 
+            <!-- Drag & Drop -->
             <div id="drop-area" class="drop-zone glass rounded-[3rem] p-16 text-center cursor-pointer relative">
                 <input type="file" id="file-input" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
                 <div class="space-y-4">
                     <div class="w-20 h-20 bg-brand-primary/10 text-brand-primary rounded-full flex items-center justify-center mx-auto">
                         <i data-lucide="upload-cloud" class="w-10 h-10"></i>
                     </div>
-                    <h3 class="text-2xl font-black">اسحب الصور هنا</h3>
-                    <p class="text-slate-500 font-bold">أو اضغط لاختيار الملفات من جهازك</p>
+                    <h3 class="text-2xl font-black">اسحب وأفلت الصور هنا</h3>
+                    <p class="text-slate-500 font-bold">أو انقر لاختيار ملفات من جهازك</p>
                 </div>
             </div>
 
+            <!-- File List -->
             <div id="file-queue" class="space-y-4"></div>
 
-            <div id="action-bar" class="hidden text-center py-6">
-                <button onclick="window.processAll()" id="btn-process-all" class="bg-brand-primary text-white px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">بدء المعالجة الآن</button>
-                <button onclick="window.downloadAll()" id="btn-download-all" class="hidden bg-brand-success text-white px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">تحميل كل الصور</button>
+            <!-- Actions -->
+            <div id="action-bar" class="hidden text-center py-10">
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="window.processAll()" id="btn-process-all" class="bg-brand-primary text-white px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">معالجة الصور الآن</button>
+                    <button onclick="window.downloadAll()" id="btn-download-all" class="hidden bg-brand-success text-white px-12 py-5 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">تحميل كافة الصور</button>
+                </div>
             </div>
         </section>
 
         <!-- View: Stats -->
         <section id="view-stats" class="view-section space-y-10">
-            <h2 class="text-3xl font-black text-center">أداؤك مع StorImage</h2>
+            <h2 class="text-3xl font-black text-center">إحصائياتك الشخصية</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass p-10 rounded-[2.5rem] text-center space-y-4">
-                    <p class="text-slate-500 font-black text-xs uppercase tracking-widest">إجمالي الصور</p>
-                    <p id="stat-total" class="text-6xl font-black">0</p>
+                <div class="glass p-10 rounded-[2.5rem] text-center space-y-4 border-b-4 border-brand-primary">
+                    <p class="text-slate-500 font-black text-xs uppercase tracking-tighter">إجمالي المعالجات</p>
+                    <p id="stat-total" class="text-6xl font-black tracking-tighter">0</p>
                 </div>
-                <div class="glass p-10 rounded-[2.5rem] text-center space-y-4">
-                    <p class="text-slate-500 font-black text-xs uppercase tracking-widest">المساحة الموفرة</p>
-                    <p id="stat-saved" class="text-6xl font-black text-brand-success">0 <span class="text-xl">KB</span></p>
+                <div class="glass p-10 rounded-[2.5rem] text-center space-y-4 border-b-4 border-brand-success">
+                    <p class="text-slate-500 font-black text-xs uppercase tracking-tighter">المساحة الموفرة</p>
+                    <p id="stat-saved" class="text-6xl font-black text-brand-success tracking-tighter">0 <span class="text-xl font-bold">KB</span></p>
                 </div>
+            </div>
+            <div class="text-center">
+                <button onclick="window.switchView('upload')" class="bg-slate-200 dark:bg-white/5 px-8 py-3 rounded-xl font-bold">العودة للتحويل</button>
             </div>
         </section>
     </main>
 
-    <!-- Footer Ads Zone (المنطقة الوحيدة للإعلانات) -->
-    <footer class="ads-bottom-container">
-        <p class="text-[10px] text-slate-500 font-black mb-4 uppercase tracking-[0.3em]">إعلانات مدعومة - أسفل الموقع</p>
-        <div id="ads-injection-container" class="min-h-[100px] flex items-center justify-center overflow-hidden">
-            <!-- سيتم حقن كود Adsterra هنا فقط -->
+    <!-- Adsterra Ads Container (Bottom Only) -->
+    <footer class="ads-footer-container">
+        <div class="max-w-4xl mx-auto">
+            <p class="text-[10px] text-slate-500 font-black mb-4 uppercase tracking-[0.4em]">مساحة إعلانية مدعومة</p>
+            <div id="ads-injection-container" class="min-h-[120px] flex items-center justify-center overflow-hidden bg-white/5 rounded-2xl border border-white/5">
+                <!-- Adsterra script goes here -->
+                <span class="text-slate-600 text-xs italic">سيظهر الإعلان هنا عند تفعيل الكود</span>
+            </div>
+            <p class="mt-8 text-[10px] text-slate-600 font-medium">© 2024 StorImage - جميع الحقوق محفوظة</p>
         </div>
     </footer>
 
-    <!-- Modal: Auth/Settings -->
-    <div id="modal-auth" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl items-center justify-center p-6">
+    <!-- Auth Modal -->
+    <div id="modal-auth" class="fixed inset-0 z-[100] bg-black/80 backdrop-blur-xl items-center justify-center p-6">
         <div class="glass p-8 md:p-12 rounded-[3rem] w-full max-w-xl space-y-8 border border-white/10">
             <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-black">إعدادات الإعلانات والبيكسل</h3>
-                <button onclick="window.closeAuth()" class="p-2"><i data-lucide="x"></i></button>
+                <h3 class="text-2xl font-black">إعدادات الإعلانات</h3>
+                <button onclick="window.closeAuth()" class="p-2 hover:bg-white/5 rounded-full"><i data-lucide="x"></i></button>
             </div>
             <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="pixel-fb" placeholder="Facebook Pixel ID" class="w-full bg-white/5 p-4 rounded-xl outline-none font-bold border border-white/5 focus:border-brand-primary">
-                    <input type="text" id="pixel-tt" placeholder="TikTok Pixel ID" class="w-full bg-white/5 p-4 rounded-xl outline-none font-bold border border-white/5 focus:border-brand-primary">
-                </div>
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400 px-1">كود الإعلانات (Adsterra / Social Bar)</label>
-                    <textarea id="ad-scripts" placeholder="ضع كود السكربت هنا... سيظهر في أسفل الصفحة فقط." class="w-full bg-black/40 p-5 rounded-2xl outline-none h-40 font-mono text-xs border border-white/5 focus:border-brand-primary"></textarea>
+                    <label class="text-[10px] font-black uppercase text-slate-400 px-1">كود Adsterra / الإعلانات السفلية</label>
+                    <textarea id="ad-scripts" placeholder="الصق كود السكربت هنا... سيظهر حصراً في أسفل الموقع." class="w-full bg-black/40 p-5 rounded-2xl outline-none h-48 font-mono text-xs border border-white/5 focus:border-brand-primary text-slate-300"></textarea>
                 </div>
-                <button onclick="window.saveAdminSettings()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg">حفظ التغييرات</button>
+                <button onclick="window.saveAdminSettings()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg hover:brightness-110 transition-all">حفظ وتحديث الإعلانات</button>
             </div>
         </div>
     </div>
@@ -172,8 +178,8 @@
     <!-- Toast -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transform translate-y-32 opacity-0 transition-all duration-500">
         <div class="bg-brand-primary text-white px-10 py-4 rounded-2xl shadow-2xl font-black flex items-center gap-3">
-            <i data-lucide="check-circle"></i>
-            <span id="toast-msg">تم بنجاح</span>
+            <i data-lucide="bell"></i>
+            <span id="toast-msg">تمت العملية</span>
         </div>
     </div>
 

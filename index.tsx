@@ -7,9 +7,7 @@ const AppState = {
     files: [] as any[],
     stats: JSON.parse(localStorage.getItem('storimage-stats') || '{"total":0,"saved":0}'),
     settings: JSON.parse(localStorage.getItem('storimage-settings') || JSON.stringify({
-        fb: '',
-        tt: '',
-        scripts: '<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>'
+        scripts: '<script type="text/javascript">\natOptions = {\n\t\'key\' : \'15385b7c751e6c7d59d59fb7f34e2934\',\n\t\'format\' : \'iframe\',\n\t\'height\' : 90,\n\t\'width\' : 728,\n\t\'params\' : {}\n};\n</script>\n<script type="text/javascript" src="//www.highperformanceformat.com/15385b7c751e6c7d59d59fb7f34e2934/invoke.js"></script>'
     }))
 };
 
@@ -61,18 +59,19 @@ const injectAds = () => {
             const range = document.createRange();
             const fragment = range.createContextualFragment(AppState.settings.scripts);
             container.appendChild(fragment);
-            console.log("Ads injected into footer only.");
+            console.log("Adsterra scripts injected into footer container.");
         } catch (e) {
             console.error("Ad injection error:", e);
         }
     }
 };
 
-// --- Image Logic ---
+// --- Image Processing Logic ---
 function setupDropZone() {
     const area = document.getElementById('drop-area');
     const input = document.getElementById('file-input') as HTMLInputElement;
     if(!area || !input) return;
+    
     input.addEventListener('change', (e: any) => handleFiles(e.target.files));
     area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('active'); });
     area.addEventListener('dragleave', () => area.classList.remove('active'));
@@ -120,23 +119,23 @@ function renderQueue() {
     document.getElementById('btn-process-all')?.classList.toggle('hidden', !hasIdle);
 
     queue.innerHTML = AppState.files.map(f => `
-        <div class="glass p-5 rounded-3xl flex items-center gap-5 transition-all hover:bg-white/5">
+        <div class="glass p-5 rounded-3xl flex items-center gap-5 transition-all hover:bg-white/5 border border-white/5">
             <div class="relative w-16 h-16 shrink-0">
                 <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl">
                 ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
             </div>
-            <div class="flex-grow overflow-hidden">
+            <div class="flex-grow overflow-hidden text-right">
                 <h4 class="text-xs font-black truncate">${f.name}</h4>
-                <p class="text-[9px] text-slate-500 font-black mt-1 uppercase">${(f.size/1024).toFixed(1)} KB</p>
+                <p class="text-[9px] text-slate-500 font-bold mt-1 uppercase">${(f.size/1024).toFixed(1)} KB</p>
             </div>
             <div class="flex items-center gap-2">
                 ${f.status === 'idle' ? 
-                    `<button onclick="window.processOne('${f.id}')" class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="zap" class="w-5 h-5"></i></button>` :
+                    `<button onclick="window.processOne('${f.id}')" class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-4 h-4"></i></button>` :
                     f.status === 'processing' ?
-                    `<div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader" class="w-5 h-5"></i></div>` :
-                    `<button onclick="window.downloadOne('${f.id}')" class="w-10 h-10 bg-brand-success text-white rounded-xl flex items-center justify-center hover:scale-110 shadow-lg"><i data-lucide="download" class="w-5 h-5"></i></button>`
+                    `<div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader" class="w-4 h-4"></i></div>` :
+                    `<button onclick="window.downloadOne('${f.id}')" class="w-10 h-10 bg-brand-success text-white rounded-xl flex items-center justify-center hover:scale-110 shadow-lg"><i data-lucide="download" class="w-4 h-4"></i></button>`
                 }
-                <button onclick="window.removeFile('${f.id}')" class="w-10 h-10 text-slate-400 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                <button onclick="window.removeFile('${f.id}')" class="w-10 h-10 text-slate-500 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
             </div>
         </div>
     `).join('');
@@ -155,7 +154,7 @@ function renderQueue() {
         AppState.stats.saved += Math.floor(f.size * (1 - qual));
         localStorage.setItem('storimage-stats', JSON.stringify(AppState.stats));
         renderQueue();
-    }, 1000);
+    }, 800);
 };
 
 (window as any).processAll = () => AppState.files.forEach(f => { if(f.status === 'idle') (window as any).processOne(f.id); });
@@ -174,20 +173,18 @@ function renderQueue() {
 
 (window as any).downloadAll = () => {
     const ready = AppState.files.filter(f => f.status === 'done');
-    ready.forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 350));
-    showToast('جاري التحميل...');
+    ready.forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 300));
+    showToast('جاري بدء التحميل...');
 };
 
 (window as any).removeFile = (id: string) => { AppState.files = AppState.files.filter(f => f.id !== id); renderQueue(); };
-(window as any).clearQueue = () => { AppState.files = []; renderQueue(); showToast('تم مسح القائمة'); };
+(window as any).clearQueue = () => { AppState.files = []; renderQueue(); showToast('تم تنظيف القائمة'); };
 
-// --- Admin ---
+// --- Admin & Settings ---
 (window as any).openAuth = () => {
     const pass = prompt('كلمة السر (1234):');
     if (pass === '1234') {
         document.getElementById('modal-auth')?.classList.add('open');
-        (document.getElementById('pixel-fb') as HTMLInputElement).value = AppState.settings.fb;
-        (document.getElementById('pixel-tt') as HTMLInputElement).value = AppState.settings.tt;
         (document.getElementById('ad-scripts') as HTMLTextAreaElement).value = AppState.settings.scripts;
     }
 };
@@ -195,14 +192,11 @@ function renderQueue() {
 (window as any).closeAuth = () => document.getElementById('modal-auth')?.classList.remove('open');
 
 (window as any).saveAdminSettings = () => {
-    const fb = (document.getElementById('pixel-fb') as HTMLInputElement).value;
-    const tt = (document.getElementById('pixel-tt') as HTMLInputElement).value;
     const scripts = (document.getElementById('ad-scripts') as HTMLTextAreaElement).value;
-    
-    AppState.settings = { fb, tt, scripts };
+    AppState.settings.scripts = scripts;
     localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
     injectAds();
-    showToast('تم الحفظ');
+    showToast('تم حفظ إعدادات الإعلانات');
     (window as any).closeAuth();
 };
 
@@ -210,7 +204,7 @@ const updateStatsUI = () => {
     const t = document.getElementById('stat-total');
     const s = document.getElementById('stat-saved');
     if(t) (t as HTMLElement).innerText = AppState.stats.total;
-    if(s) (s as HTMLElement).innerHTML = `${(AppState.stats.saved / 1024).toFixed(1)} <span class="text-xl">KB</span>`;
+    if(s) (s as HTMLElement).innerHTML = `${(AppState.stats.saved / 1024).toFixed(1)} <span class="text-xl font-bold">KB</span>`;
 };
 
 const showToast = (msg: string) => {
