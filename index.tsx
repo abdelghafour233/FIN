@@ -1,211 +1,221 @@
 export {};
 
-// --- App State (RESTORED ALL FIELDS) ---
+// --- Types ---
+interface ImageFile {
+    id: string;
+    file: File;
+    name: string;
+    originalSize: number;
+    processedSize: number | null;
+    preview: string;
+    processedUrl: string | null;
+    status: 'idle' | 'processing' | 'done' | 'error';
+}
+
+// --- Global State ---
 const AppState = {
-    theme: localStorage.getItem('storimage-theme') || 'dark',
-    files: [] as any[],
-    settings: JSON.parse(localStorage.getItem('storimage-adv-settings') || JSON.stringify({
-        fb: '',
-        tt: '',
-        ga: '',
-        sheets: '',
-        domain: '',
-        ads: `<script type="text/javascript">
-	atOptions = {
-		'key' : '15385b7c751e6c7d59d59fb7f34e2934',
-		'format' : 'iframe',
-		'height' : 90,
-		'width' : 728,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//www.highperformanceformat.com/15385b7c751e6c7d59d59fb7f34e2934/invoke.js"></script>`
-    }))
+    view: 'upload',
+    theme: localStorage.getItem('storimage_theme') || 'dark',
+    files: [] as ImageFile[],
+    stats: JSON.parse(localStorage.getItem('storimage_stats') || '{"total":0, "saved":0}'),
+    settings: JSON.parse(localStorage.getItem('storimage_settings') || '{"fb":"","tt":""}')
 };
 
-// --- Core Initialization ---
-document.addEventListener('DOMContentLoaded', () => {
-    applyTheme();
-    setupDropZone();
-    loadSettingsIntoUI();
-    injectAds();
-    initLucide();
-    
-    const slider = document.getElementById('quality-slider') as HTMLInputElement;
-    const qVal = document.getElementById('quality-val');
-    if(slider && qVal) {
-        slider.addEventListener('input', (e: any) => {
-            qVal.innerText = e.target.value + '%';
-        });
-    }
-});
-
-const initLucide = () => { if ((window as any).lucide) (window as any).lucide.createIcons(); };
+// --- Core Functions ---
 
 const applyTheme = () => {
     const html = document.documentElement;
-    AppState.theme === 'dark' ? html.classList.add('dark') : html.classList.remove('dark');
+    if (AppState.theme === 'dark') {
+        html.classList.add('dark');
+    } else {
+        html.classList.remove('dark');
+    }
 };
 
-(window as any).toggleTheme = () => {
+const toggleTheme = () => {
     AppState.theme = AppState.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('storimage-theme', AppState.theme);
+    localStorage.setItem('storimage_theme', AppState.theme);
     applyTheme();
+    initLucide();
 };
 
-// --- Settings Management (RESTORED) ---
-(window as any).openSettings = () => {
-    const pass = prompt('كلمة السر (1234):');
-    if (pass === '1234') {
-        document.getElementById('modal-settings')?.classList.add('open');
-        loadSettingsIntoUI();
-    } else if (pass !== null) {
-        alert('كلمة سر خاطئة');
-    }
-};
+const switchView = (viewId: string) => {
+    AppState.view = viewId;
+    document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.add('hidden');
+    });
+    const target = document.getElementById(`view-${viewId}`);
+    if (target) target.classList.remove('hidden');
 
-(window as any).closeSettings = () => document.getElementById('modal-settings')?.classList.remove('open');
-
-function loadSettingsIntoUI() {
-    const s = AppState.settings;
-    (document.getElementById('set-fb') as HTMLInputElement).value = s.fb;
-    (document.getElementById('set-tt') as HTMLInputElement).value = s.tt;
-    (document.getElementById('set-ga') as HTMLInputElement).value = s.ga;
-    (document.getElementById('set-sheets') as HTMLInputElement).value = s.sheets;
-    (document.getElementById('set-domain') as HTMLInputElement).value = s.domain;
-    (document.getElementById('set-ads') as HTMLTextAreaElement).value = s.ads;
-}
-
-(window as any).saveAllSettings = () => {
-    AppState.settings = {
-        fb: (document.getElementById('set-fb') as HTMLInputElement).value,
-        tt: (document.getElementById('set-tt') as HTMLInputElement).value,
-        ga: (document.getElementById('set-ga') as HTMLInputElement).value,
-        sheets: (document.getElementById('set-sheets') as HTMLInputElement).value,
-        domain: (document.getElementById('set-domain') as HTMLInputElement).value,
-        ads: (document.getElementById('set-ads') as HTMLTextAreaElement).value,
-    };
-    localStorage.setItem('storimage-adv-settings', JSON.stringify(AppState.settings));
-    injectAds();
-    showToast('تم حفظ كافة الإعدادات بنجاح');
-    (window as any).closeSettings();
-};
-
-// --- Ads Injection (FOOTER ONLY) ---
-function injectAds() {
-    const container = document.getElementById('ad-slot-footer');
-    if (container && AppState.settings.ads.trim() !== "") {
-        container.innerHTML = '';
-        try {
-            const range = document.createRange();
-            const fragment = range.createContextualFragment(AppState.settings.ads);
-            container.appendChild(fragment);
-            console.log("Ads injected into footer only.");
-        } catch (e) {
-            console.error("Ad injection failed", e);
+    if (viewId === 'stats') updateStatsUI();
+    
+    // Update active state on nav buttons
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-brand-primary', 'bg-brand-primary/10');
+        if (btn.getAttribute('onclick')?.includes(viewId)) {
+            btn.classList.add('text-brand-primary', 'bg-brand-primary/10');
         }
-    }
-}
+    });
+    initLucide();
+};
 
-// --- Image Logic ---
-function setupDropZone() {
-    const input = document.getElementById('file-input') as HTMLInputElement;
-    if (input) {
-        input.addEventListener('change', (e: any) => handleFiles(e.target.files));
-    }
-}
+const updateStatsUI = () => {
+    const totalEl = document.getElementById('stat-total');
+    const savedEl = document.getElementById('stat-saved');
+    if (totalEl) totalEl.innerText = AppState.stats.total.toString();
+    if (savedEl) savedEl.innerHTML = `${(AppState.stats.saved / 1024).toFixed(1)} <span class="text-xl">KB</span>`;
+};
 
-function handleFiles(files: FileList) {
-    for (const file of files) {
-        if (!file.type.startsWith('image/')) continue;
-        AppState.files.push({
-            id: Math.random().toString(36).substr(2, 9),
-            name: file.name,
-            originalName: file.name.split('.').slice(0, -1).join('.'),
-            size: file.size,
-            preview: URL.createObjectURL(file),
-            status: 'idle'
-        });
+// --- Image Processing Logic ---
+
+const processImage = async (id: string) => {
+    const f = AppState.files.find(x => x.id === id);
+    if (!f || f.status === 'processing') return;
+
+    f.status = 'processing';
+    renderQueue();
+
+    try {
+        const quality = parseInt((document.getElementById('quality-slider') as HTMLInputElement).value) / 100;
+        const format = (document.getElementById('export-format') as HTMLSelectElement).value;
+        const filters = {
+            b: (document.getElementById('bright-slider') as HTMLInputElement).value,
+            c: (document.getElementById('contrast-slider') as HTMLInputElement).value,
+            s: (document.getElementById('saturate-slider') as HTMLInputElement).value,
+        };
+
+        const result = await compress(f.preview, quality, format, filters);
+        
+        f.processedUrl = result.url;
+        f.processedSize = result.size;
+        f.status = 'done';
+
+        AppState.stats.total++;
+        const saved = f.originalSize - result.size;
+        if (saved > 0) AppState.stats.saved += saved;
+        localStorage.setItem('storimage_stats', JSON.stringify(AppState.stats));
+    } catch (e) {
+        f.status = 'error';
     }
     renderQueue();
-}
+};
 
-function renderQueue() {
-    const queue = document.getElementById('file-queue');
-    const bar = document.getElementById('action-bar');
-    if (!queue || !bar) return;
+const compress = (src: string, quality: number, format: string, filters: any): Promise<{url: string, size: number}> => {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.src = src;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d')!;
+            ctx.filter = `brightness(${filters.b}%) contrast(${filters.c}%) saturate(${filters.s}%)`;
+            ctx.drawImage(img, 0, 0);
+            canvas.toBlob((blob) => {
+                resolve({
+                    url: URL.createObjectURL(blob!),
+                    size: blob!.size
+                });
+            }, format, quality);
+        };
+    });
+};
+
+const renderQueue = () => {
+    const container = document.getElementById('file-queue');
+    const controls = document.getElementById('studio-controls');
+    if (!container || !controls) return;
 
     if (AppState.files.length === 0) {
-        queue.innerHTML = '';
-        bar.classList.add('hidden');
+        container.innerHTML = '';
+        controls.classList.add('hidden');
         return;
     }
 
-    bar.classList.remove('hidden');
-    const hasDone = AppState.files.some(f => f.status === 'done');
-    const hasIdle = AppState.files.some(f => f.status === 'idle');
-    
-    document.getElementById('btn-download-all')?.classList.toggle('hidden', !hasDone);
-    document.getElementById('btn-process-all')?.classList.toggle('hidden', !hasIdle);
-
-    queue.innerHTML = AppState.files.map(f => `
-        <div class="glass p-5 rounded-3xl flex items-center justify-between gap-4 border border-white/5 hover:border-brand-primary/20 transition-all">
-            <div class="flex items-center gap-4 truncate">
-                <div class="relative w-14 h-14 shrink-0">
-                    <img src="${f.preview}" class="w-full h-full object-cover rounded-xl shadow-lg">
-                    ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
-                </div>
-                <div class="truncate text-right">
-                    <p class="text-xs font-black truncate">${f.name}</p>
-                    <p class="text-[9px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">${(f.size/1024).toFixed(1)} KB</p>
+    controls.classList.remove('hidden');
+    container.innerHTML = AppState.files.map(f => `
+        <div class="glass p-5 rounded-[2rem] flex items-center justify-between gap-4 border border-white/5">
+            <div class="flex items-center gap-4">
+                <img src="${f.status === 'done' ? f.processedUrl : f.preview}" class="w-16 h-16 object-cover rounded-2xl shadow-lg">
+                <div class="text-right">
+                    <p class="text-sm font-black truncate w-32">${f.name}</p>
+                    <p class="text-[10px] opacity-50 font-bold uppercase mt-1">
+                        ${(f.originalSize/1024).toFixed(1)} KB 
+                        ${f.processedSize ? ` ➜ <span class="text-brand-primary">${(f.processedSize/1024).toFixed(1)} KB</span>` : ''}
+                    </p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 ${f.status === 'idle' ? 
-                    `<button onclick="window.processOne('${f.id}')" class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-4 h-4"></i></button>` :
+                    `<button onclick="window.processImage('${f.id}')" class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="zap" class="w-5 h-5"></i></button>` :
                     f.status === 'processing' ?
-                    `<div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader" class="w-4 h-4"></i></div>` :
-                    `<button onclick="window.downloadOne('${f.id}')" class="w-10 h-10 bg-brand-success text-white rounded-xl flex items-center justify-center hover:scale-110 shadow-xl transition-all"><i data-lucide="download" class="w-4 h-4"></i></button>`
+                    `<div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader-2" class="w-5 h-5"></i></div>` :
+                    `<a href="${f.processedUrl}" download="processed_${f.name}" class="w-10 h-10 bg-brand-success/10 text-brand-success rounded-xl flex items-center justify-center hover:bg-brand-success hover:text-white transition-all"><i data-lucide="download" class="w-5 h-5"></i></a>`
                 }
-                <button onclick="window.removeFile('${f.id}')" class="w-10 h-10 text-slate-500 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                <button onclick="window.removeFile('${f.id}')" class="w-10 h-10 text-slate-500 hover:text-red-500"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
             </div>
         </div>
     `).join('');
     initLucide();
-}
+};
 
-(window as any).processOne = (id: string) => {
-    const f = AppState.files.find(x => x.id === id);
-    if (!f) return;
-    f.status = 'processing';
+const initLucide = () => {
+    if ((window as any).lucide) (window as any).lucide.createIcons();
+};
+
+// --- Attach to Window (CRITICAL) ---
+(window as any).switchView = switchView;
+(window as any).toggleTheme = toggleTheme;
+(window as any).processImage = processImage;
+(window as any).processAll = () => AppState.files.forEach(f => processImage(f.id));
+(window as any).removeFile = (id: string) => {
+    AppState.files = AppState.files.filter(f => f.id !== id);
     renderQueue();
-    setTimeout(() => {
-        f.status = 'done';
-        renderQueue();
-    }, 800);
+};
+(window as any).clearQueue = () => {
+    AppState.files = [];
+    renderQueue();
+};
+(window as any).saveSettings = (e: Event) => {
+    e.preventDefault();
+    const formData = new FormData(e.target as HTMLFormElement);
+    AppState.settings = { fb: formData.get('fb'), tt: formData.get('tt') };
+    localStorage.setItem('storimage_settings', JSON.stringify(AppState.settings));
+    alert('تم الحفظ ✅');
 };
 
-(window as any).processAll = () => AppState.files.forEach(f => f.status === 'idle' && (window as any).processOne(f.id));
+// --- Init on Load ---
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    if (fileInput) {
+        fileInput.onchange = (e: any) => {
+            const incoming = e.target.files;
+            if (incoming) {
+                for (const file of Array.from(incoming as FileList)) {
+                    AppState.files.push({
+                        id: Math.random().toString(36).substr(2, 9),
+                        file, name: file.name, originalSize: file.size,
+                        processedSize: null, preview: URL.createObjectURL(file),
+                        processedUrl: null, status: 'idle'
+                    });
+                }
+                renderQueue();
+            }
+        };
+    }
 
-(window as any).downloadOne = (id: string) => {
-    const f = AppState.files.find(x => x.id === id);
-    if (!f || f.status !== 'done') return;
-    const format = (document.getElementById('export-format') as HTMLSelectElement).value;
-    const a = document.createElement('a');
-    a.href = f.preview;
-    a.download = `${f.originalName}_storimage.${format}`;
-    a.click();
-};
+    // Sliders Listeners
+    ['quality', 'bright', 'contrast', 'saturate'].forEach(id => {
+        const slider = document.getElementById(`${id}-slider`) as HTMLInputElement;
+        const val = document.getElementById(`${id}-val`);
+        if (slider && val) {
+            slider.addEventListener('input', (e: any) => {
+                val.innerText = e.target.value + (id === 'quality' ? '%' : '%');
+            });
+        }
+    });
 
-(window as any).downloadAll = () => AppState.files.filter(f => f.status === 'done').forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 300));
-(window as any).removeFile = (id: string) => { AppState.files = AppState.files.filter(f => f.id !== id); renderQueue(); };
-(window as any).clearQueue = () => { AppState.files = []; renderQueue(); };
-
-const showToast = (msg: string) => {
-    const t = document.getElementById('toast');
-    const m = document.getElementById('toast-msg');
-    if (!t || !m) return;
-    m.innerText = msg;
-    t.classList.remove('translate-y-32', 'opacity-0');
-    setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
-};
+    initLucide();
+    console.log('StorImage Studio Ready');
+});

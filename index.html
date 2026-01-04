@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>StorImage Pro | معالجة الصور المتكاملة</title>
+    <title>StorImage Studio | معالجة الصور</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,167 +13,161 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Cairo', 'sans-serif'] },
-                    colors: { brand: { primary: '#2563eb', success: '#10b981', accent: '#f59e0b' } }
+                    colors: { 
+                        brand: { 
+                            primary: '#3b82f6', 
+                            accent: '#8b5cf6',
+                            success: '#10b981',
+                            dark: '#020617' 
+                        } 
+                    }
                 }
             }
         }
     </script>
     <style>
-        body { font-family: 'Cairo', sans-serif; overflow-x: hidden; }
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        .light .glass { background: rgba(255, 255, 255, 0.8); border: 1px solid rgba(0, 0, 0, 0.05); }
-        .view-section { display: none; }
-        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-        
-        #modal-settings { display: none; }
-        #modal-settings.open { display: flex; }
-
-        /* منطقة الإعلانات السفلية فقط */
-        #footer-ads {
-            margin-top: 80px;
-            padding: 40px 0;
-            background: rgba(0,0,0,0.3);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            width: 100%;
-        }
+        body { font-family: 'Cairo', sans-serif; background-attachment: fixed; transition: background 0.3s ease; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); }
+        html:not(.dark) .glass { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.05); }
+        .view-section.hidden { display: none; }
+        .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        input[type="range"] { accent-color: #3b82f6; cursor: pointer; }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-300">
+<body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen">
 
-    <!-- Header -->
-    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b dark:border-white/5 px-6 py-4">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-[100] glass border-b border-white/5 px-6 py-4">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="window.switchView('upload')">
-                <div class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-lg">
-                    <i data-lucide="image" class="w-6 h-6"></i>
+                <div class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-xl">
+                    <i data-lucide="aperture" class="w-6 h-6"></i>
                 </div>
-                <h1 class="text-xl font-black italic">Stor<span class="text-brand-primary">Image</span></h1>
+                <h1 class="text-xl font-black">Stor<span class="gradient-text">Image</span></h1>
             </div>
-            <div class="flex items-center gap-3">
-                <button onclick="window.toggleTheme()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-white/5">
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
-                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
-                </button>
-                <button onclick="window.openSettings()" class="p-2.5 rounded-xl bg-slate-200 dark:bg-white/5 text-slate-500 hover:text-brand-primary">
-                    <i data-lucide="shield-check" class="w-5 h-5"></i>
-                </button>
+
+            <div class="hidden md:flex items-center gap-2 bg-slate-200/50 dark:bg-white/5 p-1 rounded-2xl">
+                <button onclick="window.switchView('upload')" class="nav-btn px-6 py-2 rounded-xl text-sm font-bold transition-all text-brand-primary bg-brand-primary/10">المحرر</button>
+                <button onclick="window.switchView('stats')" class="nav-btn px-6 py-2 rounded-xl text-sm font-bold transition-all hover:bg-slate-300 dark:hover:bg-white/10">الإحصائيات</button>
+                <button onclick="window.switchView('settings')" class="nav-btn px-6 py-2 rounded-xl text-sm font-bold transition-all hover:bg-slate-300 dark:hover:bg-white/10">الإعدادات</button>
             </div>
+
+            <button onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center hover:scale-110 transition-transform">
+                <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+            </button>
         </div>
     </nav>
 
-    <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-6 pt-28">
-        <section id="view-upload" class="view-section active space-y-8">
-            <div class="text-center space-y-3">
-                <h2 class="text-4xl font-black">أدوات المعالجة <span class="text-brand-primary">الاحترافية</span></h2>
-                <p class="text-slate-500 font-bold">تحكم كامل في ضغط وتحويل صورك في مكان واحد.</p>
+    <main class="max-w-5xl mx-auto px-6 pt-32 pb-24">
+        
+        <!-- View: Upload/Editor -->
+        <section id="view-upload" class="view-section space-y-12">
+            <header class="text-center space-y-4">
+                <h2 class="text-4xl font-black">استوديو <span class="gradient-text">المعالجة الذكية</span></h2>
+                <p class="text-slate-500 max-w-lg mx-auto font-bold">ارفع صورك، عدل إضاءتها، واضغط حجمها حتى 90% بضغطة واحدة.</p>
+            </header>
+
+            <!-- Drop Zone -->
+            <div onclick="document.getElementById('file-input').click()" class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-[3rem] p-16 text-center cursor-pointer glass hover:border-brand-primary transition-all group">
+                <input type="file" id="file-input" multiple class="hidden" accept="image/*">
+                <div class="w-20 h-20 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="upload-cloud" class="w-10 h-10"></i>
+                </div>
+                <h3 class="text-2xl font-black">اضغط هنا لرفع الصور</h3>
+                <p class="opacity-50 mt-2 font-bold text-sm">أو قم بسحب وإفلات الملفات مباشرة</p>
             </div>
 
-            <!-- Image Settings Bar -->
-            <div class="glass p-6 rounded-[2rem] flex flex-wrap items-center justify-between gap-6">
-                <div class="flex flex-wrap items-center gap-6">
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400">صيغة التصدير</label>
-                        <select id="export-format" class="block bg-slate-100 dark:bg-slate-800 p-2.5 rounded-xl outline-none font-bold text-sm">
-                            <option value="webp">WebP (أفضل ضغط)</option>
-                            <option value="png">PNG (بدون فقدان)</option>
-                            <option value="jpg">JPG (توافق عالي)</option>
+            <!-- Global Controls -->
+            <div id="studio-controls" class="hidden glass p-10 rounded-[3rem] border border-white/5 space-y-10 shadow-2xl">
+                <div class="grid md:grid-cols-3 gap-10">
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-brand-primary">إعدادات الصورة</h4>
+                        <div class="space-y-5">
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px] font-black opacity-60"><span>الإضاءة</span><span id="bright-val">100%</span></div>
+                                <input type="range" id="bright-slider" min="50" max="150" value="100" class="w-full">
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px] font-black opacity-60"><span>التباين</span><span id="contrast-val">100%</span></div>
+                                <input type="range" id="contrast-slider" min="50" max="150" value="100" class="w-full">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-brand-accent">الجودة والضغط</h4>
+                        <div class="space-y-5">
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px] font-black opacity-60"><span>جودة الضغط</span><span id="quality-val">80%</span></div>
+                                <input type="range" id="quality-slider" min="10" max="100" value="80" class="w-full">
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-[10px] font-black opacity-60"><span>التشبع</span><span id="saturate-val">100%</span></div>
+                                <input type="range" id="saturate-slider" min="0" max="200" value="100" class="w-full">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="text-xs font-black uppercase tracking-widest text-brand-success">صيغة التصدير</h4>
+                        <select id="export-format" class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold text-sm">
+                            <option value="image/webp">WebP (أفضل ضغط)</option>
+                            <option value="image/jpeg">JPEG (قياسي)</option>
+                            <option value="image/png">PNG (جودة أصلية)</option>
                         </select>
-                    </div>
-                    <div class="space-y-1 min-w-[200px]">
-                        <label class="text-[10px] font-black uppercase text-slate-400 flex justify-between">نسبة الجودة <span id="quality-val" class="text-brand-primary">85%</span></label>
-                        <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full accent-brand-primary cursor-pointer">
+                        <button onclick="window.processAll()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all">بدء معالجة الكل</button>
                     </div>
                 </div>
-                <button onclick="window.clearQueue()" class="bg-red-500/10 text-red-500 px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-red-500 hover:text-white transition-all">إفراغ القائمة</button>
-            </div>
-
-            <!-- Upload Zone -->
-            <div id="drop-area" class="glass rounded-[2.5rem] p-16 text-center cursor-pointer border-2 border-dashed border-brand-primary/20 hover:border-brand-primary transition-all relative">
-                <input type="file" id="file-input" multiple accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10">
-                <div class="space-y-4">
-                    <div class="w-20 h-20 bg-brand-primary/10 text-brand-primary rounded-full flex items-center justify-center mx-auto">
-                        <i data-lucide="upload-cloud" class="w-10 h-10"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-black">اسحب الصور هنا للبدء</h3>
-                        <p class="text-slate-500 font-bold">يدعم كافة صيغ الصور الشائعة</p>
-                    </div>
+                <div class="flex justify-between items-center pt-4 border-t border-black/5 dark:border-white/5">
+                    <button onclick="window.clearQueue()" class="text-red-500 font-bold text-xs flex items-center gap-2 hover:opacity-70"><i data-lucide="trash-2" class="w-4 h-4"></i> مسح القائمة</button>
                 </div>
             </div>
 
-            <!-- File Queue -->
-            <div id="file-queue" class="grid gap-4"></div>
+            <!-- Queue -->
+            <div id="file-queue" class="grid md:grid-cols-2 gap-6"></div>
+        </section>
 
-            <!-- Action Buttons -->
-            <div id="action-bar" class="hidden text-center py-10 space-x-4 space-x-reverse">
-                <button onclick="window.processAll()" id="btn-process-all" class="bg-brand-primary text-white px-12 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">معالجة الكل</button>
-                <button onclick="window.downloadAll()" id="btn-download-all" class="hidden bg-brand-success text-white px-12 py-4 rounded-2xl font-black shadow-xl hover:scale-105 transition-all">تحميل النتائج</button>
+        <!-- View: Stats -->
+        <section id="view-stats" class="view-section hidden space-y-12">
+            <div class="text-center">
+                <h2 class="text-3xl font-black">إحصائيات <span class="gradient-text">الأداء</span></h2>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="glass p-12 rounded-[3rem] text-center border-b-4 border-brand-primary shadow-2xl">
+                    <p class="text-[10px] font-black uppercase opacity-50 tracking-widest mb-4">صور معالجة</p>
+                    <p id="stat-total" class="text-7xl font-black">0</p>
+                </div>
+                <div class="glass p-12 rounded-[3rem] text-center border-b-4 border-brand-success shadow-2xl">
+                    <p class="text-[10px] font-black uppercase opacity-50 tracking-widest mb-4">مساحة موفرة</p>
+                    <p id="stat-saved" class="text-7xl font-black">0 <span class="text-2xl">KB</span></p>
+                </div>
             </div>
         </section>
+
+        <!-- View: Settings -->
+        <section id="view-settings" class="view-section hidden max-w-xl mx-auto">
+            <div class="glass p-10 rounded-[3rem] shadow-2xl border border-black/5 dark:border-white/5 space-y-8">
+                <h2 class="text-2xl font-black text-center">الإعدادات</h2>
+                <form onsubmit="window.saveSettings(event)" class="space-y-6 text-right">
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold opacity-50 uppercase">Facebook Pixel ID</label>
+                        <input name="fb" type="text" class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold opacity-50 uppercase">TikTok Pixel ID</label>
+                        <input name="tt" type="text" class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold">
+                    </div>
+                    <button type="submit" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black shadow-xl hover:scale-[1.01] active:scale-95 transition-all">حفظ الإعدادات</button>
+                </form>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Footer with Ads ONLY -->
-    <footer id="footer-ads">
-        <div class="max-w-4xl mx-auto text-center px-6">
-            <p class="text-[10px] text-slate-500 font-black mb-8 uppercase tracking-[0.3em]">مساحة إعلانية</p>
-            <div id="ad-slot-footer" class="min-h-[100px] flex items-center justify-center bg-white/5 rounded-2xl overflow-hidden border border-white/5">
-                <!-- Adsterra Code will be injected here via index.tsx -->
-                <p class="text-slate-600 text-xs italic">يظهر الإعلان هنا فقط لضمان أفضل تجربة للمستخدم</p>
-            </div>
-            <p class="mt-12 text-[10px] text-slate-600 font-medium">StorImage Pro © 2024 - جميع الحقوق محفوظة</p>
-        </div>
-    </footer>
-
-    <!-- Settings Modal (RESTORED) -->
-    <div id="modal-settings" class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-xl items-center justify-center p-4">
-        <div class="glass p-8 md:p-10 rounded-[3rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-8 border border-white/10">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <i data-lucide="settings" class="text-brand-primary"></i>
-                    <h3 class="text-2xl font-black">إعدادات المنصة المتقدمة</h3>
-                </div>
-                <button onclick="window.closeSettings()" class="p-2 hover:bg-white/10 rounded-full"><i data-lucide="x"></i></button>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400">Facebook Pixel ID</label>
-                    <input type="text" id="set-fb" class="w-full bg-white/5 p-3 rounded-xl outline-none border border-white/5 focus:border-brand-primary">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400">TikTok Pixel ID</label>
-                    <input type="text" id="set-tt" class="w-full bg-white/5 p-3 rounded-xl outline-none border border-white/5 focus:border-brand-primary">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400">Google Analytics ID</label>
-                    <input type="text" id="set-ga" class="w-full bg-white/5 p-3 rounded-xl outline-none border border-white/5 focus:border-brand-primary">
-                </div>
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400">Google Sheets URL</label>
-                    <input type="text" id="set-sheets" class="w-full bg-white/5 p-3 rounded-xl outline-none border border-white/5 focus:border-brand-primary">
-                </div>
-                <div class="space-y-2 md:col-span-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400">الدومين / Name Servers</label>
-                    <input type="text" id="set-domain" placeholder="example.com" class="w-full bg-white/5 p-3 rounded-xl outline-none border border-white/5 focus:border-brand-primary">
-                </div>
-                <div class="space-y-2 md:col-span-2">
-                    <label class="text-[10px] font-black uppercase text-slate-400">كود Adsterra (للتذييل فقط)</label>
-                    <textarea id="set-ads" rows="4" class="w-full bg-white/5 p-3 rounded-xl outline-none border border-white/5 focus:border-brand-primary font-mono text-xs"></textarea>
-                </div>
-            </div>
-
-            <button onclick="window.saveAllSettings()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg hover:brightness-110 transition-all">حفظ وتطبيق كافة الإعدادات</button>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transform translate-y-32 opacity-0 transition-all duration-500">
-        <div class="bg-slate-900 text-white px-10 py-4 rounded-2xl shadow-2xl font-black flex items-center gap-3">
-            <i data-lucide="check-circle" class="text-brand-success"></i>
-            <span id="toast-msg">تمت العملية</span>
-        </div>
+    <!-- Mobile Nav -->
+    <div class="md:hidden fixed bottom-6 left-6 right-6 z-50 glass rounded-3xl p-2 flex justify-around border border-black/5 dark:border-white/10 shadow-2xl">
+        <button onclick="window.switchView('upload')" class="p-4 text-brand-primary"><i data-lucide="aperture"></i></button>
+        <button onclick="window.switchView('stats')" class="p-4 opacity-50"><i data-lucide="bar-chart-3"></i></button>
+        <button onclick="window.switchView('settings')" class="p-4 opacity-50"><i data-lucide="settings"></i></button>
     </div>
 
     <script type="module" src="index.tsx"></script>

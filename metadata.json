@@ -1,5 +1,7 @@
 {
-  "name": "StorImage | معالجة وتحميل الصور",
-  "description": "منصة StorImage الاحترافية لضغط وتحويل صيغ الصور بسرعة فائقة وتصميم عصري.",
-  "requestFramePermissions": []
+  "name": "StorImage Studio | احترافية معالجة الصور",
+  "description": "منصة متطورة لضغط ومعالجة الصور وتحسين جودتها مع الحفاظ على المساحة.",
+  "requestFramePermissions": [
+    "camera"
+  ]
 }
