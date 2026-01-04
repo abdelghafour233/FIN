@@ -1,46 +1,100 @@
 
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر المغرب الحديث - Modern Morocco Store</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-      body {
-        font-family: 'Cairo', sans-serif;
-      }
-      /* Custom scrollbar for better aesthetics */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
+        body { font-family: 'Cairo', sans-serif; }
+        .product-card:hover img { transform: scale(1.05); }
+        .admin-sidebar-active { background: #2563eb; color: white; }
+        input:focus, select:focus { border-color: #2563eb; ring: 2px; ring-color: #bfdbfe; }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
-    "react/": "https://esm.sh/react@^19.2.3/",
     "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/"
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
   }
 }
 </script>
 </head>
-  <body class="bg-gray-50 text-gray-900">
-    <div id="root"></div>
-  </body>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-8">
+                <a href="#" class="text-2xl font-bold text-blue-600">متجر المغرب</a>
+                <div class="hidden md:flex gap-6">
+                    <a href="#" class="hover:text-blue-600 transition">الرئيسية</a>
+                    <a href="#category/electronics" class="hover:text-blue-600 transition">إلكترونيات</a>
+                    <a href="#category/home" class="hover:text-blue-600 transition">منزلية</a>
+                    <a href="#category/cars" class="hover:text-blue-600 transition">سيارات</a>
+                </div>
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="#admin" class="text-gray-600 hover:text-blue-600" title="لوحة التحكم">
+                    <i data-lucide="layout-dashboard"></i>
+                </a>
+                <a href="#cart" class="relative text-gray-600 hover:text-blue-600">
+                    <i data-lucide="shopping-cart"></i>
+                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Root -->
+    <div id="app-root" class="min-h-screen"></div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold">متجر المغرب الحديث</h3>
+                <p class="text-gray-400 text-sm">أفضل متجر إلكتروني في المغرب لبيع الإلكترونيات والسيارات بضمان الجودة.</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">روابط سريعة</h4>
+                <ul class="text-gray-400 text-sm space-y-2">
+                    <li><a href="#category/electronics">إلكترونيات</a></li>
+                    <li><a href="#category/home">منزلية</a></li>
+                    <li><a href="#category/cars">سيارات</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">خدمة الزبائن</h4>
+                <p class="text-gray-400 text-sm">الهاتف: 06XXXXXXXX</p>
+                <p class="text-gray-400 text-sm">الدفع عند الاستلام في كل مدن المغرب</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4">تواصل معنا</h4>
+                <div class="flex gap-4">
+                    <i data-lucide="facebook" class="cursor-pointer hover:text-blue-500"></i>
+                    <i data-lucide="instagram" class="cursor-pointer hover:text-pink-500"></i>
+                    <i data-lucide="twitter" class="cursor-pointer hover:text-blue-400"></i>
+                </div>
+            </div>
+        </div>
+        <div class="text-center text-gray-500 text-xs mt-12 pt-8 border-t border-gray-800">
+            &copy; 2024 متجر المغرب الحديث. جميع الحقوق محفوظة.
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
 </html>
