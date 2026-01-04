@@ -1,7 +1,6 @@
 export {};
 
-// --- Types ---
-interface ImageFile {
+interface ImageItem {
     id: string;
     file: File;
     name: string;
@@ -12,280 +11,132 @@ interface ImageFile {
     status: 'idle' | 'processing' | 'done' | 'error';
 }
 
-// الكود الذي زودتني به
-const DEFAULT_ADSTERRA = `<script type="text/javascript">
-	atOptions = {
-		'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-		'format' : 'iframe',
-		'height' : 250,
-		'width' : 300,
-		'params' : {}
-	};
-</script>
-<script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`;
-
-// --- Global State ---
-const AppState = {
-    view: 'upload',
-    theme: localStorage.getItem('storimage_theme') || 'dark',
-    files: [] as ImageFile[],
-    stats: JSON.parse(localStorage.getItem('storimage_stats') || '{"total":0, "saved":0}'),
-    settings: JSON.parse(localStorage.getItem('storimage_settings') || `{"fb":"","tt":"","adsterra":"${DEFAULT_ADSTERRA.replace(/\n/g, '\\n').replace(/"/g, '\\"')}"}`)
+const State = {
+    files: [] as ImageItem[],
+    theme: localStorage.getItem('theme') || 'dark'
 };
-
-// --- Script Injection Logic (Adsterra Support) ---
-
-const injectAdsterraScripts = () => {
-    const code = AppState.settings.adsterra;
-    if (!code) return;
-
-    // استهداف الحاوية المخصصة في HTML لظهور الإعلان
-    const container = document.getElementById('ad-slot-container');
-    if (!container) return;
-
-    // تنظيف الحاوية قبل الحقن الجديد
-    container.innerHTML = '';
-    
-    // إنشاء عنصر مؤقت لتحويل النص إلى Nodes
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = code;
-    
-    // حقن العناصر وتنفيذ السكريبتات
-    const fragments = document.createDocumentFragment();
-    const children = Array.from(tempDiv.childNodes);
-    
-    children.forEach(node => {
-        if (node.nodeName === 'SCRIPT') {
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            const oldScript = node as HTMLScriptElement;
-            if (oldScript.src) {
-                script.src = oldScript.src;
-            } else {
-                script.text = oldScript.text;
-            }
-            fragments.appendChild(script);
-        } else {
-            fragments.appendChild(node.cloneNode(true));
-        }
-    });
-
-    container.appendChild(fragments);
-    console.log('Adsterra Ads Injected to Slot');
-};
-
-// --- Core Functions ---
 
 const applyTheme = () => {
-    const html = document.documentElement;
-    if (AppState.theme === 'dark') {
-        html.classList.add('dark');
-    } else {
-        html.classList.remove('dark');
-    }
+    document.documentElement.classList.toggle('dark', State.theme === 'dark');
 };
 
-const toggleTheme = () => {
-    AppState.theme = AppState.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('storimage_theme', AppState.theme);
+(window as any).toggleTheme = () => {
+    State.theme = State.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('theme', State.theme);
     applyTheme();
-    initLucide();
-};
-
-const switchView = (viewId: string) => {
-    AppState.view = viewId;
-    document.querySelectorAll('.view-section').forEach(section => {
-        section.classList.add('hidden');
-    });
-    const target = document.getElementById(`view-${viewId}`);
-    if (target) target.classList.remove('hidden');
-
-    if (viewId === 'stats') updateStatsUI();
-    if (viewId === 'settings') loadSettingsToUI();
-    
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('text-brand-primary', 'bg-brand-primary/10');
-        if (btn.getAttribute('onclick')?.includes(viewId)) {
-            btn.classList.add('text-brand-primary', 'bg-brand-primary/10');
-        }
-    });
-    initLucide();
-};
-
-const loadSettingsToUI = () => {
-    const fbInput = document.getElementById('input-fb') as HTMLInputElement;
-    const ttInput = document.getElementById('input-tt') as HTMLInputElement;
-    const adsInput = document.getElementById('input-adsterra') as HTMLTextAreaElement;
-    
-    if (fbInput) fbInput.value = AppState.settings.fb || '';
-    if (ttInput) ttInput.value = AppState.settings.tt || '';
-    if (adsInput) adsInput.value = AppState.settings.adsterra || '';
-};
-
-const updateStatsUI = () => {
-    const totalEl = document.getElementById('stat-total');
-    const savedEl = document.getElementById('stat-saved');
-    if (totalEl) totalEl.innerText = AppState.stats.total.toString();
-    if (savedEl) savedEl.innerHTML = `${(AppState.stats.saved / 1024).toFixed(1)} <span class="text-xl">KB</span>`;
-};
-
-// --- Image Processing Logic ---
-
-const processImage = async (id: string) => {
-    const f = AppState.files.find(x => x.id === id);
-    if (!f || f.status === 'processing') return;
-
-    f.status = 'processing';
-    renderQueue();
-
-    try {
-        const quality = parseInt((document.getElementById('quality-slider') as HTMLInputElement).value) / 100;
-        const format = (document.getElementById('export-format') as HTMLSelectElement).value;
-        const filters = {
-            b: (document.getElementById('bright-slider') as HTMLInputElement).value,
-            c: (document.getElementById('contrast-slider') as HTMLInputElement).value,
-            s: (document.getElementById('saturate-slider') as HTMLInputElement).value,
-        };
-
-        const result = await compress(f.preview, quality, format, filters);
-        
-        f.processedUrl = result.url;
-        f.processedSize = result.size;
-        f.status = 'done';
-
-        AppState.stats.total++;
-        const saved = f.originalSize - result.size;
-        if (saved > 0) AppState.stats.saved += saved;
-        localStorage.setItem('storimage_stats', JSON.stringify(AppState.stats));
-    } catch (e) {
-        f.status = 'error';
-    }
-    renderQueue();
-};
-
-const compress = (src: string, quality: number, format: string, filters: any): Promise<{url: string, size: number}> => {
-    return new Promise((resolve) => {
-        const img = new Image();
-        img.src = src;
-        img.onload = () => {
-            const canvas = document.createElement('canvas');
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext('2d')!;
-            ctx.filter = `brightness(${filters.b}%) contrast(${filters.c}%) saturate(${filters.s}%)`;
-            ctx.drawImage(img, 0, 0);
-            canvas.toBlob((blob) => {
-                resolve({
-                    url: URL.createObjectURL(blob!),
-                    size: blob!.size
-                });
-            }, format, quality);
-        };
-    });
 };
 
 const renderQueue = () => {
-    const container = document.getElementById('file-queue');
-    const controls = document.getElementById('studio-controls');
-    if (!container || !controls) return;
+    const list = document.getElementById('files-list');
+    const panel = document.getElementById('controls-panel');
+    if (!list || !panel) return;
 
-    if (AppState.files.length === 0) {
-        container.innerHTML = '';
-        controls.classList.add('hidden');
-        return;
-    }
+    if (State.files.length > 0) panel.classList.remove('hidden');
+    else panel.classList.add('hidden');
 
-    controls.classList.remove('hidden');
-    container.innerHTML = AppState.files.map(f => `
-        <div class="glass p-5 rounded-[2rem] flex items-center justify-between gap-4 border border-white/5">
+    list.innerHTML = State.files.map(f => `
+        <div class="bg-brand-card/30 p-4 rounded-2xl flex items-center justify-between border border-white/5 group">
             <div class="flex items-center gap-4">
-                <img src="${f.status === 'done' ? f.processedUrl : f.preview}" class="w-16 h-16 object-cover rounded-2xl shadow-lg">
+                <img src="${f.preview}" class="w-14 h-14 object-cover rounded-xl shadow-lg border border-white/5">
                 <div class="text-right">
-                    <p class="text-sm font-black truncate w-32">${f.name}</p>
-                    <p class="text-[10px] opacity-50 font-bold uppercase mt-1">
-                        ${(f.originalSize/1024).toFixed(1)} KB 
-                        ${f.processedSize ? ` ➜ <span class="text-brand-primary">${(f.processedSize/1024).toFixed(1)} KB</span>` : ''}
-                    </p>
+                    <p class="text-sm font-bold truncate max-w-[150px] md:max-w-xs">${f.name}</p>
+                    <p class="text-[10px] opacity-40">الحجم: ${(f.originalSize/1024).toFixed(1)} KB ${f.processedSize ? ` ➔ ${(f.processedSize/1024).toFixed(1)} KB` : ''}</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
-                ${f.status === 'idle' ? 
-                    `<button onclick="window.processImage('${f.id}')" class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="zap" class="w-5 h-5"></i></button>` :
-                    f.status === 'processing' ?
-                    `<div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader-2" class="w-5 h-5"></i></div>` :
-                    `<a href="${f.processedUrl}" download="processed_${f.name}" class="w-10 h-10 bg-brand-success/10 text-brand-success rounded-xl flex items-center justify-center hover:bg-brand-success hover:text-white transition-all"><i data-lucide="download" class="w-5 h-5"></i></a>`
-                }
-                <button onclick="window.removeFile('${f.id}')" class="w-10 h-10 text-slate-500 hover:text-red-500"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+                ${f.status === 'processing' ? '<div class="w-4 h-4 border-2 border-brand-primary border-t-transparent animate-spin rounded-full"></div>' : ''}
+                ${f.status === 'done' ? `
+                    <a href="${f.processedUrl}" download="compressed_${f.name}" class="p-2.5 bg-brand-success/10 text-brand-success rounded-xl hover:bg-brand-success hover:text-white transition-all shadow-lg">
+                        <i data-lucide="download" class="w-5 h-5"></i>
+                    </a>
+                ` : ''}
+                <button onclick="window.removeFile('${f.id}')" class="p-2.5 text-red-500 hover:bg-red-500/10 rounded-xl transition-all">
+                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                </button>
             </div>
         </div>
     `).join('');
-    initLucide();
+    (window as any).lucide?.createIcons();
 };
 
-const initLucide = () => {
-    if ((window as any).lucide) (window as any).lucide.createIcons();
-};
-
-// --- Attach to Window ---
-(window as any).switchView = switchView;
-(window as any).toggleTheme = toggleTheme;
-(window as any).processImage = processImage;
-(window as any).processAll = () => AppState.files.forEach(f => processImage(f.id));
 (window as any).removeFile = (id: string) => {
-    AppState.files = AppState.files.filter(f => f.id !== id);
+    const item = State.files.find(f => f.id === id);
+    if (item) {
+        URL.revokeObjectURL(item.preview);
+        if (item.processedUrl) URL.revokeObjectURL(item.processedUrl);
+    }
+    State.files = State.files.filter(f => f.id !== id);
     renderQueue();
-};
-(window as any).clearQueue = () => {
-    AppState.files = [];
-    renderQueue();
-};
-(window as any).saveSettings = (e: Event) => {
-    e.preventDefault();
-    const formData = new FormData(e.target as HTMLFormElement);
-    AppState.settings = { 
-        fb: formData.get('fb') as string, 
-        tt: formData.get('tt') as string,
-        adsterra: formData.get('adsterra') as string
-    };
-    localStorage.setItem('storimage_settings', JSON.stringify(AppState.settings));
-    injectAdsterraScripts();
-    alert('تم حفظ الإعدادات وتنشيط إعلانات Adsterra بنجاح ✅');
 };
 
-// --- Init on Load ---
+const processImage = async (item: ImageItem) => {
+    if (item.status === 'done' || item.status === 'processing') return;
+
+    item.status = 'processing';
+    renderQueue();
+
+    const quality = parseInt((document.getElementById('quality-slider') as HTMLInputElement).value) / 100;
+    const format = (document.getElementById('format-select') as HTMLSelectElement).value;
+
+    try {
+        const img = new Image();
+        img.src = item.preview;
+        await new Promise(r => img.onload = r);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0);
+
+        const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, format, quality));
+        if (blob) {
+            item.processedSize = blob.size;
+            item.processedUrl = URL.createObjectURL(blob);
+            item.status = 'done';
+        } else {
+            item.status = 'error';
+        }
+    } catch (e) {
+        item.status = 'error';
+    }
+    renderQueue();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    
-    // تأخير طفيف للحقن للتأكد من بناء الـ DOM
-    setTimeout(injectAdsterraScripts, 1000);
-    
-    const fileInput = document.getElementById('file-input') as HTMLInputElement;
-    if (fileInput) {
-        fileInput.onchange = (e: any) => {
-            const incoming = e.target.files;
-            if (incoming) {
-                for (const file of Array.from(incoming as FileList)) {
-                    AppState.files.push({
-                        id: Math.random().toString(36).substr(2, 9),
-                        file, name: file.name, originalSize: file.size,
-                        processedSize: null, preview: URL.createObjectURL(file),
-                        processedUrl: null, status: 'idle'
-                    });
-                }
-                renderQueue();
-            }
-        };
-    }
+    const input = document.getElementById('file-input') as HTMLInputElement;
+    const slider = document.getElementById('quality-slider') as HTMLInputElement;
+    const processBtn = document.getElementById('process-all-btn');
 
-    ['quality', 'bright', 'contrast', 'saturate'].forEach(id => {
-        const slider = document.getElementById(`${id}-slider`) as HTMLInputElement;
-        const val = document.getElementById(`${id}-val`);
-        if (slider && val) {
-            slider.addEventListener('input', (e: any) => {
-                val.innerText = e.target.value + (id === 'quality' ? '%' : '%');
+    input?.addEventListener('change', (e: any) => {
+        const incoming = Array.from(e.target.files as FileList);
+        incoming.forEach(file => {
+            State.files.push({
+                id: Math.random().toString(36).substr(2, 9),
+                file,
+                name: file.name,
+                originalSize: file.size,
+                processedSize: null,
+                preview: URL.createObjectURL(file),
+                processedUrl: null,
+                status: 'idle'
             });
+        });
+        renderQueue();
+        input.value = '';
+    });
+
+    slider?.addEventListener('input', (e: any) => {
+        const v = document.getElementById('quality-val');
+        if (v) v.innerText = e.target.value + '%';
+    });
+
+    processBtn?.addEventListener('click', async () => {
+        for (const item of State.files) {
+            await processImage(item);
         }
     });
 
-    initLucide();
+    (window as any).lucide?.createIcons();
 });
