@@ -18,7 +18,7 @@ const AppState = {
     theme: localStorage.getItem('storimage_theme') || 'dark',
     files: [] as ImageFile[],
     stats: JSON.parse(localStorage.getItem('storimage_stats') || '{"total":0, "saved":0}'),
-    settings: JSON.parse(localStorage.getItem('storimage_settings') || '{"fb":"","tt":""}')
+    settings: JSON.parse(localStorage.getItem('storimage_settings') || '{"fb":"","tt":"","adsterra":""}')
 };
 
 // --- Core Functions ---
@@ -48,6 +48,7 @@ const switchView = (viewId: string) => {
     if (target) target.classList.remove('hidden');
 
     if (viewId === 'stats') updateStatsUI();
+    if (viewId === 'settings') loadSettingsToUI();
     
     // Update active state on nav buttons
     document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -57,6 +58,16 @@ const switchView = (viewId: string) => {
         }
     });
     initLucide();
+};
+
+const loadSettingsToUI = () => {
+    const fbInput = document.getElementById('input-fb') as HTMLInputElement;
+    const ttInput = document.getElementById('input-tt') as HTMLInputElement;
+    const adsInput = document.getElementById('input-adsterra') as HTMLTextAreaElement;
+    
+    if (fbInput) fbInput.value = AppState.settings.fb || '';
+    if (ttInput) ttInput.value = AppState.settings.tt || '';
+    if (adsInput) adsInput.value = AppState.settings.adsterra || '';
 };
 
 const updateStatsUI = () => {
@@ -163,7 +174,7 @@ const initLucide = () => {
     if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
-// --- Attach to Window (CRITICAL) ---
+// --- Attach to Window ---
 (window as any).switchView = switchView;
 (window as any).toggleTheme = toggleTheme;
 (window as any).processImage = processImage;
@@ -179,9 +190,13 @@ const initLucide = () => {
 (window as any).saveSettings = (e: Event) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
-    AppState.settings = { fb: formData.get('fb'), tt: formData.get('tt') };
+    AppState.settings = { 
+        fb: formData.get('fb') as string, 
+        tt: formData.get('tt') as string,
+        adsterra: formData.get('adsterra') as string
+    };
     localStorage.setItem('storimage_settings', JSON.stringify(AppState.settings));
-    alert('تم الحفظ ✅');
+    alert('تم حفظ الإعدادات وأكواد Adsterra بنجاح ✅');
 };
 
 // --- Init on Load ---

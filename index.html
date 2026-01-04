@@ -52,7 +52,7 @@
                 <button onclick="window.switchView('settings')" class="nav-btn px-6 py-2 rounded-xl text-sm font-bold transition-all hover:bg-slate-300 dark:hover:bg-white/10">الإعدادات</button>
             </div>
 
-            <button onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center hover:scale-110 transition-transform">
+            <button id="theme-toggle" onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center hover:scale-110 transition-transform">
                 <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                 <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
             </button>
@@ -143,20 +143,34 @@
             </div>
         </section>
 
-        <!-- View: Settings -->
-        <section id="view-settings" class="view-section hidden max-w-xl mx-auto">
+        <!-- View: Settings (Control Panel) -->
+        <section id="view-settings" class="view-section hidden max-w-2xl mx-auto">
             <div class="glass p-10 rounded-[3rem] shadow-2xl border border-black/5 dark:border-white/5 space-y-8">
-                <h2 class="text-2xl font-black text-center">الإعدادات</h2>
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl font-black">لوحة التحكم</h2>
+                    <p class="text-xs font-bold opacity-50">إدارة الأكواد والبيكسل</p>
+                </div>
+
                 <form onsubmit="window.saveSettings(event)" class="space-y-6 text-right">
-                    <div class="space-y-2">
-                        <label class="text-xs font-bold opacity-50 uppercase">Facebook Pixel ID</label>
-                        <input name="fb" type="text" class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold">
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black opacity-50 uppercase tracking-widest">Facebook Pixel ID</label>
+                            <input name="fb" id="input-fb" type="text" placeholder="12345678..." class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black opacity-50 uppercase tracking-widest">TikTok Pixel ID</label>
+                            <input name="tt" id="input-tt" type="text" placeholder="AW-XXXXX..." class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold">
+                        </div>
                     </div>
+
+                    <!-- Adsterra Codes Area -->
                     <div class="space-y-2">
-                        <label class="text-xs font-bold opacity-50 uppercase">TikTok Pixel ID</label>
-                        <input name="tt" type="text" class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-bold">
+                        <label class="text-[10px] font-black text-brand-primary uppercase tracking-widest">أكواد Adsterra (Ad Scripts)</label>
+                        <textarea name="adsterra" id="input-adsterra" rows="5" placeholder="قم بلصق أكواد Adsterra هنا..." class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-2xl border border-black/5 dark:border-white/10 outline-none font-mono text-xs"></textarea>
+                        <p class="text-[9px] opacity-40">يمكنك وضع أكواد البوب-أندر أو الإعلانات الصورية هنا ليتم حفظها.</p>
                     </div>
-                    <button type="submit" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black shadow-xl hover:scale-[1.01] active:scale-95 transition-all">حفظ الإعدادات</button>
+
+                    <button type="submit" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black shadow-xl hover:scale-[1.01] active:scale-95 transition-all">حفظ الإعدادات بالكامل</button>
                 </form>
             </div>
         </section>
