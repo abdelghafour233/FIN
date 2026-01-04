@@ -55,6 +55,17 @@
 
         #auth-overlay { display: none; opacity: 0; transition: all 0.3s ease; }
         #auth-overlay.active { display: flex; opacity: 1; }
+
+        /* Adsterra container styling */
+        #adsterra-footer-container {
+            width: 100%;
+            min-height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(16, 185, 129, 0.05);
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -135,7 +146,7 @@
         </div>
     </div>
 
-    <main class="max-w-6xl mx-auto px-6 pt-32 pb-20">
+    <main class="max-w-6xl mx-auto px-6 pt-32 pb-10">
         
         <!-- View: Upload -->
         <section id="view-upload" class="view-content active space-y-10">
@@ -248,8 +259,8 @@
                             <input type="text" id="tt-pixel" placeholder="ID فقط" class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold">
                         </div>
                         <div class="space-y-2">
-                            <label class="text-xs font-bold text-slate-500 px-1">Adsterra Key</label>
-                            <input type="text" id="adsterra-pixel" placeholder="ID أو كود التتبع" class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold">
+                            <label class="text-xs font-bold text-slate-500 px-1">Adsterra Script URL</label>
+                            <input type="text" id="adsterra-pixel" placeholder="https://bouncingbuzz.com/..." class="w-full bg-brand-black/50 border border-white/5 p-5 rounded-2xl focus:border-brand-green outline-none transition-all font-bold ltr">
                         </div>
                     </div>
                 </div>
@@ -288,6 +299,9 @@
         </section>
 
     </main>
+
+    <!-- Adsterra Dedicated Container at the very bottom -->
+    <div id="adsterra-footer-container"></div>
 
     <div id="toast" class="fixed bottom-10 left-10 z-[100] transform translate-y-20 opacity-0 transition-all duration-500">
         <div class="bg-brand-green text-black px-10 py-5 rounded-2xl shadow-2xl flex items-center gap-4 font-black">

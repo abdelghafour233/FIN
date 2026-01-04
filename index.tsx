@@ -20,7 +20,8 @@ const init = () => {
     updateStatsUI();
     initLucide();
     setupSliders();
-    console.log("ImgPro Initialized: Security & Adsterra Active");
+    applyAdsterra(); // حقن إعلانات أدستيرا عند بدء التشغيل
+    console.log("ImgPro Initialized: Adsterra injected at footer");
 };
 
 const initLucide = () => {
@@ -37,6 +38,24 @@ const setupSliders = () => {
         });
     }
 };
+
+// --- Adsterra Script Injection ---
+function applyAdsterra() {
+    const container = document.getElementById('adsterra-footer-container');
+    if (!container) return;
+
+    // تنظيف الحاوية قبل الإضافة الجديدة
+    container.innerHTML = '';
+
+    const adUrl = AppState.settings.adsterra;
+    if (adUrl && adUrl.startsWith('http')) {
+        const script = document.createElement('script');
+        script.src = adUrl;
+        script.async = true;
+        container.appendChild(script);
+        console.log("Adsterra Script Loaded:", adUrl);
+    }
+}
 
 // --- Theme Management ---
 (window as any).toggleTheme = () => {
@@ -287,7 +306,7 @@ function loadSettings() {
     
     if(fb) fb.value = s.fb || '';
     if(tt) tt.value = s.tt || '';
-    if(adsterra) adsterra.value = s.adsterra || '';
+    if(adsterra) adsterra.value = s.adsterra || 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js';
     if(domain) domain.value = s.domain || '';
     if(gsheets) gsheets.value = s.sheets || '';
     if(pass) pass.value = AppState.adminPass;
@@ -314,7 +333,9 @@ function loadSettings() {
         sheets: gsheets ? gsheets.value : ''
     };
     localStorage.setItem('imgpro-settings', JSON.stringify(AppState.settings));
-    showToast('تم حفظ كافة الإعدادات بنجاح');
+    
+    applyAdsterra(); // إعادة تطبيق الحقن بعد الحفظ
+    showToast('تم حفظ كافة الإعدادات وتطبيق الإعلانات');
 };
 
 // --- Helpers ---
