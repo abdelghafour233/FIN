@@ -8,19 +8,17 @@ const AppState = {
     isUnlocked: sessionStorage.getItem('imgpro-unlocked') === 'true',
     adminPass: localStorage.getItem('imgpro-admin-pass') || '1234',
     stats: JSON.parse(localStorage.getItem('imgpro-stats') || '{"total":0,"saved":0}'),
-    settings: JSON.parse(localStorage.getItem('imgpro-settings') || '{"fb":"","tt":"","adsterra":"","domain":"","sheets":""}')
+    settings: JSON.parse(localStorage.getItem('imgpro-settings') || '{"fb":"","tt":"","ga":""}')
 };
 
-// --- Initialization ---
+// --- Core Initialization ---
 const init = () => {
     applyTheme();
-    loadSettings();
     setupDropZone();
     updateStatsUI();
     initLucide();
     setupSliders();
-    applyAdsterra();
-    console.log("ImgPro Initialized.");
+    console.log("ImgPro Core V2.0 Initialized");
 };
 
 const initLucide = () => {
@@ -40,31 +38,7 @@ const setupSliders = () => {
     }
 };
 
-// --- Adsterra ---
-function applyAdsterra() {
-    const container = document.getElementById('adsterra-footer-container');
-    if (!container) return;
-    container.innerHTML = '';
-    const adKey = '0295263cf4ed8d9e3a97b6a2490864ee';
-    (window as any).atOptions = {
-        'key' : adKey,
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-    };
-    const script = document.createElement('script');
-    script.src = `https://bouncingbuzz.com/${adKey}/invoke.js`;
-    script.async = true;
-    container.appendChild(script);
-}
-
-// --- Auth & Dashboard Controls (FIXED) ---
-(window as any).closeAuth = () => {
-    const overlay = document.getElementById('auth-overlay');
-    if (overlay) overlay.classList.remove('active');
-};
-
+// --- Auth & Security ---
 (window as any).verifyPass = () => {
     const passInput = document.getElementById('admin-pass') as HTMLInputElement;
     if (passInput && passInput.value === AppState.adminPass) {
@@ -72,18 +46,23 @@ function applyAdsterra() {
         sessionStorage.setItem('imgpro-unlocked', 'true');
         (window as any).closeAuth();
         (window as any).switchView('settings');
-        showToast('تم الدخول بنجاح');
+        showToast('تم فتح لوحة التحكم');
         passInput.value = '';
     } else {
         showToast('كلمة السر غير صحيحة');
     }
 };
 
+(window as any).closeAuth = () => {
+    const overlay = document.getElementById('auth-overlay');
+    if (overlay) overlay.classList.remove('active');
+};
+
 (window as any).lockDashboard = () => {
     AppState.isUnlocked = false;
     sessionStorage.removeItem('imgpro-unlocked');
     (window as any).switchView('upload');
-    showToast('تم قفل لوحة التحكم');
+    showToast('تم قفل اللوحة');
 };
 
 (window as any).togglePasswordVisibility = (inputId: string, iconId: string) => {
@@ -97,6 +76,36 @@ function applyAdsterra() {
     }
 };
 
+// --- Navigation ---
+(window as any).switchView = (viewId: string) => {
+    if (viewId === 'settings' && !AppState.isUnlocked) {
+        const overlay = document.getElementById('auth-overlay');
+        if (overlay) overlay.classList.add('active');
+        return;
+    }
+    AppState.currentView = viewId;
+    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+    const activeBtn = document.getElementById(`nav-${viewId}`);
+    if(activeBtn) activeBtn.classList.add('active');
+    
+    document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+    const targetView = document.getElementById(`view-${viewId}`);
+    if(targetView) targetView.classList.add('active');
+    
+    if(viewId === 'stats') updateStatsUI();
+    if(viewId === 'settings') loadSettings();
+    initLucide();
+};
+
+// --- Settings Management ---
+function loadSettings() {
+    const s = AppState.settings;
+    const fb = document.getElementById('fb-pixel') as HTMLInputElement;
+    const tt = document.getElementById('tt-pixel') as HTMLInputElement;
+    if (fb) fb.value = s.fb || '';
+    if (tt) tt.value = s.tt || '';
+}
+
 (window as any).saveSettings = () => {
     const fb = (document.getElementById('fb-pixel') as HTMLInputElement)?.value;
     const tt = (document.getElementById('tt-pixel') as HTMLInputElement)?.value;
@@ -109,22 +118,7 @@ function applyAdsterra() {
 
     AppState.settings = { ...AppState.settings, fb, tt };
     localStorage.setItem('imgpro-settings', JSON.stringify(AppState.settings));
-    
-    showToast('تم حفظ التغييرات بنجاح');
-};
-
-// --- Social Share ---
-(window as any).shareTo = (platform: string) => {
-    const url = window.location.origin + window.location.pathname;
-    const text = "لقد قمت للتو بمعالجة صوري باستخدام إيميج برو! منصة مذهلة وسريعة ⚡";
-    let shareUrl = "";
-    switch(platform) {
-        case 'wa': shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + url)}`; break;
-        case 'fb': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`; break;
-        case 'tw': shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`; break;
-        case 'tg': shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`; break;
-    }
-    if(shareUrl) window.open(shareUrl, '_blank');
+    showToast('تم حفظ الإعدادات بنجاح');
 };
 
 // --- Theme Management ---
@@ -146,26 +140,7 @@ function applyTheme() {
     setTimeout(initLucide, 50);
 }
 
-// --- Navigation ---
-(window as any).switchView = (viewId: string) => {
-    if (viewId === 'settings' && !AppState.isUnlocked) {
-        const overlay = document.getElementById('auth-overlay');
-        if (overlay) overlay.classList.add('active');
-        return;
-    }
-    AppState.currentView = viewId;
-    document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-    const activeBtn = document.getElementById(`nav-${viewId}`);
-    if(activeBtn) activeBtn.classList.add('active');
-    document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
-    const targetView = document.getElementById(`view-${viewId}`);
-    if(targetView) targetView.classList.add('active');
-    if(viewId === 'stats') updateStatsUI();
-    if(viewId === 'settings') loadSettings();
-    initLucide();
-};
-
-// --- Image Logic ---
+// --- Image Processing Logic ---
 function setupDropZone() {
     const area = document.getElementById('drop-area');
     const input = document.getElementById('file-input') as HTMLInputElement;
@@ -206,19 +181,21 @@ function renderQueue() {
     const queue = document.getElementById('file-queue');
     const bar = document.getElementById('action-bar');
     const shareSec = document.getElementById('share-section');
-    const btnDownloadAll = document.getElementById('btn-download-all');
-    const btnProcessAll = document.getElementById('btn-process-all');
-
     if(!queue) return;
+
     if(AppState.files.length === 0) {
         queue.innerHTML = '';
         if(bar) bar.classList.add('hidden');
+        if(shareSec) shareSec.classList.add('hidden');
         return;
     }
 
     if(bar) bar.classList.remove('hidden');
     const hasDone = AppState.files.some(f => f.status === 'done');
     const hasIdle = AppState.files.some(f => f.status === 'idle');
+    
+    const btnDownloadAll = document.getElementById('btn-download-all');
+    const btnProcessAll = document.getElementById('btn-process-all');
     if(btnDownloadAll) btnDownloadAll.classList.toggle('hidden', !hasDone);
     if(btnProcessAll) btnProcessAll.classList.toggle('hidden', !hasIdle);
     if(shareSec) shareSec.classList.toggle('hidden', !hasDone);
@@ -244,18 +221,8 @@ function renderQueue() {
             </div>
         </div>
     `).join('');
-    setTimeout(initLucide, 50);
+    initLucide();
 }
-
-(window as any).removeFile = (id: string) => {
-    AppState.files = AppState.files.filter(f => f.id !== id);
-    renderQueue();
-};
-
-(window as any).clearQueue = () => {
-    AppState.files = [];
-    renderQueue();
-};
 
 (window as any).processOne = (id: string) => {
     const f = AppState.files.find(x => x.id === id);
@@ -292,11 +259,33 @@ function renderQueue() {
     document.body.removeChild(link);
 };
 
+(window as any).removeFile = (id: string) => {
+    AppState.files = AppState.files.filter(f => f.id !== id);
+    renderQueue();
+};
+
+(window as any).clearQueue = () => {
+    AppState.files = [];
+    renderQueue();
+};
+
 (window as any).downloadAll = () => {
     const doneFiles = AppState.files.filter(f => f.status === 'done');
     doneFiles.forEach((f, idx) => {
         setTimeout(() => (window as any).downloadOne(f.id), idx * 400);
     });
+};
+
+(window as any).shareTo = (platform: string) => {
+    const url = window.location.origin + window.location.pathname;
+    const text = "أداة إيميج برو مذهلة لمعالجة الصور! جربها الآن ⚡";
+    let shareUrl = "";
+    switch(platform) {
+        case 'wa': shareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text + " " + url)}`; break;
+        case 'fb': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`; break;
+        case 'tg': shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`; break;
+    }
+    if(shareUrl) window.open(shareUrl, '_blank');
 };
 
 function updateStatsUI() {
@@ -313,14 +302,6 @@ function showToast(msg: string) {
     m.innerText = msg;
     t.classList.remove('translate-y-20', 'opacity-0');
     setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000);
-}
-
-function loadSettings() {
-    const s = AppState.settings;
-    const fbIn = document.getElementById('fb-pixel') as HTMLInputElement;
-    const ttIn = document.getElementById('tt-pixel') as HTMLInputElement;
-    if (fbIn) fbIn.value = s.fb || '';
-    if (ttIn) ttIn.value = s.tt || '';
 }
 
 init();
