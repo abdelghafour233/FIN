@@ -1,100 +1,127 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متجر المغرب الحديث - Modern Morocco Store</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>محول الصور السريع | تحويل JPG, PNG, WebP مجاناً</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts: Cairo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body { font-family: 'Cairo', sans-serif; }
-        .product-card:hover img { transform: scale(1.05); }
-        .admin-sidebar-active { background: #2563eb; color: white; }
-        input:focus, select:focus { border-color: #2563eb; ring: 2px; ring-color: #bfdbfe; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background-color: #f0f4f8;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .drop-zone--over {
+            border-color: #2563eb !important;
+            background: rgba(37, 99, 235, 0.05) !important;
+        }
+        .file-card {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        input[type="range"] {
+            accent-color: #2563eb;
+        }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@^19.2.3",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react-router-dom": "https://esm.sh/react-router-dom@^7.11.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
-  }
-}
-</script>
 </head>
-<body class="bg-gray-50 text-gray-900">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <a href="#" class="text-2xl font-bold text-blue-600">متجر المغرب</a>
-                <div class="hidden md:flex gap-6">
-                    <a href="#" class="hover:text-blue-600 transition">الرئيسية</a>
-                    <a href="#category/electronics" class="hover:text-blue-600 transition">إلكترونيات</a>
-                    <a href="#category/home" class="hover:text-blue-600 transition">منزلية</a>
-                    <a href="#category/cars" class="hover:text-blue-600 transition">سيارات</a>
+<body class="min-h-screen flex flex-col">
+    <!-- Header -->
+    <nav class="glass sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 h-16 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-blue-600 p-2 rounded-lg text-white">
+                    <i data-lucide="refresh-cw" class="w-6 h-6"></i>
                 </div>
+                <h1 class="text-xl font-black text-slate-800 tracking-tight">محول الصور الذكي</h1>
             </div>
-            <div class="flex items-center gap-4">
-                <a href="#admin" class="text-gray-600 hover:text-blue-600" title="لوحة التحكم">
-                    <i data-lucide="layout-dashboard"></i>
-                </a>
-                <a href="#cart" class="relative text-gray-600 hover:text-blue-600">
-                    <i data-lucide="shopping-cart"></i>
-                    <span id="cart-count" class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center hidden">0</span>
-                </a>
+            <div class="hidden md:flex gap-6 text-sm font-bold text-slate-500">
+                <a href="#" class="hover:text-blue-600 transition">الرئيسية</a>
+                <a href="#about" class="hover:text-blue-600 transition">كيف يعمل؟</a>
+                <a href="#privacy" class="hover:text-blue-600 transition">الخصوصية</a>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Root -->
-    <div id="app-root" class="min-h-screen"></div>
+    <!-- Main Content -->
+    <main id="app-root" class="flex-grow max-w-4xl mx-auto w-full px-4 py-12">
+        <!-- Hero Section -->
+        <div class="text-center mb-12 space-y-4">
+            <h2 class="text-4xl md:text-5xl font-black text-slate-900 leading-tight">حول صورك في <span class="text-blue-600">ثوانٍ</span></h2>
+            <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">أسرع أداة لتحويل الصور بين الصيغ الأكثر شهرة مباشرة في متصفحك. آمن، مجاني، ولا يتطلب رفع الملفات.</p>
+        </div>
+
+        <!-- Upload Area -->
+        <div id="drop-zone" class="relative group">
+            <input type="file" id="file-input" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+            <div class="border-4 border-dashed border-slate-300 rounded-[2.5rem] p-12 text-center transition-all duration-300 group-hover:border-blue-400 bg-white shadow-xl shadow-slate-200/50">
+                <div class="bg-blue-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                    <i data-lucide="upload-cloud" class="w-12 h-12 text-blue-600"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-800 mb-2">اضغط هنا أو اسحب الصور</h3>
+                <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">JPG • PNG • WEBP</p>
+            </div>
+        </div>
+
+        <!-- Files List -->
+        <div id="files-container" class="mt-12 space-y-4">
+            <!-- سيتم إضافة الملفات هنا عبر جافاسكربت -->
+        </div>
+
+        <!-- Action Button -->
+        <div id="global-actions" class="hidden mt-8 text-center">
+            <button onclick="convertAll()" class="bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-xl hover:bg-blue-700 transition shadow-2xl shadow-blue-500/30 flex items-center gap-3 mx-auto">
+                <i data-lucide="zap" class="w-6 h-6"></i> بدء تحويل الكل
+            </button>
+        </div>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12 mt-12">
-        <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer class="bg-slate-900 text-white py-12 mt-20">
+        <div class="max-w-6xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-right">
             <div class="space-y-4">
-                <h3 class="text-xl font-bold">متجر المغرب الحديث</h3>
-                <p class="text-gray-400 text-sm">أفضل متجر إلكتروني في المغرب لبيع الإلكترونيات والسيارات بضمان الجودة.</p>
+                <h4 class="text-xl font-black text-blue-400">حول الأداة</h4>
+                <p class="text-slate-400 text-sm leading-relaxed">تطبيق ويب يعالج الصور محلياً على جهازك. بياناتك لا تغادر متصفحك أبداً لضمان أقصى درجات الخصوصية والأمان.</p>
             </div>
-            <div>
-                <h4 class="font-bold mb-4">روابط سريعة</h4>
-                <ul class="text-gray-400 text-sm space-y-2">
-                    <li><a href="#category/electronics">إلكترونيات</a></li>
-                    <li><a href="#category/home">منزلية</a></li>
-                    <li><a href="#category/cars">سيارات</a></li>
+            <div class="space-y-4">
+                <h4 class="text-xl font-black text-blue-400">المميزات</h4>
+                <ul class="text-slate-400 text-sm space-y-2">
+                    <li>✓ تحويل سريع جداً</li>
+                    <li>✓ لا حدود لحجم الملفات</li>
+                    <li>✓ خصوصية تامة 100%</li>
+                    <li>✓ مجاني تماماً</li>
                 </ul>
             </div>
-            <div>
-                <h4 class="font-bold mb-4">خدمة الزبائن</h4>
-                <p class="text-gray-400 text-sm">الهاتف: 06XXXXXXXX</p>
-                <p class="text-gray-400 text-sm">الدفع عند الاستلام في كل مدن المغرب</p>
-            </div>
-            <div>
-                <h4 class="font-bold mb-4">تواصل معنا</h4>
-                <div class="flex gap-4">
-                    <i data-lucide="facebook" class="cursor-pointer hover:text-blue-500"></i>
-                    <i data-lucide="instagram" class="cursor-pointer hover:text-pink-500"></i>
+            <div class="space-y-4">
+                <h4 class="text-xl font-black text-blue-400">تواصل معنا</h4>
+                <div class="flex justify-center md:justify-start gap-4">
+                    <i data-lucide="mail" class="cursor-pointer hover:text-blue-400"></i>
+                    <i data-lucide="github" class="cursor-pointer hover:text-blue-400"></i>
                     <i data-lucide="twitter" class="cursor-pointer hover:text-blue-400"></i>
                 </div>
             </div>
         </div>
-        <div class="text-center text-gray-500 text-xs mt-12 pt-8 border-t border-gray-800">
-            &copy; 2024 متجر المغرب الحديث. جميع الحقوق محفوظة.
+        <div class="text-center text-slate-600 text-[10px] mt-12 pt-8 border-t border-slate-800 uppercase tracking-widest font-bold">
+            &copy; 2024 محول الصور السريع - جميع الحقوق محفوظة
         </div>
     </footer>
 
     <!-- Scripts -->
-    <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

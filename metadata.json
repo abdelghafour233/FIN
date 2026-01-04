@@ -1,7 +1,5 @@
 {
-  "name": "متجر المغرب الحديث - Vanilla JS",
-  "description": "متجر إلكتروني احترافي مخصص لبيع المنتجات الإلكترونية والسيارات في المغرب مع لوحة تحكم متكاملة.",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
+  "name": "محول الصور السريع",
+  "description": "أداة احترافية وآمنة لتحويل الصور بين صيغ JPG, PNG, WebP مباشرة في المتصفح.",
+  "requestFramePermissions": []
 }
