@@ -45,6 +45,13 @@
         .nav-link.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
         .btn-neon { background: #10b981; color: #000; font-weight: 900; transition: all 0.3s; }
         .btn-neon:hover { background: #00ff66; box-shadow: 0 0 20px rgba(0, 255, 102, 0.4); transform: translateY(-2px); }
+        
+        .btn-outline-neon { border: 1px solid #10b981; color: #10b981; font-weight: 700; transition: all 0.3s; }
+        .btn-outline-neon:hover { background: rgba(16, 185, 129, 0.1); transform: translateY(-2px); }
+
+        .image-ready { position: relative; }
+        .image-ready::after { content: ''; position: absolute; inset: -4px; border: 2px solid #10b981; border-radius: 1.2rem; animation: pulse-neon 2s infinite; }
+        @keyframes pulse-neon { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.05); } 100% { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body class="min-h-screen">
@@ -80,7 +87,23 @@
         <section id="view-upload" class="view-content active space-y-12">
             <div class="text-center space-y-4">
                 <h2 class="text-4xl md:text-5xl font-black leading-tight">مركز رفع <span class="text-brand-green">الصور الذكي</span></h2>
-                <p class="text-slate-500 max-w-xl mx-auto font-bold">قم برفع صورك الآن للحصول على تحسين تلقائي وضغط عالي الجودة في ثوانٍ معدودة.</p>
+                <p class="text-slate-500 max-w-xl mx-auto font-bold">معالجة فورية، تحويل الصيغ، وتحميل جماعي بضغطة زر.</p>
+            </div>
+
+            <!-- Options Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-4 px-4">
+                <div class="flex items-center gap-4 bg-brand-dark/50 p-2 rounded-2xl border border-brand-green/10">
+                    <span class="text-xs font-black text-slate-500 px-2">صيغة التنزيل:</span>
+                    <select id="export-format" class="bg-transparent text-brand-green font-bold text-sm outline-none cursor-pointer">
+                        <option value="webp">WebP (أفضل ضغط)</option>
+                        <option value="png">PNG (أعلى جودة)</option>
+                        <option value="jpg">JPG (متوافق)</option>
+                    </select>
+                </div>
+                <button onclick="clearQueue()" class="text-red-500 text-xs font-black flex items-center gap-2 hover:opacity-70 transition-all">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    مسح كافة الصور
+                </button>
             </div>
 
             <!-- Drag Area -->
@@ -94,11 +117,6 @@
                         <h3 class="text-2xl font-black mb-2">اسحب وأفلت الصور هنا</h3>
                         <p class="text-slate-400 font-bold">أو انقر لتصفح ملفات جهازك</p>
                     </div>
-                    <div class="flex justify-center gap-4 pt-4">
-                        <span class="px-5 py-2 rounded-full bg-brand-green/5 text-brand-green text-xs font-black border border-brand-green/10">WEBP</span>
-                        <span class="px-5 py-2 rounded-full bg-brand-green/5 text-brand-green text-xs font-black border border-brand-green/10">PNG</span>
-                        <span class="px-5 py-2 rounded-full bg-brand-green/5 text-brand-green text-xs font-black border border-brand-green/10">JPG</span>
-                    </div>
                 </div>
             </div>
 
@@ -107,10 +125,14 @@
                 <!-- Items injected via JS -->
             </div>
 
-            <div id="action-bar" class="hidden flex justify-center mt-12">
-                <button onclick="processAll()" class="btn-neon px-16 py-5 rounded-2xl flex items-center gap-3">
+            <div id="action-bar" class="hidden flex flex-wrap justify-center gap-4 mt-12">
+                <button onclick="processAll()" id="btn-process-all" class="btn-neon px-12 py-5 rounded-2xl flex items-center gap-3">
                     <i data-lucide="zap" class="w-6 h-6"></i>
-                    بدء المعالجة الشاملة
+                    بدء المعالجة
+                </button>
+                <button onclick="downloadAll()" id="btn-download-all" class="hidden btn-outline-neon px-12 py-5 rounded-2xl flex items-center gap-3">
+                    <i data-lucide="download-cloud" class="w-6 h-6"></i>
+                    تحميل كافة الصور الجاهزة
                 </button>
             </div>
         </section>

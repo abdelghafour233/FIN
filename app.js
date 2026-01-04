@@ -77,6 +77,7 @@ function handleFiles(incoming) {
         const fileObj = {
             id: 'img-' + Date.now() + Math.random().toString(36).substr(2, 5),
             name: file.name,
+            originalName: file.name.split('.').slice(0, -1).join('.'),
             size: file.size,
             preview: URL.createObjectURL(file),
             status: 'idle' // idle, processing, done
@@ -93,6 +94,9 @@ function handleFiles(incoming) {
 function renderQueue() {
     const queue = document.getElementById('file-queue');
     const bar = document.getElementById('action-bar');
+    const btnDownloadAll = document.getElementById('btn-download-all');
+    const btnProcessAll = document.getElementById('btn-process-all');
+
     if(!queue) return;
 
     if(AppState.files.length === 0) {
@@ -102,8 +106,16 @@ function renderQueue() {
     }
 
     bar.classList.remove('hidden');
+
+    // Show "Download All" if at least one is done
+    const hasDone = AppState.files.some(f => f.status === 'done');
+    const hasIdle = AppState.files.some(f => f.status === 'idle');
+    
+    if(btnDownloadAll) btnDownloadAll.classList.toggle('hidden', !hasDone);
+    if(btnProcessAll) btnProcessAll.classList.toggle('hidden', !hasIdle);
+
     queue.innerHTML = AppState.files.map(f => `
-        <div class="neon-card p-6 rounded-[2rem] flex items-center gap-5 transition-all hover:scale-[1.02]">
+        <div class="neon-card p-6 rounded-[2rem] flex items-center gap-5 transition-all hover:scale-[1.02] ${f.status === 'done' ? 'image-ready' : ''}">
             <div class="relative w-16 h-16 shrink-0">
                 <img src="${f.preview}" class="w-full h-full object-cover rounded-xl shadow-lg">
                 ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-green text-black p-1 rounded-full shadow-lg"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
@@ -114,12 +126,12 @@ function renderQueue() {
             </div>
             <div class="flex gap-2">
                 ${f.status === 'idle' ? 
-                    `<button onclick="processOne('${f.id}')" class="w-9 h-9 bg-brand-green/20 text-brand-green rounded-lg flex items-center justify-center hover:bg-brand-green hover:text-black transition-all"><i data-lucide="zap" class="w-4 h-4"></i></button>` :
+                    `<button onclick="processOne('${f.id}')" class="w-10 h-10 bg-brand-green/20 text-brand-green rounded-xl flex items-center justify-center hover:bg-brand-green hover:text-black transition-all" title="معالجة"><i data-lucide="zap" class="w-5 h-5"></i></button>` :
                     f.status === 'processing' ?
-                    `<div class="w-9 h-9 text-brand-green animate-spin flex items-center justify-center"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>` :
-                    `<div class="w-9 h-9 text-brand-green flex items-center justify-center"><i data-lucide="smile" class="w-5 h-5"></i></div>`
+                    `<div class="w-10 h-10 text-brand-green animate-spin flex items-center justify-center"><i data-lucide="refresh-cw" class="w-5 h-5"></i></div>` :
+                    `<button onclick="downloadOne('${f.id}')" class="w-10 h-10 bg-brand-green text-black rounded-xl flex items-center justify-center hover:scale-110 transition-all" title="تحميل"><i data-lucide="download" class="w-5 h-5"></i></button>`
                 }
-                <button onclick="removeFile('${f.id}')" class="w-9 h-9 text-slate-600 hover:text-red-500 transition-colors"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                <button onclick="removeFile('${f.id}')" class="w-10 h-10 text-slate-600 hover:text-red-500 transition-colors" title="إزالة"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
         </div>
     `).join('');
@@ -131,6 +143,12 @@ window.removeFile = (id) => {
     renderQueue();
 };
 
+window.clearQueue = () => {
+    AppState.files = [];
+    renderQueue();
+    showToast('تم مسح القائمة');
+};
+
 window.processOne = (id) => {
     const f = AppState.files.find(x => x.id === id);
     if(!f || f.status !== 'idle') return;
@@ -138,19 +156,46 @@ window.processOne = (id) => {
     f.status = 'processing';
     renderQueue();
 
+    // Mock processing / compression
     setTimeout(() => {
         f.status = 'done';
         AppState.stats.total++;
         AppState.stats.saved += Math.floor(f.size * 0.45);
         localStorage.setItem('imgpro-stats', JSON.stringify(AppState.stats));
         renderQueue();
-    }, 1200);
+    }, 1000);
 };
 
 window.processAll = () => {
     AppState.files.forEach(f => {
         if(f.status === 'idle') window.processOne(f.id);
     });
+};
+
+window.downloadOne = (id) => {
+    const f = AppState.files.find(x => x.id === id);
+    if(!f || f.status !== 'done') return;
+
+    const format = document.getElementById('export-format').value || 'webp';
+    const link = document.createElement('a');
+    link.href = f.preview;
+    link.download = `${f.originalName}_imgpro.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    showToast('بدء التحميل...');
+};
+
+window.downloadAll = () => {
+    const doneFiles = AppState.files.filter(f => f.status === 'done');
+    if(doneFiles.length === 0) return;
+
+    doneFiles.forEach((f, index) => {
+        setTimeout(() => {
+            window.downloadOne(f.id);
+        }, index * 300); // Small delay to prevent browser blocks
+    });
+    showToast('بدء التحميل الجماعي...');
 };
 
 // --- Dashboard / Settings ---
