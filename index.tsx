@@ -27,6 +27,25 @@ const applyTheme = () => {
     applyTheme();
 };
 
+const updateSocialLinks = () => {
+    const siteUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent("جربت StorImage Studio؟ أداة رهيبة لضغط ومعالجة الصور مجاناً وبدون إعلانات! انصحك بها:");
+    
+    const ids = [
+        ['side-share-wa', 'footer-share-wa', `https://api.whatsapp.com/send?text=${shareText}%20${siteUrl}`],
+        ['side-share-fb', 'footer-share-fb', `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`],
+        ['side-share-tg', 'footer-share-tg', `https://t.me/share/url?url=${siteUrl}&text=${shareText}`],
+        ['side-share-tw', 'footer-share-tw', `https://twitter.com/intent/tweet?url=${siteUrl}&text=${shareText}`]
+    ];
+
+    ids.forEach(([sideId, footerId, url]) => {
+        const sideEl = document.getElementById(sideId) as HTMLAnchorElement;
+        const footerEl = document.getElementById(footerId) as HTMLAnchorElement;
+        if (sideEl) sideEl.href = url;
+        if (footerEl) footerEl.href = url;
+    });
+};
+
 const updateActivePreview = () => {
     const active = State.files.find(f => f.id === State.selectedId);
     const mainImg = document.getElementById('main-preview-img') as HTMLImageElement;
@@ -38,17 +57,16 @@ const updateActivePreview = () => {
 
     if (!active || !mainImg) return;
 
-    // Transition effect
     mainImg.style.opacity = '0';
     setTimeout(() => {
         mainImg.src = active.preview;
         mainImg.style.opacity = '1';
         if (nameEl) nameEl.innerText = active.name;
-        if (sizeEl) sizeEl.innerText = `الحجم الأصلي: ${(active.originalSize/1024).toFixed(1)} KB ${active.processedSize ? ` | بعد الضغط: ${(active.processedSize/1024).toFixed(1)} KB` : ''}`;
+        if (sizeEl) sizeEl.innerText = `الحجم: ${(active.originalSize/1024).toFixed(1)} KB ${active.processedSize ? ` ➔ ${(active.processedSize/1024).toFixed(1)} KB` : ''}`;
         
         if (badge) {
-            badge.innerText = active.status === 'done' ? 'تمت المعالجة' : active.status === 'processing' ? 'جاري المعالجة...' : 'جاهز';
-            badge.className = `px-3 py-1 text-[10px] font-black rounded-full uppercase tracking-tighter ${active.status === 'done' ? 'bg-brand-success/20 text-brand-success' : 'bg-brand-primary/20 text-brand-primary'}`;
+            badge.innerText = active.status === 'done' ? 'تم الضغط بنجاح' : active.status === 'processing' ? 'جاري العمل...' : 'جاهز';
+            badge.className = `px-3 py-1 text-[10px] font-black rounded-full uppercase tracking-tighter ${active.status === 'done' ? 'bg-brand-success/20 text-brand-success border border-brand-success/30' : 'bg-brand-primary/20 text-brand-primary'}`;
         }
 
         if (active.status === 'done' && downloadZone && downloadBtn) {
@@ -69,9 +87,9 @@ const renderThumbs = () => {
 
     list.innerHTML = State.files.map(f => `
         <div onclick="window.selectImage('${f.id}')" class="relative group shrink-0 cursor-pointer transition-all">
-            <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl shadow-md border-2 ${State.selectedId === f.id ? 'border-brand-primary' : 'border-white/5'} hover:scale-105 transition-transform">
-            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
-            <button onclick="event.stopPropagation(); window.removeFile('${f.id}')" class="absolute -bottom-1 -left-1 bg-red-500 text-white p-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+            <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl shadow-md border-2 ${State.selectedId === f.id ? 'border-brand-primary ring-4 ring-brand-primary/10' : 'border-white/5'} hover:scale-105 transition-transform">
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full shadow-lg border-2 border-brand-dark"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
+            <button onclick="event.stopPropagation(); window.removeFile('${f.id}')" class="absolute -bottom-1 -left-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
                 <i data-lucide="x" class="w-3 h-3"></i>
             </button>
         </div>
@@ -141,10 +159,11 @@ const processImage = async (item: ImageItem) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
+    updateSocialLinks(); // تفعيل الروابط فور التحميل
+    
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
     const processActiveBtn = document.getElementById('process-active-btn');
-    const processAllBtn = document.getElementById('process-all-btn');
 
     input?.addEventListener('change', (e: any) => {
         const incoming = Array.from(e.target.files as FileList);
@@ -179,12 +198,6 @@ document.addEventListener('DOMContentLoaded', () => {
     processActiveBtn?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.selectedId);
         if (active) processImage(active);
-    });
-
-    processAllBtn?.addEventListener('click', async () => {
-        for (const item of State.files) {
-            await processImage(item);
-        }
     });
 
     (window as any).lucide?.createIcons();

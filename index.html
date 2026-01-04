@@ -37,6 +37,7 @@
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         .hidden { display: none; }
         .active-thumb { border: 2px solid #3b82f6; transform: scale(1.05); }
+        .social-btn { @apply w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all hover:scale-110 active:scale-95; }
     </style>
 </head>
 <body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen">
@@ -56,13 +57,13 @@
         </div>
     </nav>
 
-    <main class="max-w-5xl mx-auto px-6 pt-28 pb-24">
+    <main class="max-w-5xl mx-auto px-6 pt-28 pb-10">
         
         <!-- View: Initial Upload -->
         <section id="upload-view" class="text-center py-12">
             <header class="mb-12">
                 <h2 class="text-4xl font-black mb-4 tracking-tight">استوديو <span class="gradient-text">الصور</span> الذكي</h2>
-                <p class="text-slate-500 font-bold max-w-lg mx-auto leading-relaxed">أداة احترافية لضغط الصور وتحويل صيغها بجودة عالية وبسرعة فائقة.</p>
+                <p class="text-slate-500 font-bold max-w-lg mx-auto leading-relaxed">اضغط، حول، وشارك صورك مع الجمهور بجودة احترافية.</p>
             </header>
 
             <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone p-16 rounded-[3rem] text-center cursor-pointer group active:scale-[0.98]">
@@ -75,50 +76,41 @@
             </div>
         </section>
 
-        <!-- View: Workspace (Hidden by default) -->
+        <!-- View: Workspace -->
         <section id="workspace-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             <!-- Left: Main Preview Area -->
             <div class="lg:col-span-8 space-y-6">
                 <div class="main-preview-box relative bg-brand-card/30 border border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center min-h-[400px] p-4 group">
                     <div id="active-image-container" class="w-full h-full flex items-center justify-center">
-                        <!-- Big Image Injected Here -->
                         <img id="main-preview-img" src="" class="max-w-full max-h-[500px] object-contain rounded-2xl shadow-2xl transition-all duration-500">
                     </div>
                     
-                    <!-- Overlay Info -->
                     <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
                         <div class="text-right">
                             <p id="active-name" class="text-sm font-bold text-white truncate max-w-[200px]"></p>
                             <p id="active-size" class="text-[10px] text-white/60 font-mono"></p>
                         </div>
-                        <div id="status-badge" class="px-3 py-1 bg-brand-primary/20 text-brand-primary text-[10px] font-black rounded-full uppercase tracking-tighter">جاهز للمعالجة</div>
+                        <div id="status-badge" class="px-3 py-1 bg-brand-primary/20 text-brand-primary text-[10px] font-black rounded-full uppercase tracking-tighter">جاهز</div>
                     </div>
                 </div>
 
-                <!-- Thumbnails Strip -->
-                <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 px-2 scroll-smooth no-scrollbar">
-                    <!-- Tiny thumbs injected here -->
-                </div>
+                <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 px-2 scroll-smooth no-scrollbar"></div>
             </div>
 
             <!-- Right: Controls Area -->
             <div class="lg:col-span-4 space-y-6">
-                <div class="bg-brand-card/50 p-8 rounded-[2rem] border border-white/5 space-y-8 sticky top-28">
+                <div class="bg-brand-card/50 p-8 rounded-[2rem] border border-white/5 space-y-8 sticky top-28 shadow-2xl">
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <label class="text-xs font-black opacity-50">جودة الضغط</label>
                             <span id="quality-val" class="text-brand-primary font-black text-sm">85%</span>
                         </div>
                         <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-primary">
-                        <div class="flex justify-between mt-2 text-[9px] font-bold opacity-30">
-                            <span>جودة عالية</span>
-                            <span>ضغط أكبر</span>
-                        </div>
                     </div>
 
                     <div>
-                        <label class="text-xs font-black opacity-50 block mb-3">الصيغة المطلوبة</label>
+                        <label class="text-xs font-black opacity-50 block mb-3">الصيغة</label>
                         <select id="format-select" class="w-full bg-brand-dark p-4 rounded-xl border border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-colors text-right cursor-pointer">
                             <option value="image/webp">WebP (موصى به)</option>
                             <option value="image/jpeg">JPEG (قياسي)</option>
@@ -126,21 +118,36 @@
                         </select>
                     </div>
 
-                    <div class="pt-4 space-y-3">
+                    <div class="space-y-3">
                         <button id="process-active-btn" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
                             <i data-lucide="zap" class="w-5 h-5"></i>
-                            معالجة الصورة الحالية
+                            معالجة الحالية
                         </button>
-                        <button id="process-all-btn" class="w-full bg-white/5 hover:bg-white/10 text-slate-300 py-4 rounded-xl font-bold transition-all active:scale-95 border border-white/5">
-                            معالجة جميع الصور
-                        </button>
+                        <div id="download-zone" class="hidden animate-bounce">
+                            <a id="final-download-link" href="#" download class="w-full bg-brand-success text-white py-4 rounded-xl font-black shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                                <i data-lucide="download" class="w-5 h-5"></i>
+                                تحميل النتيجة
+                            </a>
+                        </div>
                     </div>
 
-                    <div id="download-zone" class="hidden border-t border-white/5 pt-6 animate-pulse">
-                        <a id="final-download-link" href="#" download class="w-full bg-brand-success text-white py-4 rounded-xl font-black shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02]">
-                            <i data-lucide="download" class="w-5 h-5"></i>
-                            تحميل الملف المعالج
-                        </a>
+                    <!-- Permanent Social Share Section -->
+                    <div class="pt-6 border-t border-white/5 text-center">
+                        <p class="text-[10px] font-black opacity-30 mb-4 uppercase tracking-widest">انشر الموقع مع الجمهور</p>
+                        <div class="flex justify-center gap-3">
+                            <a id="side-share-wa" href="#" target="_blank" class="social-btn bg-[#25D366] hover:shadow-[#25D366]/20">
+                                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                            </a>
+                            <a id="side-share-fb" href="#" target="_blank" class="social-btn bg-[#1877F2] hover:shadow-[#1877F2]/20">
+                                <i data-lucide="facebook" class="w-5 h-5"></i>
+                            </a>
+                            <a id="side-share-tg" href="#" target="_blank" class="social-btn bg-[#0088cc] hover:shadow-[#0088cc]/20">
+                                <i data-lucide="send" class="w-5 h-5"></i>
+                            </a>
+                            <a id="side-share-tw" href="#" target="_blank" class="social-btn bg-black border border-white/10">
+                                <i data-lucide="twitter" class="w-5 h-5"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -148,8 +155,30 @@
 
     </main>
 
-    <footer class="text-center py-12 opacity-30 text-xs font-bold">
-        &copy; 2024 StorImage Studio - تجربة معالجة صور ذكية
+    <!-- Footer with Social Links -->
+    <footer class="mt-20 border-t border-slate-200 dark:border-white/5 py-12 px-6">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="text-right">
+                <h4 class="text-lg font-black mb-1">Stor<span class="gradient-text">Image</span> Studio</h4>
+                <p class="text-xs opacity-40 font-bold">بوابتك الاحترافية لمعالجة الصور مجاناً وبدون إعلانات.</p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] font-black opacity-30 uppercase ml-2">شاركنا الآن:</span>
+                <a id="footer-share-wa" href="#" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-[#25D366] hover:text-white transition-all">
+                    <i data-lucide="message-circle" class="w-4 h-4"></i>
+                </a>
+                <a id="footer-share-fb" href="#" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-[#1877F2] hover:text-white transition-all">
+                    <i data-lucide="facebook" class="w-4 h-4"></i>
+                </a>
+                <a id="footer-share-tg" href="#" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-[#0088cc] hover:text-white transition-all">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </a>
+            </div>
+        </div>
+        <div class="text-center mt-10 opacity-20 text-[10px] font-black uppercase tracking-widest">
+            &copy; 2024 جميع الحقوق محفوظة لـ StorImage
+        </div>
     </footer>
 
     <script type="module" src="index.tsx"></script>
