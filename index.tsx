@@ -1,40 +1,28 @@
 export {};
 
-// --- App State ---
+// --- State ---
 const AppState = {
     theme: localStorage.getItem('storimage-theme') || 'dark',
-    currentView: 'upload',
     files: [] as any[],
-    stats: JSON.parse(localStorage.getItem('storimage-stats') || '{"total":0,"saved":0}'),
-    settings: JSON.parse(localStorage.getItem('storimage-settings') || JSON.stringify({
-        scripts: '' // سيتم استخدامه إذا أراد المستخدم تغيير الكود من لوحة التحكم
-    }))
 };
 
-// --- Initialization ---
+// --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    setupDropZone();
-    updateStatsUI();
     initLucide();
-    
+    setupImageLogic();
+
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
     const qVal = document.getElementById('quality-val');
-    if(slider && qVal) {
+    if (slider && qVal) {
         slider.addEventListener('input', (e: any) => {
             qVal.innerText = e.target.value + '%';
         });
-    }
-
-    // حقن الكود المخصص إذا كان موجوداً في الإعدادات
-    if (AppState.settings.scripts) {
-        injectCustomAds(AppState.settings.scripts);
     }
 });
 
 const initLucide = () => { if ((window as any).lucide) (window as any).lucide.createIcons(); };
 
-// --- Theme ---
 const applyTheme = () => {
     const html = document.documentElement;
     AppState.theme === 'dark' ? html.classList.add('dark') : html.classList.remove('dark');
@@ -46,71 +34,47 @@ const applyTheme = () => {
     applyTheme();
 };
 
-// --- View Management ---
-(window as any).switchView = (viewId: string) => {
+(window as any).switchView = (view: string) => {
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-    document.getElementById(`view-${viewId}`)?.classList.add('active');
-    if(viewId === 'stats') updateStatsUI();
+    document.getElementById(`view-${view}`)?.classList.add('active');
     initLucide();
 };
 
-// --- Ads Injection Logic ---
-const injectCustomAds = (scriptCode: string) => {
-    const container = document.getElementById('ads-injection-container');
-    if (container && scriptCode.trim() !== "") {
-        container.innerHTML = '';
-        const range = document.createRange();
-        const fragment = range.createContextualFragment(scriptCode);
-        container.appendChild(fragment);
-    }
-};
-
-// --- Image Processing Logic ---
-function setupDropZone() {
-    const area = document.getElementById('drop-area');
+// --- Image Processing ---
+function setupImageLogic() {
     const input = document.getElementById('file-input') as HTMLInputElement;
-    if(!area || !input) return;
-    
-    input.addEventListener('change', (e: any) => handleFiles(e.target.files));
-    area.addEventListener('dragover', (e) => { e.preventDefault(); area.classList.add('active'); });
-    area.addEventListener('dragleave', () => area.classList.remove('active'));
-    area.addEventListener('drop', (e: any) => {
-        e.preventDefault();
-        area.classList.remove('active');
-        handleFiles(e.dataTransfer.files);
-    });
+    if (input) {
+        input.addEventListener('change', (e: any) => handleFiles(e.target.files));
+    }
 }
 
-function handleFiles(incoming: FileList) {
-    let count = 0;
-    for (const file of incoming) {
+function handleFiles(files: FileList) {
+    for (const file of files) {
         if (!file.type.startsWith('image/')) continue;
-        const fileObj = {
-            id: 'img-' + Math.random().toString(36).substr(2, 9),
+        AppState.files.push({
+            id: Math.random().toString(36).substr(2, 9),
             name: file.name,
             originalName: file.name.split('.').slice(0, -1).join('.'),
             size: file.size,
             preview: URL.createObjectURL(file),
             status: 'idle'
-        };
-        AppState.files.push(fileObj);
-        count++;
+        });
     }
-    if(count > 0) { renderQueue(); showToast(`تم إضافة ${count} صور`); }
+    renderQueue();
 }
 
 function renderQueue() {
     const queue = document.getElementById('file-queue');
     const bar = document.getElementById('action-bar');
-    if(!queue) return;
-    
-    if(AppState.files.length === 0) {
+    if (!queue || !bar) return;
+
+    if (AppState.files.length === 0) {
         queue.innerHTML = '';
-        bar?.classList.add('hidden');
+        bar.classList.add('hidden');
         return;
     }
-    
-    bar?.classList.remove('hidden');
+
+    bar.classList.remove('hidden');
     const hasDone = AppState.files.some(f => f.status === 'done');
     const hasIdle = AppState.files.some(f => f.status === 'idle');
     
@@ -118,23 +82,22 @@ function renderQueue() {
     document.getElementById('btn-process-all')?.classList.toggle('hidden', !hasIdle);
 
     queue.innerHTML = AppState.files.map(f => `
-        <div class="glass p-5 rounded-3xl flex items-center gap-5 border border-white/5">
-            <div class="relative w-16 h-16 shrink-0">
-                <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl">
-                ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
-            </div>
-            <div class="flex-grow overflow-hidden text-right">
-                <h4 class="text-xs font-black truncate">${f.name}</h4>
-                <p class="text-[9px] text-slate-500 font-bold uppercase">${(f.size/1024).toFixed(1)} KB</p>
+        <div class="glass p-4 rounded-2xl flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 truncate">
+                <img src="${f.preview}" class="w-12 h-12 object-cover rounded-lg shrink-0">
+                <div class="truncate text-right">
+                    <p class="text-xs font-bold truncate">${f.name}</p>
+                    <p class="text-[10px] text-slate-500 uppercase">${(f.size/1024).toFixed(1)} KB</p>
+                </div>
             </div>
             <div class="flex items-center gap-2">
                 ${f.status === 'idle' ? 
-                    `<button onclick="window.processOne('${f.id}')" class="w-10 h-10 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-4 h-4"></i></button>` :
+                    `<button onclick="window.processOne('${f.id}')" class="p-2 bg-brand-primary text-white rounded-lg"><i data-lucide="play" class="w-4 h-4"></i></button>` :
                     f.status === 'processing' ?
-                    `<div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader" class="w-4 h-4"></i></div>` :
-                    `<button onclick="window.downloadOne('${f.id}')" class="w-10 h-10 bg-brand-success text-white rounded-xl flex items-center justify-center hover:scale-110 shadow-lg"><i data-lucide="download" class="w-4 h-4"></i></button>`
+                    `<div class="animate-spin text-brand-primary"><i data-lucide="loader" class="w-4 h-4"></i></div>` :
+                    `<button onclick="window.downloadOne('${f.id}')" class="p-2 bg-brand-success text-white rounded-lg"><i data-lucide="download" class="w-4 h-4"></i></button>`
                 }
-                <button onclick="window.removeFile('${f.id}')" class="w-10 h-10 text-slate-500 hover:text-red-500 transition-colors"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="window.removeFile('${f.id}')" class="p-2 text-slate-400 hover:text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
             </div>
         </div>
     `).join('');
@@ -143,74 +106,36 @@ function renderQueue() {
 
 (window as any).processOne = (id: string) => {
     const f = AppState.files.find(x => x.id === id);
-    if(!f || f.status !== 'idle') return;
+    if (!f) return;
     f.status = 'processing';
     renderQueue();
     setTimeout(() => {
         f.status = 'done';
-        AppState.stats.total++;
-        const qual = parseInt((document.getElementById('quality-slider') as HTMLInputElement).value) / 100;
-        AppState.stats.saved += Math.floor(f.size * (1 - qual));
-        localStorage.setItem('storimage-stats', JSON.stringify(AppState.stats));
         renderQueue();
-    }, 800);
+    }, 600);
 };
 
-(window as any).processAll = () => AppState.files.forEach(f => { if(f.status === 'idle') (window as any).processOne(f.id); });
+(window as any).processAll = () => AppState.files.forEach(f => f.status === 'idle' && (window as any).processOne(f.id));
 
 (window as any).downloadOne = (id: string) => {
     const f = AppState.files.find(x => x.id === id);
-    if(!f || f.status !== 'done') return;
+    if (!f || f.status !== 'done') return;
     const format = (document.getElementById('export-format') as HTMLSelectElement).value;
-    const link = document.createElement('a');
-    link.href = f.preview;
-    link.download = `${f.originalName}_storimage.${format}`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const a = document.createElement('a');
+    a.href = f.preview;
+    a.download = `${f.originalName}_storimage.${format}`;
+    a.click();
 };
 
-(window as any).downloadAll = () => {
-    const ready = AppState.files.filter(f => f.status === 'done');
-    ready.forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 300));
-    showToast('جاري التحميل...');
-};
-
+(window as any).downloadAll = () => AppState.files.filter(f => f.status === 'done').forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 300));
 (window as any).removeFile = (id: string) => { AppState.files = AppState.files.filter(f => f.id !== id); renderQueue(); };
-(window as any).clearQueue = () => { AppState.files = []; renderQueue(); showToast('تم تنظيف القائمة'); };
-
-// --- Settings Management ---
-(window as any).openAuth = () => {
-    const pass = prompt('كلمة السر (1234):');
-    if (pass === '1234') {
-        document.getElementById('modal-auth')?.classList.add('open');
-        (document.getElementById('ad-scripts') as HTMLTextAreaElement).value = AppState.settings.scripts;
-    }
-};
-
-(window as any).closeAuth = () => document.getElementById('modal-auth')?.classList.remove('open');
-
-(window as any).saveAdminSettings = () => {
-    const scripts = (document.getElementById('ad-scripts') as HTMLTextAreaElement).value;
-    AppState.settings.scripts = scripts;
-    localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
-    if (scripts) injectCustomAds(scripts);
-    showToast('تم تحديث الإعدادات');
-    (window as any).closeAuth();
-};
-
-const updateStatsUI = () => {
-    const t = document.getElementById('stat-total');
-    const s = document.getElementById('stat-saved');
-    if(t) (t as HTMLElement).innerText = AppState.stats.total;
-    if(s) (s as HTMLElement).innerHTML = `${(AppState.stats.saved / 1024).toFixed(1)} <span class="text-xl font-bold">KB</span>`;
-};
+(window as any).clearQueue = () => { AppState.files = []; renderQueue(); };
 
 const showToast = (msg: string) => {
     const t = document.getElementById('toast');
     const m = document.getElementById('toast-msg');
     if (!t || !m) return;
-    (m as HTMLElement).innerText = msg;
-    t.classList.remove('translate-y-32', 'opacity-0');
-    setTimeout(() => t.classList.add('translate-y-32', 'opacity-0'), 3000);
+    m.innerText = msg;
+    t.classList.remove('translate-y-20', 'opacity-0');
+    setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000);
 };
