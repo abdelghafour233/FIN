@@ -11,7 +11,7 @@ const AppState = {
     settings: JSON.parse(localStorage.getItem('storimage-settings') || '{"fb":"","tt":"","adPop":"","adSocial":"","adBanner":""}')
 };
 
-// --- Toast & UI Helpers ---
+// --- UI Logic & Helpers ---
 const showToast = (msg: string) => {
     const t = document.getElementById('toast');
     const m = document.getElementById('toast-msg');
@@ -28,7 +28,7 @@ const initLucide = () => {
     }
 };
 
-// --- Define Global Functions Early ---
+// --- GLOBAL ATTACHMENTS (CRITICAL FOR BUTTONS) ---
 (window as any).toggleMobileMenu = (open: boolean) => {
     const menu = document.getElementById('mobile-menu');
     if (menu) {
@@ -38,6 +38,7 @@ const initLucide = () => {
 };
 
 (window as any).switchView = (viewId: string) => {
+    console.log(`Switching to: ${viewId}`);
     if (viewId === 'settings' && !AppState.isUnlocked) {
         (window as any).openAuth();
         return;
@@ -45,12 +46,12 @@ const initLucide = () => {
     
     AppState.currentView = viewId;
     
-    // Update Nav Buttons
+    // Update Nav Buttons UI
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     const activeBtn = document.getElementById(`nav-${viewId}`);
     if(activeBtn) activeBtn.classList.add('active');
     
-    // Switch View
+    // Update View Content
     document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
     const target = document.getElementById(`view-${viewId}`);
     if(target) target.classList.add('active');
@@ -68,13 +69,11 @@ const initLucide = () => {
 };
 
 (window as any).openAuth = () => {
-    const modal = document.getElementById('auth-modal');
-    if (modal) modal.classList.add('open');
+    document.getElementById('auth-modal')?.classList.add('open');
 };
 
 (window as any).closeAuth = () => {
-    const modal = document.getElementById('auth-modal');
-    if (modal) modal.classList.remove('open');
+    document.getElementById('auth-modal')?.classList.remove('open');
 };
 
 (window as any).verifyAdmin = () => {
@@ -98,14 +97,7 @@ const initLucide = () => {
     showToast('تم الخروج بنجاح');
 };
 
-(window as any).togglePass = (id: string) => {
-    const input = document.getElementById(id) as HTMLInputElement;
-    if (input) {
-        input.type = input.type === 'password' ? 'text' : 'password';
-    }
-};
-
-// --- Image Logic ---
+// --- Image Operations ---
 function setupDropZone() {
     const area = document.getElementById('drop-area');
     const input = document.getElementById('file-input') as HTMLInputElement;
@@ -145,9 +137,6 @@ function handleFiles(incoming: FileList) {
 function renderQueue() {
     const queue = document.getElementById('file-queue');
     const bar = document.getElementById('action-bar');
-    const btnDownloadAll = document.getElementById('btn-download-all');
-    const btnProcessAll = document.getElementById('btn-process-all');
-
     if(!queue) return;
 
     if(AppState.files.length === 0) {
@@ -160,23 +149,22 @@ function renderQueue() {
     const hasDone = AppState.files.some(f => f.status === 'done');
     const hasIdle = AppState.files.some(f => f.status === 'idle');
     
-    if(btnDownloadAll) btnDownloadAll.classList.toggle('hidden', !hasDone);
-    if(btnProcessAll) btnProcessAll.classList.toggle('hidden', !hasIdle);
+    document.getElementById('btn-download-all')?.classList.toggle('hidden', !hasDone);
+    document.getElementById('btn-process-all')?.classList.toggle('hidden', !hasIdle);
 
     queue.innerHTML = AppState.files.map(f => `
-        <div class="glass p-6 rounded-[2rem] flex items-center gap-6 transition-all hover:scale-[1.01] ${f.status === 'done' ? 'border-brand-success/40' : ''}">
+        <div class="glass p-6 rounded-[2rem] flex items-center gap-6 transition-all hover:scale-[1.01]">
             <div class="relative w-20 h-20 shrink-0">
-                <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl shadow-xl">
-                ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1.5 rounded-full shadow-lg"><i data-lucide="check" class="w-4 h-4"></i></div>' : ''}
+                <img src="${f.preview}" class="w-full h-full object-cover rounded-2xl">
+                ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1.5 rounded-full"><i data-lucide="check" class="w-4 h-4"></i></div>' : ''}
             </div>
             <div class="flex-grow overflow-hidden text-right">
                 <h4 class="text-sm font-black truncate">${f.name}</h4>
-                <p class="text-[10px] text-slate-500 font-black mt-1 uppercase tracking-widest">${(f.size/1024).toFixed(1)} KB • ${f.status === 'done' ? '<span class="text-brand-success font-black">جاهز للتحميل</span>' : f.status === 'processing' ? '<span class="text-brand-primary animate-pulse">جاري المعالجة...</span>' : 'بانتظار البدء'}</p>
-                ${f.status === 'processing' ? '<div class="w-full h-1.5 bg-slate-200 dark:bg-white/5 rounded-full mt-3 overflow-hidden"><div class="h-full bg-brand-primary animate-[shimmer_2s_infinite]" style="width: 60%"></div></div>' : ''}
+                <p class="text-[10px] text-slate-500 font-black mt-1 uppercase tracking-widest">${(f.size/1024).toFixed(1)} KB</p>
             </div>
             <div class="flex items-center gap-2">
                 ${f.status === 'idle' ? 
-                    `<button onclick="window.processOne('${f.id}')" class="w-12 h-12 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-6 h-6"></i></button>` :
+                    `<button onclick="window.processOne('${f.id}')" class="w-12 h-12 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center hover:bg-brand-primary hover:text-white"><i data-lucide="play" class="w-6 h-6"></i></button>` :
                     f.status === 'processing' ?
                     `<div class="w-12 h-12 text-brand-primary animate-spin flex items-center justify-center"><i data-lucide="loader" class="w-6 h-6"></i></div>` :
                     `<button onclick="window.downloadOne('${f.id}')" class="w-12 h-12 bg-brand-success text-white rounded-2xl flex items-center justify-center hover:scale-110 shadow-lg"><i data-lucide="download" class="w-6 h-6"></i></button>`
@@ -224,7 +212,7 @@ function renderQueue() {
 (window as any).downloadAll = () => {
     const ready = AppState.files.filter(f => f.status === 'done');
     ready.forEach((f, i) => setTimeout(() => (window as any).downloadOne(f.id), i * 350));
-    showToast('بدء التحميل المتعدد...');
+    showToast('بدء التحميل...');
 };
 
 (window as any).removeFile = (id: string) => {
@@ -235,49 +223,44 @@ function renderQueue() {
 (window as any).clearQueue = () => {
     AppState.files = [];
     renderQueue();
-    showToast('تم إخلاء القائمة');
+    showToast('تم الإخلاء');
 };
 
-// --- Storage & Init ---
+// --- Settings Operations ---
 function loadSettings() {
     const s = AppState.settings;
     const fb = document.getElementById('fb-pixel') as HTMLInputElement;
     const tt = document.getElementById('tt-pixel') as HTMLInputElement;
     const adPop = document.getElementById('ads-popunder') as HTMLTextAreaElement;
-    const adSocial = document.getElementById('ads-socialbar') as HTMLTextAreaElement;
-    const adBanner = document.getElementById('ads-banner') as HTMLTextAreaElement;
+    const adSoc = document.getElementById('ads-socialbar') as HTMLTextAreaElement;
+    const adBan = document.getElementById('ads-banner') as HTMLTextAreaElement;
 
     if(fb) fb.value = s.fb || '';
     if(tt) tt.value = s.tt || '';
     if(adPop) adPop.value = s.adPop || '';
-    if(adSocial) adSocial.value = s.adSocial || '';
-    if(adBanner) adBanner.value = s.adBanner || '';
+    if(adSoc) adSoc.value = s.adSocial || '';
+    if(adBan) adBan.value = s.adBanner || '';
 }
 
 (window as any).saveSettings = () => {
-    const fbInput = document.getElementById('fb-pixel') as HTMLInputElement;
-    const ttInput = document.getElementById('tt-pixel') as HTMLInputElement;
-    const adPopInput = document.getElementById('ads-popunder') as HTMLTextAreaElement;
-    const adSocialInput = document.getElementById('ads-socialbar') as HTMLTextAreaElement;
-    const adBannerInput = document.getElementById('ads-banner') as HTMLTextAreaElement;
-    const passInput = document.getElementById('setting-admin-pass') as HTMLInputElement;
+    const fb = (document.getElementById('fb-pixel') as HTMLInputElement).value;
+    const tt = (document.getElementById('tt-pixel') as HTMLInputElement).value;
+    const adPop = (document.getElementById('ads-popunder') as HTMLTextAreaElement).value;
+    const adSoc = (document.getElementById('ads-socialbar') as HTMLTextAreaElement).value;
+    const adBan = (document.getElementById('ads-banner') as HTMLTextAreaElement).value;
+    const pass = (document.getElementById('setting-admin-pass') as HTMLInputElement).value;
 
-    if(passInput.value.trim()) {
-        AppState.adminPass = passInput.value;
-        localStorage.setItem('storimage-admin-pass', AppState.adminPass);
+    if(pass.trim()) {
+        AppState.adminPass = pass;
+        localStorage.setItem('storimage-admin-pass', pass);
     }
     
-    AppState.settings = { 
-        fb: fbInput.value, 
-        tt: ttInput.value,
-        adPop: adPopInput.value,
-        adSocial: adSocialInput.value,
-        adBanner: adBannerInput.value
-    };
+    AppState.settings = { fb, tt, adPop, adSocial: adSoc, adBanner: adBan };
     localStorage.setItem('storimage-settings', JSON.stringify(AppState.settings));
-    showToast('تم حفظ جميع الإعدادات');
+    showToast('تم حفظ الإعدادات');
 };
 
+// --- Initialization ---
 function updateStatsUI() {
     const t = document.getElementById('stat-total');
     const s = document.getElementById('stat-saved');
@@ -297,30 +280,18 @@ function applyTheme() {
     setTimeout(initLucide, 50);
 }
 
-const setupSliders = () => {
-    const slider = document.getElementById('quality-slider') as HTMLInputElement;
-    const val = document.getElementById('quality-val');
-    if(slider && val) {
-        slider.addEventListener('input', (e: any) => {
-            val.innerText = e.target.value + '%';
-        });
-    }
-};
-
-// --- Final Init ---
+// Startup
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     setupDropZone();
     updateStatsUI();
     initLucide();
-    setupSliders();
+    
+    const slider = document.getElementById('quality-slider') as HTMLInputElement;
+    const qVal = document.getElementById('quality-val');
+    if(slider && qVal) {
+        slider.addEventListener('input', (e: any) => {
+            qVal.innerText = e.target.value + '%';
+        });
+    }
 });
-
-// Run immediately if DOM ready
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    applyTheme();
-    setupDropZone();
-    updateStatsUI();
-    initLucide();
-    setupSliders();
-}
