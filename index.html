@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title id="site-title-tag">محول الصور برو | نظام تحويل سحابي محلي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إيميج برو | منصة معالجة الصور الاحترافية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,178 +12,205 @@
     <script>
         tailwind.config = {
             darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Cairo', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            black: '#0a0a0a',
+                            dark: '#121212',
+                            green: '#10b981',
+                            neon: '#00ff66',
+                        }
+                    }
+                }
+            }
         }
     </script>
     <style>
-        body { font-family: 'Cairo', sans-serif; transition: background-color 0.3s ease; }
-        
-        .sidebar-active { background: #2563eb; color: white; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2); }
-        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        
-        .dark body { background-color: #020617; color: #f1f5f9; }
-        .dark .glass { background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .dark .bg-white { background-color: #0f172a; }
-        .dark .border-slate-100, .dark .border-slate-200 { border-color: #1e293b; }
-        .dark .text-slate-900 { color: #f8fafc; }
-        .dark .text-slate-800 { color: #f1f5f9; }
-        .dark .text-slate-600 { color: #94a3b8; }
-        .dark .text-slate-500 { color: #64748b; }
-        .dark .bg-slate-50 { background-color: #1e293b; }
+        body { transition: background-color 0.4s ease, color 0.4s ease; font-family: 'Cairo', sans-serif; }
+        .dark body { background-color: #0a0a0a; color: #ffffff; }
+        .light body { background-color: #f8fafc; color: #0f172a; }
 
-        .admin-card { transition: all 0.3s ease; }
-        .admin-card:hover { transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); }
-        .drop-zone--over { border-color: #2563eb !important; background: #eff6ff !important; }
-        .dark .drop-zone--over { background: #1e293b !important; }
+        .neon-glow { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .dark .neon-card { background: #121212; border: 1px solid rgba(16, 185, 129, 0.1); }
+        .light .neon-card { background: #ffffff; border: 1px solid #e2e8f0; }
         
-        input[type="range"] { accent-color: #2563eb; }
+        .drop-zone { border: 2px dashed rgba(16, 185, 129, 0.3); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .drop-zone.active { border-color: #10b981; background: rgba(16, 185, 129, 0.05); transform: scale(1.01); }
         
-        header { z-index: 40; }
+        .view-content { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease; }
+        .view-content.active { display: block; opacity: 1; transform: translateY(0); }
+        
+        .nav-link.active { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+        .btn-neon { background: #10b981; color: #000; font-weight: 900; transition: all 0.3s; }
+        .btn-neon:hover { background: #00ff66; box-shadow: 0 0 20px rgba(0, 255, 102, 0.4); transform: translateY(-2px); }
     </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300">
+<body class="min-h-screen">
 
-    <div class="flex flex-col lg:flex-row min-h-screen">
+    <!-- Sidebar / Nav -->
+    <nav class="fixed top-0 left-0 right-0 z-50 border-b border-brand-green/10 bg-brand-black/80 backdrop-blur-xl dark:bg-brand-black/80 light:bg-white/80">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-brand-green rounded-xl flex items-center justify-center text-black shadow-lg shadow-brand-green/20">
+                    <i data-lucide="image" class="w-6 h-6"></i>
+                </div>
+                <h1 class="text-xl font-black tracking-tighter">إيميج<span class="text-brand-green">برو</span></h1>
+            </div>
+
+            <div class="hidden md:flex items-center gap-2 bg-slate-800/50 dark:bg-slate-800/50 light:bg-slate-200/50 p-1 rounded-2xl">
+                <button onclick="switchView('upload')" id="nav-upload" class="nav-link active px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">رفع الصور</button>
+                <button onclick="switchView('stats')" id="nav-stats" class="nav-link px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">الإحصائيات</button>
+                <button onclick="switchView('settings')" id="nav-settings" class="nav-link px-6 py-2 rounded-xl font-bold text-sm transition-all duration-300">لوحة التحكم</button>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="toggleTheme()" id="theme-btn" class="w-11 h-11 flex items-center justify-center rounded-xl border border-brand-green/20 hover:bg-brand-green/10 text-brand-green transition-all">
+                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 pt-32 pb-20">
         
-        <!-- Sidebar Navigation -->
-        <aside class="w-full lg:w-72 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-8 z-50">
-            <div class="flex items-center gap-3 px-2">
-                <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/20">
-                    <i data-lucide="refresh-cw" class="w-6 h-6"></i>
-                </div>
-                <span class="text-xl font-black text-slate-800 dark:text-white" id="brand-name">محول برو</span>
+        <!-- View: Upload -->
+        <section id="view-upload" class="view-content active space-y-12">
+            <div class="text-center space-y-4">
+                <h2 class="text-4xl md:text-5xl font-black leading-tight">مركز رفع <span class="text-brand-green">الصور الذكي</span></h2>
+                <p class="text-slate-500 max-w-xl mx-auto font-bold">قم برفع صورك الآن للحصول على تحسين تلقائي وضغط عالي الجودة في ثوانٍ معدودة.</p>
             </div>
 
-            <nav class="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
-                <button onclick="switchTab('converter')" id="tab-converter" class="sidebar-active flex-grow lg:flex-none flex items-center gap-3 p-4 rounded-2xl font-bold transition whitespace-nowrap">
-                    <i data-lucide="layout-grid" class="w-5 h-5"></i> المحول الذكي
-                </button>
-                <button onclick="switchTab('dashboard')" id="tab-dashboard" class="text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 flex-grow lg:flex-none flex items-center gap-3 p-4 rounded-2xl font-bold transition whitespace-nowrap">
-                    <i data-lucide="pie-chart" class="w-5 h-5"></i> لوحة التحكم
-                </button>
-                <button onclick="switchTab('settings')" id="tab-settings" class="text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 flex-grow lg:flex-none flex items-center gap-3 p-4 rounded-2xl font-bold transition whitespace-nowrap">
-                    <i data-lucide="settings" class="w-5 h-5"></i> الإعدادات
-                </button>
-            </nav>
-
-            <div class="hidden lg:block mt-auto bg-blue-50 dark:bg-blue-900/20 p-6 rounded-[2rem] border border-blue-100 dark:border-blue-900/30">
-                <h5 class="font-black text-blue-900 dark:text-blue-400 mb-2 text-sm">نصيحة اليوم</h5>
-                <p class="text-[10px] text-blue-600 dark:text-blue-300 leading-relaxed font-bold">صيغة WebP توفر حتى 35% من حجم الصورة مقارنة بـ JPG دون فقدان الجودة.</p>
-            </div>
-        </aside>
-
-        <!-- Main Workspace -->
-        <main class="flex-grow bg-slate-50 dark:bg-slate-950 transition-colors duration-300">
-            
-            <!-- Top Header -->
-            <header class="sticky top-0 w-full bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 px-6 lg:px-10 py-4 flex items-center justify-between">
-                <div class="flex items-center gap-4">
-                    <h1 class="text-lg font-black text-slate-800 dark:text-white hidden lg:block" id="header-context-title">المحول الذكي</h1>
-                </div>
-                
-                <div class="flex items-center gap-3">
-                    <!-- Dark Mode Toggle Button (Top) -->
-                    <button onclick="toggleDarkMode()" id="dark-mode-btn" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 rounded-xl transition-all duration-300 border border-transparent dark:border-slate-700 group">
-                        <span id="dark-icon-container" class="text-slate-600 dark:text-yellow-400">
-                            <i data-lucide="moon" class="w-5 h-5"></i>
-                        </span>
-                        <span class="text-xs font-bold text-slate-700 dark:text-slate-200" id="dark-text">النظام الليلي</span>
-                    </button>
-                    
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-                    
-                    <div class="flex items-center gap-2 px-2 py-1 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900/30 rounded-lg">
-                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span class="text-[10px] font-black text-green-700 dark:text-green-400">النظام متصل</span>
+            <!-- Drag Area -->
+            <div id="drop-area" class="drop-zone neon-card relative group rounded-[3rem] p-16 md:p-24 text-center overflow-hidden">
+                <input type="file" id="file-input" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                <div class="relative z-0 space-y-6">
+                    <div class="w-24 h-24 bg-brand-green/10 text-brand-green rounded-full flex items-center justify-center mx-auto group-hover:scale-110 transition-transform duration-500">
+                        <i data-lucide="upload-cloud" class="w-12 h-12"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black mb-2">اسحب وأفلت الصور هنا</h3>
+                        <p class="text-slate-400 font-bold">أو انقر لتصفح ملفات جهازك</p>
+                    </div>
+                    <div class="flex justify-center gap-4 pt-4">
+                        <span class="px-5 py-2 rounded-full bg-brand-green/5 text-brand-green text-xs font-black border border-brand-green/10">WEBP</span>
+                        <span class="px-5 py-2 rounded-full bg-brand-green/5 text-brand-green text-xs font-black border border-brand-green/10">PNG</span>
+                        <span class="px-5 py-2 rounded-full bg-brand-green/5 text-brand-green text-xs font-black border border-brand-green/10">JPG</span>
                     </div>
                 </div>
-            </header>
-
-            <div class="p-4 lg:p-10">
-                <!-- Tab: Converter -->
-                <section id="view-converter" class="space-y-10 max-w-5xl mx-auto">
-                    <div class="space-y-2 text-center lg:text-right">
-                        <h2 class="text-3xl lg:text-5xl font-black text-slate-900 dark:text-white">محول الصور <span class="text-blue-600">الاحترافي</span></h2>
-                        <p class="text-slate-400 dark:text-slate-500 font-medium">حوّل صورك بأمان تام وسرعة خارقة - جميع العمليات تتم في جهازك.</p>
-                    </div>
-
-                    <div id="drop-zone" class="relative group">
-                        <input type="file" id="file-input" multiple accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                        <div class="border-4 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] p-12 lg:p-20 text-center transition-all duration-300 group-hover:border-blue-400 bg-white dark:bg-slate-900 shadow-xl shadow-slate-200/20 dark:shadow-black/20">
-                            <div class="bg-blue-600 w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-blue-200 dark:shadow-blue-900/20 group-hover:scale-110 transition-transform">
-                                <i data-lucide="plus" class="w-10 h-10 text-white"></i>
-                            </div>
-                            <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">اسحب الصور هنا للبدء</h3>
-                            <p class="text-slate-400 dark:text-slate-500 font-bold text-sm">يدعم JPG, PNG, WEBP, GIF</p>
-                        </div>
-                    </div>
-
-                    <div id="files-container" class="space-y-4"></div>
-
-                    <div id="global-actions" class="hidden text-center pt-6">
-                        <button onclick="convertAll()" class="bg-slate-900 dark:bg-blue-600 text-white px-12 py-5 rounded-2xl font-black text-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition shadow-2xl flex items-center gap-3 mx-auto">
-                            <i data-lucide="zap" class="w-6 h-6"></i> تحويل كافة الملفات
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Tab: Dashboard -->
-                <section id="view-dashboard" class="hidden space-y-10 max-w-6xl mx-auto">
-                    <h2 class="text-4xl font-black text-slate-900 dark:text-white">إحصائيات النظام</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="admin-card bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-                            <div class="text-blue-600 bg-blue-50 dark:bg-blue-900/30 w-12 h-12 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="image"></i></div>
-                            <h4 class="text-slate-400 dark:text-slate-500 font-bold text-sm mb-1">إجمالي الصور المعالجة</h4>
-                            <p class="text-4xl font-black text-slate-900 dark:text-white" id="stat-total">0</p>
-                        </div>
-                        <div class="admin-card bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-                            <div class="text-green-600 bg-green-50 dark:bg-green-900/30 w-12 h-12 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="hard-drive"></i></div>
-                            <h4 class="text-slate-400 dark:text-slate-500 font-bold text-sm mb-1">المساحة الموفرة</h4>
-                            <p class="text-4xl font-black text-slate-900 dark:text-white" id="stat-saved">0 KB</p>
-                        </div>
-                        <div class="admin-card bg-white dark:bg-slate-900 p-8 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-                            <div class="text-purple-600 bg-purple-50 dark:bg-purple-900/30 w-12 h-12 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="activity"></i></div>
-                            <h4 class="text-slate-400 dark:text-slate-500 font-bold text-sm mb-1">متوسط وقت المعالجة</h4>
-                            <p class="text-4xl font-black text-slate-900 dark:text-white" id="stat-time">0.2s</p>
-                        </div>
-                    </div>
-                    <div class="bg-white dark:bg-slate-900 rounded-[2.5rem] p-10 border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <h3 class="text-xl font-black mb-8 dark:text-white">سجل العمليات الأخيرة</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right">
-                                <thead class="text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-widest border-b border-slate-50 dark:border-slate-800">
-                                    <tr>
-                                        <th class="pb-4">الملف</th>
-                                        <th class="pb-4">الصيغة الأصلية</th>
-                                        <th class="pb-4">الصيغة الناتجة</th>
-                                        <th class="pb-4">الحالة</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-log-body" class="divide-y divide-slate-50 dark:divide-slate-800"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Tab: Settings -->
-                <section id="view-settings" class="hidden space-y-10 max-w-4xl mx-auto">
-                    <h2 class="text-4xl font-black text-slate-900 dark:text-white">إعدادات المنصة</h2>
-                    <div class="space-y-8 bg-white dark:bg-slate-900 p-10 rounded-[3rem] border border-slate-100 dark:border-slate-800 shadow-sm">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div class="space-y-3">
-                                <label class="text-sm font-black text-slate-600 dark:text-slate-400 pr-2">اسم الموقع</label>
-                                <input type="text" id="set-site-name" onchange="updateSettings('siteName', this.value)" class="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition font-bold dark:text-white">
-                            </div>
-                            <div class="space-y-3">
-                                <label class="text-sm font-black text-slate-600 dark:text-slate-400 pr-2">رابط الدومين</label>
-                                <input type="text" id="set-domain" onchange="updateSettings('domain', this.value)" class="w-full p-5 bg-slate-50 dark:bg-slate-800 rounded-2xl border-0 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/20 transition font-bold dark:text-white" placeholder="example.com">
-                            </div>
-                        </div>
-                    </div>
-                </section>
             </div>
-        </main>
+
+            <!-- Queue Area -->
+            <div id="file-queue" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Items injected via JS -->
+            </div>
+
+            <div id="action-bar" class="hidden flex justify-center mt-12">
+                <button onclick="processAll()" class="btn-neon px-16 py-5 rounded-2xl flex items-center gap-3">
+                    <i data-lucide="zap" class="w-6 h-6"></i>
+                    بدء المعالجة الشاملة
+                </button>
+            </div>
+        </section>
+
+        <!-- View: Stats -->
+        <section id="view-stats" class="view-content space-y-10">
+            <h2 class="text-3xl font-black flex items-center gap-4">
+                <span class="w-2 h-10 bg-brand-green rounded-full"></span>
+                إحصائيات المنصة
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="neon-card p-10 rounded-[2.5rem] space-y-4">
+                    <div class="text-brand-green"><i data-lucide="files" class="w-10 h-10"></i></div>
+                    <h4 class="text-slate-500 font-bold">إجمالي الصور المعالجة</h4>
+                    <p class="text-5xl font-black" id="stat-total">0</p>
+                </div>
+                <div class="neon-card p-10 rounded-[2.5rem] space-y-4">
+                    <div class="text-brand-green"><i data-lucide="shield-check" class="w-10 h-10"></i></div>
+                    <h4 class="text-slate-500 font-bold">المساحة الموفرة</h4>
+                    <p class="text-5xl font-black" id="stat-saved">0 <span class="text-xl">KB</span></p>
+                </div>
+                <div class="neon-card p-10 rounded-[2.5rem] space-y-4">
+                    <div class="text-brand-green"><i data-lucide="clock" class="w-10 h-10"></i></div>
+                    <h4 class="text-slate-500 font-bold">سرعة المعالجة</h4>
+                    <p class="text-5xl font-black" id="stat-speed">0.4 <span class="text-xl">ث/ص</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- View: Settings (Dashboard) -->
+        <section id="view-settings" class="view-content space-y-8">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <h2 class="text-3xl font-black flex items-center gap-4">
+                    <span class="w-2 h-10 bg-brand-green rounded-full"></span>
+                    لوحة التحكم والإعدادات
+                </h2>
+                <button onclick="saveSettings()" class="btn-neon px-10 py-4 rounded-xl">حفظ كافة الإعدادات</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Tracking Pixels -->
+                <div class="neon-card p-8 md:p-12 rounded-[3rem] space-y-8">
+                    <h3 class="text-xl font-black text-brand-green flex items-center gap-3">
+                        <i data-lucide="code" class="w-6 h-6"></i>
+                        أكواد التتبع (Pixels)
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">Facebook Pixel ID</label>
+                            <input type="text" id="fb-pixel" placeholder="مثال: 1234567890" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">TikTok Pixel ID</label>
+                            <input type="text" id="tt-pixel" placeholder="مثال: ABC123XYZ" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">Google Analytics (G-ID)</label>
+                            <input type="text" id="ga-id" placeholder="مثال: G-XXXXXXX" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domain & Technical -->
+                <div class="neon-card p-8 md:p-12 rounded-[3rem] space-y-8">
+                    <h3 class="text-xl font-black text-brand-green flex items-center gap-3">
+                        <i data-lucide="globe" class="w-6 h-6"></i>
+                        إعدادات الدومين والربط
+                    </h3>
+                    <div class="space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">اسم النطاق (Domain)</label>
+                            <input type="text" id="domain-name" placeholder="www.example.com" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">Name Server 1</label>
+                            <input type="text" id="ns1" placeholder="ns1.provider.com" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">Name Server 2</label>
+                            <input type="text" id="ns2" placeholder="ns2.provider.com" class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm font-black text-slate-500 mr-2">رابط Google Sheets للطلبات</label>
+                            <input type="text" id="gsheets" placeholder="https://docs.google.com/spreadsheets/..." class="w-full bg-brand-black/50 border border-brand-green/10 p-5 rounded-2xl outline-none focus:border-brand-green transition-all font-bold text-left ltr">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Toast -->
+    <div id="toast" class="fixed bottom-10 left-10 z-[100] transform translate-y-20 opacity-0 transition-all duration-500">
+        <div class="bg-brand-green text-black px-10 py-5 rounded-2xl shadow-2xl flex items-center gap-4 font-black">
+            <i data-lucide="check-circle" class="w-6 h-6"></i>
+            <span id="toast-msg">تمت العملية بنجاح</span>
+        </div>
     </div>
-    <div id="toast-container" class="fixed bottom-10 right-10 z-[100] space-y-4"></div>
+
     <script src="app.js"></script>
 </body>
 </html>
