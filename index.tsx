@@ -26,9 +26,9 @@ const State = {
     })),
     socialLinks: JSON.parse(localStorage.getItem('social_links') || JSON.stringify({
         whatsapp: '212600000000',
-        facebook: '#',
-        instagram: '#',
-        twitter: '#'
+        facebook: '',
+        instagram: '',
+        twitter: ''
     }))
 };
 
@@ -39,7 +39,7 @@ const applyTheme = () => {
     }, 10);
 };
 
-// تحديث روابط التواصل في واجهة المستخدم
+// تحديث روابط التواصل وإخفائها إذا كانت غير مربوطة
 const updateSocialLinksUI = () => {
     const floatWa = document.getElementById('btn-floating-whatsapp') as HTMLAnchorElement;
     const footerWa = document.getElementById('link-whatsapp') as HTMLAnchorElement;
@@ -47,11 +47,56 @@ const updateSocialLinksUI = () => {
     const footerIg = document.getElementById('link-instagram') as HTMLAnchorElement;
     const footerTw = document.getElementById('link-twitter') as HTMLAnchorElement;
 
-    if (floatWa) floatWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
-    if (footerWa) footerWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
-    if (footerFb) footerFb.href = State.socialLinks.facebook;
-    if (footerIg) footerIg.href = State.socialLinks.instagram;
-    if (footerTw) footerTw.href = State.socialLinks.twitter;
+    // مساعد للتحقق من الرابط
+    const isValid = (val: string) => val && val.trim() !== '' && val !== '#';
+
+    // الواتساب
+    if (floatWa) {
+        if (isValid(State.socialLinks.whatsapp)) {
+            floatWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
+            floatWa.classList.remove('hidden');
+        } else {
+            floatWa.classList.add('hidden');
+        }
+    }
+    if (footerWa) {
+        if (isValid(State.socialLinks.whatsapp)) {
+            footerWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
+            footerWa.classList.remove('hidden');
+        } else {
+            footerWa.classList.add('hidden');
+        }
+    }
+
+    // فيسبوك
+    if (footerFb) {
+        if (isValid(State.socialLinks.facebook)) {
+            footerFb.href = State.socialLinks.facebook;
+            footerFb.classList.remove('hidden');
+        } else {
+            footerFb.classList.add('hidden');
+        }
+    }
+
+    // إنستغرام
+    if (footerIg) {
+        if (isValid(State.socialLinks.instagram)) {
+            footerIg.href = State.socialLinks.instagram;
+            footerIg.classList.remove('hidden');
+        } else {
+            footerIg.classList.add('hidden');
+        }
+    }
+
+    // تويتر
+    if (footerTw) {
+        if (isValid(State.socialLinks.twitter)) {
+            footerTw.href = State.socialLinks.twitter;
+            footerTw.classList.remove('hidden');
+        } else {
+            footerTw.classList.add('hidden');
+        }
+    }
 };
 
 (window as any).toggleTheme = () => {
@@ -156,7 +201,7 @@ const loadDashboardInputs = () => {
     localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
     localStorage.setItem('social_links', JSON.stringify(State.socialLinks));
     
-    showToast('تم حفظ جميع الإعدادات بنجاح!');
+    showToast('تم حفظ الإعدادات وتحديث الأزرار!');
     updateSocialLinksUI();
     setTimeout(() => (window as any).toggleDashboard(), 500);
     injectAds();
@@ -331,12 +376,11 @@ const processImage = async (item: ImageItem) => {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     injectAds(); 
-    updateSocialLinksUI(); // تهيئة الروابط عند التحميل
+    updateSocialLinksUI();
     
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
     const processActiveBtn = document.getElementById('process-active-btn');
-    const passInput = document.getElementById('dashboard-pass-input');
     const downloadTriggerBtn = document.getElementById('final-download-btn-trigger');
 
     input?.addEventListener('change', (e: any) => {
@@ -376,10 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     downloadTriggerBtn?.addEventListener('click', () => {
         handleDownloadWithAd();
-    });
-
-    passInput?.addEventListener('keypress', (e: any) => {
-        if (e.key === 'Enter') (window as any).verifyDashboardPass();
     });
 
     (window as any).lucide?.createIcons();

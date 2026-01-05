@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>StorImage Studio | استوديو معالجة الصور</title>
+    <title>StorImage Studio | معالجة الصور الاحترافية</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -58,7 +58,6 @@
                 <h1 class="text-xl font-black">Stor<span class="gradient-text">Image</span></h1>
             </div>
             <div class="flex items-center gap-3">
-                <!-- Top Nav Theme Toggle -->
                 <button onclick="window.toggleTheme()" class="flex items-center gap-2 p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all font-bold text-sm">
                     <div class="dark:hidden flex items-center gap-2">
                         <span>الوضع الليلي</span>
@@ -76,7 +75,6 @@
         </div>
     </nav>
 
-    <!-- Floating Theme Toggle Button -->
     <button onclick="window.toggleTheme()" class="floating-theme-btn flex items-center gap-3 bg-brand-primary text-white px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(59,130,246,0.3)] hover:scale-105 transition-all active:scale-95 font-black">
         <span class="dark:hidden">الوضع الليلي</span>
         <span class="hidden dark:inline">وضع النهار</span>
@@ -86,14 +84,13 @@
         </div>
     </button>
 
-    <!-- Floating WhatsApp Button -->
-    <a id="btn-floating-whatsapp" href="#" target="_blank" class="floating-whatsapp-btn flex items-center gap-3 bg-brand-whatsapp text-white px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(37,211,102,0.3)] hover:scale-105 transition-all active:scale-95 font-black">
+    <!-- Floating WhatsApp (Only shows if connected) -->
+    <a id="btn-floating-whatsapp" href="#" target="_blank" class="hidden floating-whatsapp-btn flex items-center gap-3 bg-brand-whatsapp text-white px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(37,211,102,0.3)] hover:scale-105 transition-all active:scale-95 font-black">
         <span>تواصل معنا</span>
         <i data-lucide="message-circle" class="w-6 h-6"></i>
     </a>
 
     <main class="pt-28 px-6 max-w-6xl mx-auto">
-        <!-- Upload Section -->
         <section id="upload-view" class="py-12">
             <div class="text-center mb-12">
                 <h2 class="text-4xl md:text-5xl font-black mb-4">اضغط، عالج، <span class="gradient-text">حمل</span></h2>
@@ -110,10 +107,8 @@
             </div>
         </section>
 
-        <!-- Workspace Section -->
         <section id="workspace-view" class="hidden py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 space-y-6">
-                <!-- Main Preview -->
                 <div class="bg-slate-50 dark:bg-white/5 rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 overflow-hidden">
                     <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-200 dark:bg-brand-dark flex items-center justify-center mb-6">
                         <img id="main-preview-img" class="max-w-full max-h-full object-contain transition-opacity duration-300">
@@ -133,8 +128,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Thumbs -->
                 <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"></div>
             </div>
 
@@ -144,7 +137,6 @@
                         <i data-lucide="sliders" class="w-5 h-5 text-brand-primary"></i>
                         إعدادات المعالجة
                     </h3>
-
                     <div class="space-y-8">
                         <div>
                             <div class="flex justify-between mb-4">
@@ -153,7 +145,6 @@
                             </div>
                             <input type="range" id="quality-slider" min="10" max="100" value="80" class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-primary">
                         </div>
-
                         <div>
                             <label class="block font-bold text-sm mb-4">صيغة التصدير</label>
                             <select id="format-select" class="w-full bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-bold focus:ring-2 ring-brand-primary/20 outline-none">
@@ -162,37 +153,34 @@
                                 <option value="image/png">PNG (شفافية)</option>
                             </select>
                         </div>
-
                         <button id="process-active-btn" class="w-full bg-brand-primary text-white py-5 rounded-[1.5rem] font-black text-lg shadow-xl shadow-brand-primary/20 hover:scale-[1.02] transition-transform active:scale-95">
                             بدء المعالجة
                         </button>
                     </div>
                 </div>
-                
-                <!-- Ad Placeholder -->
                 <div id="ad-banner-300-250" class="flex justify-center bg-slate-100 dark:bg-white/5 rounded-3xl py-4 min-h-[250px]"></div>
             </div>
         </section>
 
-        <!-- Social & Contact Footer Section -->
+        <!-- Dynamic Social Footer Section (Only shows icons with real links) -->
         <section class="py-16 mt-12 border-t border-slate-100 dark:border-white/5">
             <div class="flex flex-col items-center gap-8">
                 <div class="text-center">
-                    <h3 class="text-2xl font-black mb-2">تابعنا وتواصل معنا</h3>
-                    <p class="text-slate-500 dark:text-slate-400">نحن متواجدون دائماً للإجابة على استفساراتكم</p>
+                    <h3 class="text-2xl font-black mb-2">تواصل معنا</h3>
+                    <p class="text-slate-500 dark:text-slate-400">تابعنا عبر منصاتنا الرسمية</p>
                 </div>
                 
                 <div id="footer-social-links" class="flex flex-wrap justify-center gap-6">
-                    <a id="link-facebook" href="#" target="_blank" class="social-icon w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                    <a id="link-facebook" href="#" target="_blank" class="hidden social-icon w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
                         <i data-lucide="facebook" class="w-7 h-7"></i>
                     </a>
-                    <a id="link-instagram" href="#" target="_blank" class="social-icon w-14 h-14 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20">
+                    <a id="link-instagram" href="#" target="_blank" class="hidden social-icon w-14 h-14 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20">
                         <i data-lucide="instagram" class="w-7 h-7"></i>
                     </a>
-                    <a id="link-twitter" href="#" target="_blank" class="social-icon w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/20">
+                    <a id="link-twitter" href="#" target="_blank" class="hidden social-icon w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/20">
                         <i data-lucide="twitter" class="w-7 h-7"></i>
                     </a>
-                    <a id="link-whatsapp" href="#" target="_blank" class="social-icon w-14 h-14 bg-brand-whatsapp text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand-whatsapp/20">
+                    <a id="link-whatsapp" href="#" target="_blank" class="hidden social-icon w-14 h-14 bg-brand-whatsapp text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand-whatsapp/20">
                         <i data-lucide="phone" class="w-7 h-7"></i>
                     </a>
                 </div>
@@ -207,7 +195,6 @@
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
             
-            <!-- Login -->
             <div id="dashboard-login" class="text-center py-6">
                 <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
                     <i data-lucide="lock" class="w-8 h-8"></i>
@@ -223,12 +210,9 @@
                 <button onclick="window.verifyDashboardPass()" class="w-full max-w-xs bg-brand-primary text-white py-4 rounded-2xl font-black">دخول</button>
             </div>
 
-            <!-- Content -->
             <div id="dashboard-content" class="hidden space-y-8">
                 <h2 class="text-2xl font-black mb-6">إعدادات الموقع</h2>
-                
                 <div class="space-y-6">
-                    <!-- Ads -->
                     <div class="space-y-4">
                         <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">إعدادات الإعلانات</h3>
                         <div>
@@ -240,10 +224,9 @@
                             <input type="text" id="ad-script-pop" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 font-mono text-xs">
                         </div>
                     </div>
-
-                    <!-- Social Links -->
                     <div class="space-y-4">
                         <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">روابط التواصل الاجتماعي</h3>
+                        <p class="text-[10px] text-slate-500 leading-tight">اترك الحقل فارغاً لإخفاء الزر نهائياً من الموقع.</p>
                         <div>
                             <label class="text-xs font-bold mb-1 block">رقم الواتساب (مثال: 212612345678)</label>
                             <input type="text" id="social-whatsapp" placeholder="212600000000" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
@@ -262,7 +245,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="flex gap-3 pt-6">
                     <button onclick="window.saveDashboardSettings()" class="flex-1 bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg">حفظ الإعدادات</button>
                     <button onclick="window.logoutDashboard()" class="px-6 bg-slate-100 dark:bg-white/5 rounded-2xl font-bold text-red-500">خروج</button>
@@ -271,7 +253,6 @@
         </div>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-20 opacity-0">
         <div class="bg-brand-dark text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-3">
             <i data-lucide="info" class="w-5 h-5 text-brand-primary"></i>
@@ -279,7 +260,6 @@
         </div>
     </div>
 
-    <!-- Adsterra Container -->
     <div class="mt-20 border-t border-slate-100 dark:border-white/5 py-10 flex flex-col items-center">
         <p class="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">إعلانات قد تهمك</p>
         <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
@@ -287,8 +267,6 @@
 
     <script src="index.tsx" type="module"></script>
     <div id="adsterra-scripts"></div>
-
-    <!-- Adsterra Invoke Script -->
     <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
 </body>
 </html>
