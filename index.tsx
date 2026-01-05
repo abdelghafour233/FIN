@@ -28,6 +28,10 @@ const State = {
 
 const applyTheme = () => {
     document.documentElement.classList.toggle('dark', State.theme === 'dark');
+    // تحديث أيقونات لوسيد بعد التغيير
+    setTimeout(() => {
+        if ((window as any).lucide) (window as any).lucide.createIcons();
+    }, 10);
 };
 
 (window as any).toggleTheme = () => {
