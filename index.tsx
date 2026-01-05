@@ -163,17 +163,18 @@ const updateSocialLinks = () => {
     const shareText = encodeURIComponent("جربت StorImage Studio؟ أداة رهيبة لضغط ومعالجة الصور مجاناً وبدون إعلانات! انصحك بها:");
     
     const ids = [
-        ['side-share-wa', 'footer-share-wa', `https://api.whatsapp.com/send?text=${shareText}%20${siteUrl}`],
-        ['side-share-fb', 'footer-share-fb', `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`],
-        ['side-share-tg', 'footer-share-tg', `https://t.me/share/url?url=${siteUrl}&text=${shareText}`],
-        ['side-share-tw', 'footer-share-tw', `https://twitter.com/intent/tweet?url=${siteUrl}&text=${shareText}`]
+        ['side-share-wa', 'footer-share-wa', 'result-share-wa', `https://api.whatsapp.com/send?text=${shareText}%20${siteUrl}`],
+        ['side-share-fb', 'footer-share-fb', 'result-share-fb', `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`],
+        ['side-share-tg', 'footer-share-tg', 'result-share-tg', `https://t.me/share/url?url=${siteUrl}&text=${shareText}`],
+        ['side-share-tw', 'footer-share-tw', 'result-share-tw', `https://twitter.com/intent/tweet?url=${siteUrl}&text=${shareText}`]
     ];
 
-    ids.forEach(([sideId, footerId, url]) => {
-        const sideEl = document.getElementById(sideId) as HTMLAnchorElement;
-        const footerEl = document.getElementById(footerId) as HTMLAnchorElement;
-        if (sideEl) sideEl.href = url;
-        if (footerEl) footerEl.href = url;
+    ids.forEach((config) => {
+        const url = config[config.length - 1];
+        for (let i = 0; i < config.length - 1; i++) {
+            const el = document.getElementById(config[i]) as HTMLAnchorElement;
+            if (el) el.href = url;
+        }
     });
 };
 
