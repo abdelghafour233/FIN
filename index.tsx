@@ -51,6 +51,10 @@ const applyTheme = () => {
                 contentSec?.classList.add('hidden');
                 if (passInput) {
                     passInput.value = '';
+                    passInput.type = 'password'; // Reset visibility on open
+                    const icon = document.getElementById('pass-eye-icon');
+                    if (icon) icon.setAttribute('data-lucide', 'eye');
+                    (window as any).lucide?.createIcons();
                     passInput.focus();
                 }
             } else {
@@ -61,6 +65,17 @@ const applyTheme = () => {
         } else {
             view.classList.remove('open');
         }
+    }
+};
+
+(window as any).toggleDashboardPassVisibility = () => {
+    const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
+    const icon = document.getElementById('pass-eye-icon');
+    if (input && icon) {
+        const isPass = input.type === 'password';
+        input.type = isPass ? 'text' : 'password';
+        icon.setAttribute('data-lucide', isPass ? 'eye-off' : 'eye');
+        (window as any).lucide?.createIcons();
     }
 };
 
