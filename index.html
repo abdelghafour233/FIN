@@ -100,7 +100,7 @@
                     </header>
 
                     <div class="space-y-6">
-                        <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-white/5">
+                        <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-white/5 max-h-[400px] overflow-y-auto no-scrollbar">
                             <div class="flex items-center gap-3 mb-6 text-brand-primary">
                                 <i data-lucide="code" class="w-5 h-5"></i>
                                 <h3 class="text-lg font-black">إعدادات Adsterra</h3>
@@ -108,7 +108,11 @@
 
                             <div class="space-y-4">
                                 <div>
-                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">مفتاح البانر (300x250)</label>
+                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">رابط الإعلان المباشر (لزر التحميل)</label>
+                                    <input type="text" id="ad-link-direct" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://adsterra-direct-link.com/...">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">مفتاح البانر السفلي (300x250)</label>
                                     <input type="text" id="ad-key-banner" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="أدخل Key هنا...">
                                 </div>
                                 <div>
@@ -199,10 +203,14 @@
                             معالجة الحالية
                         </button>
                         <div id="download-zone" class="hidden animate-bounce space-y-4">
-                            <a id="final-download-link" href="#" download class="w-full bg-brand-success text-white py-4 rounded-xl font-black shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                            <!-- Download Button with Ad Logic -->
+                            <button id="final-download-btn-trigger" class="w-full bg-brand-success text-white py-4 rounded-xl font-black shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95">
                                 <i data-lucide="download" class="w-5 h-5"></i>
                                 تحميل النتيجة
-                            </a>
+                            </button>
+                            <!-- Hidden Anchor for Actual Download -->
+                            <a id="final-download-link" href="#" download class="hidden"></a>
+                            
                             <div class="flex flex-col items-center gap-3 pt-4 border-t border-white/5">
                                 <p class="text-[10px] font-black opacity-30 uppercase tracking-widest">شارك النتيجة مع أصدقائك</p>
                                 <div class="flex justify-center gap-2">
@@ -273,14 +281,12 @@
         </div>
     </footer>
 
-    <!-- Adsterra 300x250 Banner - Bottom Placement -->
-    <div id="adsterra-banner-container" class="ad-container">
+    <!-- Adsterra Banners & Scripts placed at the absolute bottom -->
+    <div id="adsterra-banner-container" class="ad-container mt-10">
         <div id="ad-banner-300-250">
-            <!-- Dynamic Key Injection via index.tsx -->
+            <!-- Banner Injected Here -->
         </div>
     </div>
-
-    <!-- Adsterra Scripts Container -->
     <div id="adsterra-scripts"></div>
 
     <!-- Toast Notification -->

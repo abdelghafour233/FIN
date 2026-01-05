@@ -17,11 +17,12 @@ const State = {
     theme: localStorage.getItem('theme') || 'dark',
     isDashboardOpen: false,
     isAuthenticated: false,
-    dashboardPassword: 'admin123', // كلمة المرور الافتراضية
+    dashboardPassword: 'admin123',
     adSettings: JSON.parse(localStorage.getItem('ad_settings') || JSON.stringify({
         bannerKey: '0295263cf4ed8d9e3a97b6a2490864ee',
         popunderScript: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
-        socialBarScript: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js'
+        socialBarScript: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js',
+        directLink: ''
     }))
 };
 
@@ -45,7 +46,6 @@ const applyTheme = () => {
     if (view) {
         if (State.isDashboardOpen) {
             view.classList.add('open');
-            // Reset to login if not authenticated
             if (!State.isAuthenticated) {
                 loginSec?.classList.remove('hidden');
                 contentSec?.classList.add('hidden');
@@ -89,17 +89,20 @@ const loadDashboardInputs = () => {
     const banner = document.getElementById('ad-key-banner') as HTMLInputElement;
     const pop = document.getElementById('ad-script-pop') as HTMLInputElement;
     const social = document.getElementById('ad-script-social') as HTMLInputElement;
+    const direct = document.getElementById('ad-link-direct') as HTMLInputElement;
     
-    if (banner) banner.value = State.adSettings.bannerKey;
-    if (pop) pop.value = State.adSettings.popunderScript;
-    if (social) social.value = State.adSettings.socialBarScript;
+    if (banner) banner.value = State.adSettings.bannerKey || '';
+    if (pop) pop.value = State.adSettings.popunderScript || '';
+    if (social) social.value = State.adSettings.socialBarScript || '';
+    if (direct) direct.value = State.adSettings.directLink || '';
 };
 
 (window as any).saveDashboardSettings = () => {
     State.adSettings = {
         bannerKey: (document.getElementById('ad-key-banner') as HTMLInputElement).value,
         popunderScript: (document.getElementById('ad-script-pop') as HTMLInputElement).value,
-        socialBarScript: (document.getElementById('ad-script-social') as HTMLInputElement).value
+        socialBarScript: (document.getElementById('ad-script-social') as HTMLInputElement).value,
+        directLink: (document.getElementById('ad-link-direct') as HTMLInputElement).value
     };
     localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
     
@@ -126,36 +129,48 @@ const injectAds = () => {
     container.innerHTML = '';
     scriptsContainer.innerHTML = '';
 
-    // Inject Banner
-    const scriptTag = document.createElement('script');
-    scriptTag.type = 'text/javascript';
-    scriptTag.innerHTML = `
-        atOptions = {
-            'key' : '${State.adSettings.bannerKey}',
-            'format' : 'iframe',
-            'height' : 250,
-            'width' : 300,
-            'params' : {}
-        };
-    `;
-    const invokeTag = document.createElement('script');
-    invokeTag.type = 'text/javascript';
-    invokeTag.src = `https://bouncingbuzz.com/${State.adSettings.bannerKey}/invoke.js`;
-    
-    container.appendChild(scriptTag);
-    container.appendChild(invokeTag);
+    if (State.adSettings.bannerKey) {
+        const scriptTag = document.createElement('script');
+        scriptTag.type = 'text/javascript';
+        scriptTag.innerHTML = `
+            atOptions = {
+                'key' : '${State.adSettings.bannerKey}',
+                'format' : 'iframe',
+                'height' : 250,
+                'width' : 300,
+                'params' : {}
+            };
+        `;
+        const invokeTag = document.createElement('script');
+        invokeTag.type = 'text/javascript';
+        invokeTag.src = `https://bouncingbuzz.com/${State.adSettings.bannerKey}/invoke.js`;
+        container.appendChild(scriptTag);
+        container.appendChild(invokeTag);
+    }
 
-    // Inject Popunder
-    const popTag = document.createElement('script');
-    popTag.type = 'text/javascript';
-    popTag.src = State.adSettings.popunderScript;
-    scriptsContainer.appendChild(popTag);
+    if (State.adSettings.popunderScript) {
+        const popTag = document.createElement('script');
+        popTag.type = 'text/javascript';
+        popTag.src = State.adSettings.popunderScript;
+        scriptsContainer.appendChild(popTag);
+    }
 
-    // Inject Social Bar
-    const socialTag = document.createElement('script');
-    socialTag.type = 'text/javascript';
-    socialTag.src = State.adSettings.socialBarScript;
-    scriptsContainer.appendChild(socialTag);
+    if (State.adSettings.socialBarScript) {
+        const socialTag = document.createElement('script');
+        socialTag.type = 'text/javascript';
+        socialTag.src = State.adSettings.socialBarScript;
+        scriptsContainer.appendChild(socialTag);
+    }
+};
+
+const handleDownloadWithAd = () => {
+    if (State.adSettings.directLink) {
+        window.open(State.adSettings.directLink, '_blank');
+    }
+    const realDownloadLink = document.getElementById('final-download-link') as HTMLAnchorElement;
+    if (realDownloadLink) {
+        realDownloadLink.click();
+    }
 };
 
 const updateSocialLinks = () => {
@@ -185,7 +200,7 @@ const updateActivePreview = () => {
     const sizeEl = document.getElementById('active-size');
     const badge = document.getElementById('status-badge');
     const downloadZone = document.getElementById('download-zone');
-    const downloadBtn = document.getElementById('final-download-link') as HTMLAnchorElement;
+    const downloadAnchor = document.getElementById('final-download-link') as HTMLAnchorElement;
 
     if (!active || !mainImg) return;
 
@@ -201,10 +216,10 @@ const updateActivePreview = () => {
             badge.className = `px-3 py-1 text-[10px] font-black rounded-full uppercase tracking-tighter ${active.status === 'done' ? 'bg-brand-success/20 text-brand-success border border-brand-success/30' : 'bg-brand-primary/20 text-brand-primary'}`;
         }
 
-        if (active.status === 'done' && downloadZone && downloadBtn) {
+        if (active.status === 'done' && downloadZone && downloadAnchor) {
             downloadZone.classList.remove('hidden');
-            downloadBtn.href = active.processedUrl || '#';
-            downloadBtn.download = `optimized_${active.name}`;
+            downloadAnchor.href = active.processedUrl || '#';
+            downloadAnchor.download = `optimized_${active.name}`;
         } else {
             downloadZone?.classList.add('hidden');
         }
@@ -298,6 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
     const processActiveBtn = document.getElementById('process-active-btn');
     const passInput = document.getElementById('dashboard-pass-input');
+    const downloadTriggerBtn = document.getElementById('final-download-btn-trigger');
 
     input?.addEventListener('change', (e: any) => {
         const incoming = Array.from(e.target.files as FileList);
@@ -332,6 +348,10 @@ document.addEventListener('DOMContentLoaded', () => {
     processActiveBtn?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.selectedId);
         if (active) processImage(active);
+    });
+
+    downloadTriggerBtn?.addEventListener('click', () => {
+        handleDownloadWithAd();
     });
 
     passInput?.addEventListener('keypress', (e: any) => {
