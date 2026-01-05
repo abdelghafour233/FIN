@@ -16,6 +16,8 @@ const State = {
     selectedId: null as string | null,
     theme: localStorage.getItem('theme') || 'dark',
     isDashboardOpen: false,
+    isAuthenticated: false,
+    dashboardPassword: 'admin123', // كلمة المرور الافتراضية
     adSettings: JSON.parse(localStorage.getItem('ad_settings') || JSON.stringify({
         bannerKey: '0295263cf4ed8d9e3a97b6a2490864ee',
         popunderScript: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
@@ -36,17 +38,61 @@ const applyTheme = () => {
 (window as any).toggleDashboard = () => {
     State.isDashboardOpen = !State.isDashboardOpen;
     const view = document.getElementById('dashboard-view');
+    const loginSec = document.getElementById('dashboard-login');
+    const contentSec = document.getElementById('dashboard-content');
+    const passInput = document.getElementById('dashboard-pass-input') as HTMLInputElement;
+
     if (view) {
         if (State.isDashboardOpen) {
             view.classList.add('open');
-            // Fill inputs with current values
-            (document.getElementById('ad-key-banner') as HTMLInputElement).value = State.adSettings.bannerKey;
-            (document.getElementById('ad-script-pop') as HTMLInputElement).value = State.adSettings.popunderScript;
-            (document.getElementById('ad-script-social') as HTMLInputElement).value = State.adSettings.socialBarScript;
+            // Reset to login if not authenticated
+            if (!State.isAuthenticated) {
+                loginSec?.classList.remove('hidden');
+                contentSec?.classList.add('hidden');
+                if (passInput) {
+                    passInput.value = '';
+                    passInput.focus();
+                }
+            } else {
+                loginSec?.classList.add('hidden');
+                contentSec?.classList.remove('hidden');
+                loadDashboardInputs();
+            }
         } else {
             view.classList.remove('open');
         }
     }
+};
+
+(window as any).verifyDashboardPass = () => {
+    const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
+    if (input.value === State.dashboardPassword) {
+        State.isAuthenticated = true;
+        document.getElementById('dashboard-login')?.classList.add('hidden');
+        document.getElementById('dashboard-content')?.classList.remove('hidden');
+        loadDashboardInputs();
+        showToast('مرحباً بك في لوحة التحكم');
+    } else {
+        showToast('كلمة المرور غير صحيحة!');
+        input.value = '';
+        input.focus();
+    }
+};
+
+(window as any).logoutDashboard = () => {
+    State.isAuthenticated = false;
+    (window as any).toggleDashboard();
+    showToast('تم تسجيل الخروج وتأمين اللوحة');
+};
+
+const loadDashboardInputs = () => {
+    const banner = document.getElementById('ad-key-banner') as HTMLInputElement;
+    const pop = document.getElementById('ad-script-pop') as HTMLInputElement;
+    const social = document.getElementById('ad-script-social') as HTMLInputElement;
+    
+    if (banner) banner.value = State.adSettings.bannerKey;
+    if (pop) pop.value = State.adSettings.popunderScript;
+    if (social) social.value = State.adSettings.socialBarScript;
 };
 
 (window as any).saveDashboardSettings = () => {
@@ -73,7 +119,6 @@ const showToast = (msg: string) => {
 };
 
 const injectAds = () => {
-    // Clear existing
     const container = document.getElementById('ad-banner-300-250');
     const scriptsContainer = document.getElementById('adsterra-scripts');
     if (!container || !scriptsContainer) return;
@@ -246,11 +291,12 @@ const processImage = async (item: ImageItem) => {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     updateSocialLinks();
-    injectAds(); // التحميل الأولي للإعلانات
+    injectAds(); 
     
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
     const processActiveBtn = document.getElementById('process-active-btn');
+    const passInput = document.getElementById('dashboard-pass-input');
 
     input?.addEventListener('change', (e: any) => {
         const incoming = Array.from(e.target.files as FileList);
@@ -285,6 +331,10 @@ document.addEventListener('DOMContentLoaded', () => {
     processActiveBtn?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.selectedId);
         if (active) processImage(active);
+    });
+
+    passInput?.addEventListener('keypress', (e: any) => {
+        if (e.key === 'Enter') (window as any).verifyDashboardPass();
     });
 
     (window as any).lucide?.createIcons();

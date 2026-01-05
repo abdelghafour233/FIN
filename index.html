@@ -39,7 +39,7 @@
         .active-thumb { border: 2px solid #3b82f6; transform: scale(1.05); }
         .social-btn { @apply w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all hover:scale-110 active:scale-95; }
         .ad-container { @apply flex justify-center py-8 bg-black/5 dark:bg-white/5 border-t border-white/5; }
-        .dashboard-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(2, 6, 23, 0.9); backdrop-filter: blur(10px); display: none; }
+        .dashboard-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(15px); display: none; }
         .dashboard-overlay.open { display: flex; }
     </style>
 </head>
@@ -55,7 +55,7 @@
             </div>
             <div class="flex items-center gap-3">
                 <button onclick="window.toggleDashboard()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center transition-transform active:scale-90 hover:text-brand-primary">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <i data-lucide="lock" class="w-5 h-5"></i>
                 </button>
                 <button onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center transition-transform active:scale-90">
                     <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
@@ -67,45 +67,66 @@
 
     <!-- Dashboard View Overlay -->
     <section id="dashboard-view" class="dashboard-overlay items-center justify-center p-6">
-        <div class="bg-white dark:bg-brand-card w-full max-w-2xl rounded-[3rem] shadow-2xl border border-white/10 overflow-hidden relative">
-            <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 text-slate-400 hover:text-white transition-colors">
-                <i data-lucide="x" class="w-8 h-8"></i>
+        <div class="bg-white dark:bg-brand-card w-full max-w-xl rounded-[3rem] shadow-2xl border border-white/10 overflow-hidden relative">
+            <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 text-slate-400 hover:text-red-500 transition-colors">
+                <i data-lucide="x" class="w-7 h-7"></i>
             </button>
             
             <div class="p-10">
-                <header class="mb-10 text-right">
-                    <h2 class="text-3xl font-black mb-2">لوحة التحكم</h2>
-                    <p class="text-slate-500 font-bold">إدارة إعدادات الموقع وإعلانات Adsterra</p>
-                </header>
-
-                <div class="space-y-6">
-                    <!-- Adsterra Section -->
-                    <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-white/5">
-                        <div class="flex items-center gap-3 mb-6 text-brand-primary">
-                            <i data-lucide="layout-grid" class="w-6 h-6"></i>
-                            <h3 class="text-xl font-black">إعدادات Adsterra</h3>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-xs font-black opacity-40 block mb-2 mr-1">مفتاح إعلان البانر (300x250)</label>
-                                <input type="text" id="ad-key-banner" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="أدخل Key هنا...">
-                            </div>
-                            <div>
-                                <label class="text-xs font-black opacity-40 block mb-2 mr-1">رابط سكربت Popunder</label>
-                                <input type="text" id="ad-script-pop" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://...">
-                            </div>
-                            <div>
-                                <label class="text-xs font-black opacity-40 block mb-2 mr-1">رابط سكربت Social Bar</label>
-                                <input type="text" id="ad-script-social" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://...">
-                            </div>
-                        </div>
+                <!-- Login Section -->
+                <div id="dashboard-login" class="text-center py-6">
+                    <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
                     </div>
+                    <h2 class="text-2xl font-black mb-2">منطقة محمية</h2>
+                    <p class="text-slate-500 text-sm mb-8 font-bold">يرجى إدخال كلمة المرور للوصول إلى الإعدادات</p>
+                    
+                    <div class="space-y-4 max-w-xs mx-auto">
+                        <input type="password" id="dashboard-pass-input" class="w-full bg-slate-50 dark:bg-brand-dark p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-center font-black tracking-widest focus:border-brand-primary transition-all" placeholder="••••••••">
+                        <button onclick="window.verifyDashboardPass()" class="w-full bg-brand-primary text-white py-4 rounded-xl font-black shadow-lg hover:bg-brand-primary/90 transition-all active:scale-95">
+                            دخول
+                        </button>
+                    </div>
+                </div>
 
-                    <button onclick="window.saveDashboardSettings()" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-5 rounded-2xl font-black shadow-lg shadow-brand-primary/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3">
-                        <i data-lucide="save" class="w-5 h-5"></i>
-                        حفظ جميع الإعدادات
-                    </button>
+                <!-- Settings Content (Hidden by default) -->
+                <div id="dashboard-content" class="hidden">
+                    <header class="mb-10 text-right flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-black mb-1">لوحة التحكم</h2>
+                            <p class="text-slate-500 text-xs font-bold">إدارة إعلانات Adsterra</p>
+                        </div>
+                        <button onclick="window.logoutDashboard()" class="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-500/10 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-all">خروج</button>
+                    </header>
+
+                    <div class="space-y-6">
+                        <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-white/5">
+                            <div class="flex items-center gap-3 mb-6 text-brand-primary">
+                                <i data-lucide="code" class="w-5 h-5"></i>
+                                <h3 class="text-lg font-black">إعدادات Adsterra</h3>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">مفتاح البانر (300x250)</label>
+                                    <input type="text" id="ad-key-banner" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="أدخل Key هنا...">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">رابط سكربت Popunder</label>
+                                    <input type="text" id="ad-script-pop" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://...">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">رابط سكربت Social Bar</label>
+                                    <input type="text" id="ad-script-social" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="window.saveDashboardSettings()" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-2xl font-black shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3">
+                            <i data-lucide="save" class="w-5 h-5"></i>
+                            حفظ التعديلات
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
