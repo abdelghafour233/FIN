@@ -23,15 +23,35 @@ const State = {
         popunderScript: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
         socialBarScript: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js',
         directLink: ''
+    })),
+    socialLinks: JSON.parse(localStorage.getItem('social_links') || JSON.stringify({
+        whatsapp: '212600000000',
+        facebook: '#',
+        instagram: '#',
+        twitter: '#'
     }))
 };
 
 const applyTheme = () => {
     document.documentElement.classList.toggle('dark', State.theme === 'dark');
-    // تحديث أيقونات لوسيد بعد التغيير
     setTimeout(() => {
         if ((window as any).lucide) (window as any).lucide.createIcons();
     }, 10);
+};
+
+// تحديث روابط التواصل في واجهة المستخدم
+const updateSocialLinksUI = () => {
+    const floatWa = document.getElementById('btn-floating-whatsapp') as HTMLAnchorElement;
+    const footerWa = document.getElementById('link-whatsapp') as HTMLAnchorElement;
+    const footerFb = document.getElementById('link-facebook') as HTMLAnchorElement;
+    const footerIg = document.getElementById('link-instagram') as HTMLAnchorElement;
+    const footerTw = document.getElementById('link-twitter') as HTMLAnchorElement;
+
+    if (floatWa) floatWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
+    if (footerWa) footerWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
+    if (footerFb) footerFb.href = State.socialLinks.facebook;
+    if (footerIg) footerIg.href = State.socialLinks.instagram;
+    if (footerTw) footerTw.href = State.socialLinks.twitter;
 };
 
 (window as any).toggleTheme = () => {
@@ -107,22 +127,37 @@ const applyTheme = () => {
 const loadDashboardInputs = () => {
     const banner = document.getElementById('ad-key-banner') as HTMLInputElement;
     const pop = document.getElementById('ad-script-pop') as HTMLInputElement;
-    const direct = document.getElementById('ad-link-direct') as HTMLInputElement;
+    const wa = document.getElementById('social-whatsapp') as HTMLInputElement;
+    const fb = document.getElementById('social-facebook') as HTMLInputElement;
+    const ig = document.getElementById('social-instagram') as HTMLInputElement;
+    const tw = document.getElementById('social-twitter') as HTMLInputElement;
     
     if (banner) banner.value = State.adSettings.bannerKey || '';
     if (pop) pop.value = State.adSettings.popunderScript || '';
-    if (direct) direct.value = State.adSettings.directLink || '';
+    if (wa) wa.value = State.socialLinks.whatsapp || '';
+    if (fb) fb.value = State.socialLinks.facebook || '';
+    if (ig) ig.value = State.socialLinks.instagram || '';
+    if (tw) tw.value = State.socialLinks.twitter || '';
 };
 
 (window as any).saveDashboardSettings = () => {
     State.adSettings = {
         bannerKey: (document.getElementById('ad-key-banner') as HTMLInputElement).value,
         popunderScript: (document.getElementById('ad-script-pop') as HTMLInputElement).value,
-        directLink: (document.getElementById('ad-link-direct') as HTMLInputElement).value
+        directLink: State.adSettings.directLink
     };
+    State.socialLinks = {
+        whatsapp: (document.getElementById('social-whatsapp') as HTMLInputElement).value,
+        facebook: (document.getElementById('social-facebook') as HTMLInputElement).value,
+        instagram: (document.getElementById('social-instagram') as HTMLInputElement).value,
+        twitter: (document.getElementById('social-twitter') as HTMLInputElement).value,
+    };
+
     localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
+    localStorage.setItem('social_links', JSON.stringify(State.socialLinks));
     
-    showToast('تم حفظ إعدادات الإعلانات بنجاح!');
+    showToast('تم حفظ جميع الإعدادات بنجاح!');
+    updateSocialLinksUI();
     setTimeout(() => (window as any).toggleDashboard(), 500);
     injectAds();
 };
@@ -296,6 +331,7 @@ const processImage = async (item: ImageItem) => {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     injectAds(); 
+    updateSocialLinksUI(); // تهيئة الروابط عند التحميل
     
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;

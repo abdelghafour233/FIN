@@ -78,8 +78,8 @@
 
     <!-- Floating Theme Toggle Button -->
     <button onclick="window.toggleTheme()" class="floating-theme-btn flex items-center gap-3 bg-brand-primary text-white px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(59,130,246,0.3)] hover:scale-105 transition-all active:scale-95 font-black">
-        <span class="dark:hidden">تفعيل الوضع الليلي</span>
-        <span class="hidden dark:inline">تفعيل وضع النهار</span>
+        <span class="dark:hidden">الوضع الليلي</span>
+        <span class="hidden dark:inline">وضع النهار</span>
         <div class="w-6 h-6 flex items-center justify-center">
             <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
             <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
@@ -87,7 +87,7 @@
     </button>
 
     <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/212000000000" target="_blank" class="floating-whatsapp-btn flex items-center gap-3 bg-brand-whatsapp text-white px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(37,211,102,0.3)] hover:scale-105 transition-all active:scale-95 font-black">
+    <a id="btn-floating-whatsapp" href="#" target="_blank" class="floating-whatsapp-btn flex items-center gap-3 bg-brand-whatsapp text-white px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(37,211,102,0.3)] hover:scale-105 transition-all active:scale-95 font-black">
         <span>تواصل معنا</span>
         <i data-lucide="message-circle" class="w-6 h-6"></i>
     </a>
@@ -182,17 +182,17 @@
                     <p class="text-slate-500 dark:text-slate-400">نحن متواجدون دائماً للإجابة على استفساراتكم</p>
                 </div>
                 
-                <div class="flex flex-wrap justify-center gap-6">
-                    <a href="#" class="social-icon w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
+                <div id="footer-social-links" class="flex flex-wrap justify-center gap-6">
+                    <a id="link-facebook" href="#" target="_blank" class="social-icon w-14 h-14 bg-blue-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-blue-600/20">
                         <i data-lucide="facebook" class="w-7 h-7"></i>
                     </a>
-                    <a href="#" class="social-icon w-14 h-14 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20">
+                    <a id="link-instagram" href="#" target="_blank" class="social-icon w-14 h-14 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-red-500/20">
                         <i data-lucide="instagram" class="w-7 h-7"></i>
                     </a>
-                    <a href="#" class="social-icon w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/20">
+                    <a id="link-twitter" href="#" target="_blank" class="social-icon w-14 h-14 bg-black text-white rounded-2xl flex items-center justify-center shadow-lg shadow-black/20">
                         <i data-lucide="twitter" class="w-7 h-7"></i>
                     </a>
-                    <a href="#" class="social-icon w-14 h-14 bg-brand-whatsapp text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand-whatsapp/20">
+                    <a id="link-whatsapp" href="#" target="_blank" class="social-icon w-14 h-14 bg-brand-whatsapp text-white rounded-2xl flex items-center justify-center shadow-lg shadow-brand-whatsapp/20">
                         <i data-lucide="phone" class="w-7 h-7"></i>
                     </a>
                 </div>
@@ -202,7 +202,7 @@
 
     <!-- Dashboard Overlay -->
     <div id="dashboard-view" class="dashboard-overlay items-center justify-center p-6">
-        <div class="bg-white dark:bg-brand-card w-full max-w-lg rounded-[3rem] p-10 relative shadow-2xl overflow-hidden border border-slate-200 dark:border-white/5">
+        <div class="bg-white dark:bg-brand-card w-full max-w-lg rounded-[3rem] p-10 relative shadow-2xl overflow-y-auto max-h-[90vh] border border-slate-200 dark:border-white/5">
             <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
@@ -224,26 +224,47 @@
             </div>
 
             <!-- Content -->
-            <div id="dashboard-content" class="hidden space-y-6">
-                <h2 class="text-2xl font-black mb-6">إعدادات الإعلانات (Adsterra)</h2>
+            <div id="dashboard-content" class="hidden space-y-8">
+                <h2 class="text-2xl font-black mb-6">إعدادات الموقع</h2>
                 
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Banner Key (300x250)</label>
-                        <input type="text" id="ad-key-banner" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 font-mono text-sm">
+                <div class="space-y-6">
+                    <!-- Ads -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">إعدادات الإعلانات</h3>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">Banner Key (300x250)</label>
+                            <input type="text" id="ad-key-banner" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 font-mono text-xs">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">Popunder Script URL</label>
+                            <input type="text" id="ad-script-pop" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 font-mono text-xs">
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Popunder Script URL</label>
-                        <input type="text" id="ad-script-pop" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 font-mono text-sm">
-                    </div>
-                    <div>
-                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Direct Link (Download Ad)</label>
-                        <input type="text" id="ad-link-direct" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 font-mono text-sm">
+
+                    <!-- Social Links -->
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">روابط التواصل الاجتماعي</h3>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">رقم الواتساب (مثال: 212612345678)</label>
+                            <input type="text" id="social-whatsapp" placeholder="212600000000" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">رابط فيسبوك</label>
+                            <input type="text" id="social-facebook" placeholder="https://facebook.com/yourpage" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">رابط إنستغرام</label>
+                            <input type="text" id="social-instagram" placeholder="https://instagram.com/yourprofile" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">رابط تويتر (X)</label>
+                            <input type="text" id="social-twitter" placeholder="https://twitter.com/yourhandle" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
+                        </div>
                     </div>
                 </div>
 
                 <div class="flex gap-3 pt-6">
-                    <button onclick="window.saveDashboardSettings()" class="flex-1 bg-brand-primary text-white py-4 rounded-2xl font-black">حفظ الإعدادات</button>
+                    <button onclick="window.saveDashboardSettings()" class="flex-1 bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg">حفظ الإعدادات</button>
                     <button onclick="window.logoutDashboard()" class="px-6 bg-slate-100 dark:bg-white/5 rounded-2xl font-bold text-red-500">خروج</button>
                 </div>
             </div>
