@@ -14,7 +14,13 @@ interface ImageItem {
 const State = {
     files: [] as ImageItem[],
     selectedId: null as string | null,
-    theme: localStorage.getItem('theme') || 'dark'
+    theme: localStorage.getItem('theme') || 'dark',
+    isDashboardOpen: false,
+    adSettings: JSON.parse(localStorage.getItem('ad_settings') || JSON.stringify({
+        bannerKey: '0295263cf4ed8d9e3a97b6a2490864ee',
+        popunderScript: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
+        socialBarScript: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js'
+    }))
 };
 
 const applyTheme = () => {
@@ -25,6 +31,86 @@ const applyTheme = () => {
     State.theme = State.theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('theme', State.theme);
     applyTheme();
+};
+
+(window as any).toggleDashboard = () => {
+    State.isDashboardOpen = !State.isDashboardOpen;
+    const view = document.getElementById('dashboard-view');
+    if (view) {
+        if (State.isDashboardOpen) {
+            view.classList.add('open');
+            // Fill inputs with current values
+            (document.getElementById('ad-key-banner') as HTMLInputElement).value = State.adSettings.bannerKey;
+            (document.getElementById('ad-script-pop') as HTMLInputElement).value = State.adSettings.popunderScript;
+            (document.getElementById('ad-script-social') as HTMLInputElement).value = State.adSettings.socialBarScript;
+        } else {
+            view.classList.remove('open');
+        }
+    }
+};
+
+(window as any).saveDashboardSettings = () => {
+    State.adSettings = {
+        bannerKey: (document.getElementById('ad-key-banner') as HTMLInputElement).value,
+        popunderScript: (document.getElementById('ad-script-pop') as HTMLInputElement).value,
+        socialBarScript: (document.getElementById('ad-script-social') as HTMLInputElement).value
+    };
+    localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
+    
+    showToast('تم حفظ إعدادات الإعلانات بنجاح!');
+    setTimeout(() => (window as any).toggleDashboard(), 500);
+    injectAds();
+};
+
+const showToast = (msg: string) => {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-msg');
+    if (toast && toastMsg) {
+        toastMsg.innerText = msg;
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+    }
+};
+
+const injectAds = () => {
+    // Clear existing
+    const container = document.getElementById('ad-banner-300-250');
+    const scriptsContainer = document.getElementById('adsterra-scripts');
+    if (!container || !scriptsContainer) return;
+
+    container.innerHTML = '';
+    scriptsContainer.innerHTML = '';
+
+    // Inject Banner
+    const scriptTag = document.createElement('script');
+    scriptTag.type = 'text/javascript';
+    scriptTag.innerHTML = `
+        atOptions = {
+            'key' : '${State.adSettings.bannerKey}',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+        };
+    `;
+    const invokeTag = document.createElement('script');
+    invokeTag.type = 'text/javascript';
+    invokeTag.src = `https://bouncingbuzz.com/${State.adSettings.bannerKey}/invoke.js`;
+    
+    container.appendChild(scriptTag);
+    container.appendChild(invokeTag);
+
+    // Inject Popunder
+    const popTag = document.createElement('script');
+    popTag.type = 'text/javascript';
+    popTag.src = State.adSettings.popunderScript;
+    scriptsContainer.appendChild(popTag);
+
+    // Inject Social Bar
+    const socialTag = document.createElement('script');
+    socialTag.type = 'text/javascript';
+    socialTag.src = State.adSettings.socialBarScript;
+    scriptsContainer.appendChild(socialTag);
 };
 
 const updateSocialLinks = () => {
@@ -88,9 +174,9 @@ const renderThumbs = () => {
     list.innerHTML = State.files.map(f => `
         <div onclick="window.selectImage('${f.id}')" class="relative group shrink-0 cursor-pointer transition-all">
             <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl shadow-md border-2 ${State.selectedId === f.id ? 'border-brand-primary ring-4 ring-brand-primary/10' : 'border-white/5'} hover:scale-105 transition-transform">
-            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full shadow-lg border-2 border-brand-dark"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full shadow-lg border-2 border-brand-dark"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>' : ''}
             <button onclick="event.stopPropagation(); window.removeFile('${f.id}')" class="absolute -bottom-1 -left-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
-                <i data-lucide="x" class="w-3 h-3"></i>
+                <i data-lucide="x" class="w-3.5 h-3.5"></i>
             </button>
         </div>
     `).join('');
@@ -159,7 +245,8 @@ const processImage = async (item: ImageItem) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    updateSocialLinks(); // تفعيل الروابط فور التحميل
+    updateSocialLinks();
+    injectAds(); // التحميل الأولي للإعلانات
     
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
