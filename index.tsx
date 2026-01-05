@@ -19,7 +19,7 @@ const State = {
     isAuthenticated: false,
     dashboardPassword: 'admin123',
     adSettings: JSON.parse(localStorage.getItem('ad_settings') || JSON.stringify({
-        bannerKey: '0295263cf4ed8d9e3a97b6a2490864ee',
+        bannerKey: '5391a99b621f7fabc01edf3b98c1b6e5',
         popunderScript: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
         socialBarScript: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js',
         directLink: ''
@@ -51,7 +51,7 @@ const applyTheme = () => {
                 contentSec?.classList.add('hidden');
                 if (passInput) {
                     passInput.value = '';
-                    passInput.type = 'password'; // Reset visibility on open
+                    passInput.type = 'password';
                     const icon = document.getElementById('pass-eye-icon');
                     if (icon) icon.setAttribute('data-lucide', 'eye');
                     (window as any).lucide?.createIcons();
@@ -103,12 +103,10 @@ const applyTheme = () => {
 const loadDashboardInputs = () => {
     const banner = document.getElementById('ad-key-banner') as HTMLInputElement;
     const pop = document.getElementById('ad-script-pop') as HTMLInputElement;
-    const social = document.getElementById('ad-script-social') as HTMLInputElement;
     const direct = document.getElementById('ad-link-direct') as HTMLInputElement;
     
     if (banner) banner.value = State.adSettings.bannerKey || '';
     if (pop) pop.value = State.adSettings.popunderScript || '';
-    if (social) social.value = State.adSettings.socialBarScript || '';
     if (direct) direct.value = State.adSettings.directLink || '';
 };
 
@@ -116,7 +114,6 @@ const loadDashboardInputs = () => {
     State.adSettings = {
         bannerKey: (document.getElementById('ad-key-banner') as HTMLInputElement).value,
         popunderScript: (document.getElementById('ad-script-pop') as HTMLInputElement).value,
-        socialBarScript: (document.getElementById('ad-script-social') as HTMLInputElement).value,
         directLink: (document.getElementById('ad-link-direct') as HTMLInputElement).value
     };
     localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
@@ -169,13 +166,6 @@ const injectAds = () => {
         popTag.src = State.adSettings.popunderScript;
         scriptsContainer.appendChild(popTag);
     }
-
-    if (State.adSettings.socialBarScript) {
-        const socialTag = document.createElement('script');
-        socialTag.type = 'text/javascript';
-        socialTag.src = State.adSettings.socialBarScript;
-        scriptsContainer.appendChild(socialTag);
-    }
 };
 
 const handleDownloadWithAd = () => {
@@ -186,26 +176,6 @@ const handleDownloadWithAd = () => {
     if (realDownloadLink) {
         realDownloadLink.click();
     }
-};
-
-const updateSocialLinks = () => {
-    const siteUrl = encodeURIComponent(window.location.href);
-    const shareText = encodeURIComponent("جربت StorImage Studio؟ أداة رهيبة لضغط ومعالجة الصور مجاناً وبدون إعلانات! انصحك بها:");
-    
-    const ids = [
-        ['side-share-wa', 'footer-share-wa', 'result-share-wa', `https://api.whatsapp.com/send?text=${shareText}%20${siteUrl}`],
-        ['side-share-fb', 'footer-share-fb', 'result-share-fb', `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`],
-        ['side-share-tg', 'footer-share-tg', 'result-share-tg', `https://t.me/share/url?url=${siteUrl}&text=${shareText}`],
-        ['side-share-tw', 'footer-share-tw', 'result-share-tw', `https://twitter.com/intent/tweet?url=${siteUrl}&text=${shareText}`]
-    ];
-
-    ids.forEach((config) => {
-        const url = config[config.length - 1];
-        for (let i = 0; i < config.length - 1; i++) {
-            const el = document.getElementById(config[i]) as HTMLAnchorElement;
-            if (el) el.href = url;
-        }
-    });
 };
 
 const updateActivePreview = () => {
@@ -321,7 +291,6 @@ const processImage = async (item: ImageItem) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    updateSocialLinks();
     injectAds(); 
     
     const input = document.getElementById('file-input') as HTMLInputElement;

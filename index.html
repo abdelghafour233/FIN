@@ -27,23 +27,23 @@
         }
     </script>
     <style>
-        body { font-family: 'Cairo', sans-serif; transition: background 0.3s ease; }
+        body { font-family: 'Cairo', sans-serif; transition: background 0.3s ease, color 0.3s ease; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .dark .glass { background: rgba(15, 23, 42, 0.8); }
+        html:not(.dark) .glass { background: rgba(255, 255, 255, 0.8); border-bottom: 1px solid rgba(0,0,0,0.05); }
         .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .upload-zone { border: 2px dashed rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        html:not(.dark) .upload-zone { border: 2px dashed rgba(0,0,0,0.1); }
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        .main-preview-box { background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%); }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
         .hidden { display: none !important; }
-        .active-thumb { border: 2px solid #3b82f6; transform: scale(1.05); }
-        .social-btn { @apply w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-lg transition-all hover:scale-110 active:scale-95; }
-        .ad-container { @apply flex justify-center py-8 bg-black/5 dark:bg-white/5 border-t border-white/5; }
         .dashboard-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(15px); display: none; }
         .dashboard-overlay.open { display: flex; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
+        .floating-theme-btn { position: fixed; bottom: 2rem; left: 2rem; z-index: 60; }
     </style>
 </head>
-<body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen pb-20">
 
     <nav class="fixed top-0 left-0 right-0 z-50 glass px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -54,252 +54,181 @@
                 <h1 class="text-xl font-black">Stor<span class="gradient-text">Image</span></h1>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="window.toggleDashboard()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center transition-transform active:scale-90 hover:text-brand-primary">
-                    <i data-lucide="lock" class="w-5 h-5"></i>
-                </button>
-                <button onclick="window.toggleTheme()" class="w-10 h-10 bg-slate-200 dark:bg-white/5 rounded-xl flex items-center justify-center transition-transform active:scale-90">
+                <!-- Top Theme Toggle -->
+                <button onclick="window.toggleTheme()" class="flex items-center gap-2 p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors font-bold text-sm">
+                    <span class="hidden md:inline dark:hidden">الوضع الليلي</span>
+                    <span class="hidden md:inline hidden dark:inline">وضع النهار</span>
                     <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
                     <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+                </button>
+                <button onclick="window.toggleDashboard()" class="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
                 </button>
             </div>
         </div>
     </nav>
 
-    <!-- Dashboard View Overlay -->
-    <section id="dashboard-view" class="dashboard-overlay items-center justify-center p-6">
-        <div class="bg-white dark:bg-brand-card w-full max-w-xl rounded-[3rem] shadow-2xl border border-white/10 overflow-hidden relative">
-            <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 text-slate-400 hover:text-red-500 transition-colors">
-                <i data-lucide="x" class="w-7 h-7"></i>
-            </button>
-            
-            <div class="p-10">
-                <!-- Login Section -->
-                <div id="dashboard-login" class="text-center py-6">
-                    <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <i data-lucide="shield-check" class="w-8 h-8"></i>
-                    </div>
-                    <h2 class="text-2xl font-black mb-2">منطقة محمية</h2>
-                    <p class="text-slate-500 text-sm mb-8 font-bold">يرجى إدخال كلمة المرور للوصول إلى الإعدادات</p>
-                    
-                    <div class="space-y-4 max-w-xs mx-auto">
-                        <div class="relative">
-                            <input type="password" id="dashboard-pass-input" class="w-full bg-slate-50 dark:bg-brand-dark p-4 pl-12 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-center font-black tracking-widest focus:border-brand-primary transition-all" placeholder="••••••••">
-                            <button onclick="window.toggleDashboardPassVisibility()" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-primary transition-colors">
-                                <i id="pass-eye-icon" data-lucide="eye" class="w-5 h-5"></i>
-                            </button>
-                        </div>
-                        <button onclick="window.verifyDashboardPass()" class="w-full bg-brand-primary text-white py-4 rounded-xl font-black shadow-lg hover:bg-brand-primary/90 transition-all active:scale-95">
-                            دخول
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Settings Content (Hidden by default) -->
-                <div id="dashboard-content" class="hidden">
-                    <header class="mb-10 text-right flex items-center justify-between">
-                        <div>
-                            <h2 class="text-2xl font-black mb-1">لوحة التحكم</h2>
-                            <p class="text-slate-500 text-xs font-bold">إدارة إعلانات Adsterra</p>
-                        </div>
-                        <button onclick="window.logoutDashboard()" class="text-[10px] font-black uppercase tracking-widest text-red-500 bg-red-500/10 px-4 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-all">خروج</button>
-                    </header>
-
-                    <div class="space-y-6">
-                        <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-white/5 max-h-[400px] overflow-y-auto no-scrollbar">
-                            <div class="flex items-center gap-3 mb-6 text-brand-primary">
-                                <i data-lucide="code" class="w-5 h-5"></i>
-                                <h3 class="text-lg font-black">إعدادات Adsterra</h3>
-                            </div>
-
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">رابط الإعلان المباشر (لزر التحميل)</label>
-                                    <input type="text" id="ad-link-direct" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://adsterra-direct-link.com/...">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">مفتاح البانر السفلي (300x250)</label>
-                                    <input type="text" id="ad-key-banner" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="أدخل Key هنا...">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">رابط سكربت Popunder</label>
-                                    <input type="text" id="ad-script-pop" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://...">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black opacity-40 block mb-2 mr-1 uppercase">رابط سكربت Social Bar</label>
-                                    <input type="text" id="ad-script-social" class="w-full bg-white dark:bg-brand-card p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-all" placeholder="https://...">
-                                </div>
-                            </div>
-                        </div>
-
-                        <button onclick="window.saveDashboardSettings()" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-2xl font-black shadow-lg transition-all active:scale-[0.98] flex items-center justify-center gap-3">
-                            <i data-lucide="save" class="w-5 h-5"></i>
-                            حفظ التعديلات
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- Floating Theme Toggle Button -->
+    <button onclick="window.toggleTheme()" class="floating-theme-btn flex items-center gap-3 bg-brand-primary text-white px-6 py-3.5 rounded-full shadow-2xl hover:scale-105 transition-transform active:scale-95 font-black z-50">
+        <span class="dark:hidden">الوضع الليلي</span>
+        <span class="hidden dark:inline">وضع النهار</span>
+        <div class="w-6 h-6 flex items-center justify-center">
+            <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+            <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
         </div>
-    </section>
+    </button>
 
-    <main class="max-w-5xl mx-auto px-6 pt-28 pb-10">
-        
-        <!-- View: Initial Upload -->
-        <section id="upload-view" class="text-center py-12">
-            <header class="mb-12">
-                <h2 class="text-4xl font-black mb-4 tracking-tight">استوديو <span class="gradient-text">الصور</span> الذكي</h2>
-                <p class="text-slate-500 font-bold max-w-lg mx-auto leading-relaxed">اضغط، حول، وشارك صورك مع الجمهور بجودة احترافية.</p>
-            </header>
+    <main class="pt-28 px-6 max-w-6xl mx-auto">
+        <!-- Upload Section -->
+        <section id="upload-view" class="py-12">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-5xl font-black mb-4">اضغط، عالج، <span class="gradient-text">حمل</span></h2>
+                <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-lg">أداة احترافية لضغط الصور وتغيير صيغها بسرعة فائقة وجودة خرافية.</p>
+            </div>
 
-            <div id="drop-zone" onclick="document.getElementById('file-input').click()" class="upload-zone p-16 rounded-[3rem] text-center cursor-pointer group active:scale-[0.98]">
-                <input type="file" id="file-input" multiple class="hidden" accept="image/*">
-                <div class="w-24 h-24 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                    <i data-lucide="image-plus" class="w-12 h-12"></i>
+            <div class="upload-zone relative rounded-[2.5rem] p-12 text-center group cursor-pointer bg-slate-50 dark:bg-white/5" onclick="document.getElementById('file-input').click()">
+                <input type="file" id="file-input" class="hidden" multiple accept="image/*">
+                <div class="w-20 h-20 bg-brand-primary/10 rounded-3xl flex items-center justify-center text-brand-primary mx-auto mb-6 group-hover:scale-110 transition-transform">
+                    <i data-lucide="upload-cloud" class="w-10 h-10"></i>
                 </div>
-                <h3 class="text-2xl font-black mb-2">اختر الصور أو اسحبها هنا</h3>
-                <p class="text-sm opacity-50">يدعم WebP, JPG, PNG - حتى 20 ميجابايت</p>
+                <p class="text-xl font-bold mb-2">اسحب الصور هنا أو اضغط للاختيار</p>
+                <p class="text-sm text-slate-500 font-medium">يدعم PNG, JPG, WebP (حتى 20MB)</p>
             </div>
         </section>
 
-        <!-- View: Workspace -->
-        <section id="workspace-view" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <!-- Left: Main Preview Area -->
+        <!-- Workspace Section -->
+        <section id="workspace-view" class="hidden py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 space-y-6">
-                <div class="main-preview-box relative bg-brand-card/30 border border-white/5 rounded-[2.5rem] overflow-hidden flex flex-col items-center justify-center min-h-[400px] p-4 group">
-                    <div id="active-image-container" class="w-full h-full flex items-center justify-center">
-                        <img id="main-preview-img" src="" class="max-w-full max-h-[500px] object-contain rounded-2xl shadow-2xl transition-all duration-500">
+                <!-- Main Preview -->
+                <div class="bg-slate-50 dark:bg-white/5 rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 overflow-hidden">
+                    <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-200 dark:bg-brand-dark flex items-center justify-center mb-6">
+                        <img id="main-preview-img" class="max-w-full max-h-full object-contain transition-opacity duration-300">
+                        <div id="status-badge" class="absolute top-4 right-4 px-3 py-1 bg-brand-primary text-white text-[10px] font-black rounded-full uppercase">جاهز</div>
                     </div>
-                    
-                    <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between bg-black/40 backdrop-blur-md p-4 rounded-2xl border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div class="text-right">
-                            <p id="active-name" class="text-sm font-bold text-white truncate max-w-[200px]"></p>
-                            <p id="active-size" class="text-[10px] text-white/60 font-mono"></p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 id="active-name" class="font-bold text-xl truncate max-w-[250px]">اسم الصورة</h3>
+                            <p id="active-size" class="text-sm text-slate-500 font-bold">الحجم الأصلي: 0 KB</p>
                         </div>
-                        <div id="status-badge" class="px-3 py-1 bg-brand-primary/20 text-brand-primary text-[10px] font-black rounded-full uppercase tracking-tighter">جاهز</div>
-                    </div>
-                </div>
-
-                <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 px-2 scroll-smooth no-scrollbar"></div>
-            </div>
-
-            <!-- Right: Controls Area -->
-            <div class="lg:col-span-4 space-y-6">
-                <div class="bg-brand-card/50 p-8 rounded-[2rem] border border-white/5 space-y-8 sticky top-28 shadow-2xl">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <label class="text-xs font-black opacity-50">جودة الضغط</label>
-                            <span id="quality-val" class="text-brand-primary font-black text-sm">85%</span>
-                        </div>
-                        <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-brand-primary">
-                    </div>
-
-                    <div>
-                        <label class="text-xs font-black opacity-50 block mb-3">الصيغة</label>
-                        <select id="format-select" class="w-full bg-slate-100 dark:bg-brand-dark p-4 rounded-xl border border-slate-200 dark:border-white/10 outline-none text-sm font-bold focus:border-brand-primary transition-colors text-right cursor-pointer text-slate-900 dark:text-slate-100">
-                            <option value="image/webp" class="bg-white dark:bg-brand-dark">WebP (موصى به)</option>
-                            <option value="image/jpeg" class="bg-white dark:bg-brand-dark">JPEG (قياسي)</option>
-                            <option value="image/png" class="bg-white dark:bg-brand-dark">PNG (شفافية)</option>
-                        </select>
-                    </div>
-
-                    <div class="space-y-3">
-                        <button id="process-active-btn" class="w-full bg-brand-primary hover:bg-brand-primary/90 text-white py-4 rounded-xl font-black shadow-lg transition-all active:scale-95 flex items-center justify-center gap-2">
-                            <i data-lucide="zap" class="w-5 h-5"></i>
-                            معالجة الحالية
-                        </button>
-                        <div id="download-zone" class="hidden animate-bounce space-y-4">
-                            <!-- Download Button with Ad Logic -->
-                            <button id="final-download-btn-trigger" class="w-full bg-brand-success text-white py-4 rounded-xl font-black shadow-lg flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95">
+                        <div id="download-zone" class="hidden flex gap-2">
+                             <button id="final-download-btn-trigger" class="bg-brand-success text-white px-6 py-3 rounded-2xl font-black flex items-center gap-2 hover:scale-105 transition-transform shadow-lg shadow-brand-success/20">
                                 <i data-lucide="download" class="w-5 h-5"></i>
                                 تحميل النتيجة
                             </button>
-                            <!-- Hidden Anchor for Actual Download -->
-                            <a id="final-download-link" href="#" download class="hidden"></a>
-                            
-                            <div class="flex flex-col items-center gap-3 pt-4 border-t border-white/5">
-                                <p class="text-[10px] font-black opacity-30 uppercase tracking-widest">شارك النتيجة مع أصدقائك</p>
-                                <div class="flex justify-center gap-2">
-                                    <a id="result-share-wa" href="#" target="_blank" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-[#25D366] hover:scale-110 transition-transform shadow-md">
-                                        <i data-lucide="message-circle" class="w-4 h-4"></i>
-                                    </a>
-                                    <a id="result-share-fb" href="#" target="_blank" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-[#1877F2] hover:scale-110 transition-transform shadow-md">
-                                        <i data-lucide="facebook" class="w-4 h-4"></i>
-                                    </a>
-                                    <a id="result-share-tg" href="#" target="_blank" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-[#0088cc] hover:scale-110 transition-transform shadow-md">
-                                        <i data-lucide="send" class="w-4 h-4"></i>
-                                    </a>
-                                    <a id="result-share-tw" href="#" target="_blank" class="w-8 h-8 rounded-lg flex items-center justify-center text-white bg-black hover:scale-110 transition-transform shadow-md border border-white/10">
-                                        <i data-lucide="twitter" class="w-4 h-4"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Permanent Social Share Section -->
-                    <div class="pt-6 border-t border-white/5 text-center">
-                        <p class="text-[10px] font-black opacity-30 mb-4 uppercase tracking-widest">انشر الموقع مع الجمهور</p>
-                        <div class="flex justify-center gap-3">
-                            <a id="side-share-wa" href="#" target="_blank" class="social-btn bg-[#25D366] hover:shadow-[#25D366]/20">
-                                <i data-lucide="message-circle" class="w-5 h-5"></i>
-                            </a>
-                            <a id="side-share-fb" href="#" target="_blank" class="social-btn bg-[#1877F2] hover:shadow-[#1877F2]/20">
-                                <i data-lucide="facebook" class="w-5 h-5"></i>
-                            </a>
-                            <a id="side-share-tg" href="#" target="_blank" class="social-btn bg-[#0088cc] hover:shadow-[#0088cc]/20">
-                                <i data-lucide="send" class="w-5 h-5"></i>
-                            </a>
-                            <a id="side-share-tw" href="#" target="_blank" class="social-btn bg-black border border-white/10">
-                                <i data-lucide="twitter" class="w-5 h-5"></i>
-                            </a>
+                            <a id="final-download-link" class="hidden"></a>
                         </div>
                     </div>
                 </div>
+
+                <!-- Thumbs -->
+                <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 scrollbar-hide"></div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-slate-50 dark:bg-white/5 rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5">
+                    <h3 class="font-black text-xl mb-6 flex items-center gap-2">
+                        <i data-lucide="sliders" class="w-5 h-5 text-brand-primary"></i>
+                        إعدادات المعالجة
+                    </h3>
+
+                    <div class="space-y-8">
+                        <div>
+                            <div class="flex justify-between mb-4">
+                                <label class="font-bold text-sm">مستوى الجودة</label>
+                                <span id="quality-val" class="text-brand-primary font-black">80%</span>
+                            </div>
+                            <input type="range" id="quality-slider" min="10" max="100" value="80" class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-primary">
+                        </div>
+
+                        <div>
+                            <label class="block font-bold text-sm mb-4">صيغة التصدير</label>
+                            <select id="format-select" class="w-full bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-bold focus:ring-2 ring-brand-primary/20 outline-none">
+                                <option value="image/webp">WebP (أفضل ضغط)</option>
+                                <option value="image/jpeg">JPEG (قياسي)</option>
+                                <option value="image/png">PNG (شفافية)</option>
+                            </select>
+                        </div>
+
+                        <button id="process-active-btn" class="w-full bg-brand-primary text-white py-5 rounded-[1.5rem] font-black text-lg shadow-xl shadow-brand-primary/20 hover:scale-[1.02] transition-transform active:scale-95">
+                            بدء المعالجة
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Ad Placeholder -->
+                <div id="ad-banner-300-250" class="flex justify-center bg-slate-100 dark:bg-white/5 rounded-3xl py-4 min-h-[250px]"></div>
             </div>
         </section>
-
     </main>
 
-    <!-- Footer with Social Links -->
-    <footer class="mt-20 border-t border-slate-200 dark:border-white/5 py-12 px-6">
-        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
-            <div class="text-right">
-                <h4 class="text-lg font-black mb-1">Stor<span class="gradient-text">Image</span> Studio</h4>
-                <p class="text-xs opacity-40 font-bold">بوابتك الاحترافية لمعالجة الصور مجاناً وبدون إعلانات.</p>
-            </div>
+    <!-- Dashboard Overlay -->
+    <div id="dashboard-view" class="dashboard-overlay items-center justify-center p-6">
+        <div class="bg-white dark:bg-brand-card w-full max-w-lg rounded-[3rem] p-10 relative shadow-2xl overflow-hidden border border-slate-200 dark:border-white/5">
+            <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
             
-            <div class="flex items-center gap-4">
-                <span class="text-[10px] font-black opacity-30 uppercase ml-2">شاركنا الآن:</span>
-                <a id="footer-share-wa" href="#" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-[#25D366] hover:text-white transition-all">
-                    <i data-lucide="message-circle" class="w-4 h-4"></i>
-                </a>
-                <a id="footer-share-fb" href="#" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-[#1877F2] hover:text-white transition-all">
-                    <i data-lucide="facebook" class="w-4 h-4"></i>
-                </a>
-                <a id="footer-share-tg" href="#" target="_blank" class="w-9 h-9 flex items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 hover:bg-[#0088cc] hover:text-white transition-all">
-                    <i data-lucide="send" class="w-4 h-4"></i>
-                </a>
+            <!-- Login -->
+            <div id="dashboard-login" class="text-center py-6">
+                <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-2xl font-black mb-2">منطقة الإدارة</h2>
+                <p class="text-slate-500 mb-8">أدخل كلمة المرور للوصول للإعدادات</p>
+                <div class="relative max-w-xs mx-auto mb-6">
+                    <input type="password" id="dashboard-pass-input" placeholder="كلمة المرور" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-center font-bold focus:ring-2 ring-brand-primary/20 outline-none pr-12">
+                    <button onclick="window.toggleDashboardPassVisibility()" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-brand-primary transition-colors">
+                        <i id="pass-eye-icon" data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <button onclick="window.verifyDashboardPass()" class="w-full max-w-xs bg-brand-primary text-white py-4 rounded-2xl font-black">دخول</button>
             </div>
-        </div>
-        <div class="text-center mt-10 opacity-20 text-[10px] font-black uppercase tracking-widest">
-            &copy; 2024 جميع الحقوق محفوظة لـ StorImage
-        </div>
-    </footer>
 
-    <!-- Adsterra Banners & Scripts placed at the absolute bottom -->
-    <div id="adsterra-banner-container" class="ad-container mt-10">
-        <div id="ad-banner-300-250">
-            <!-- Banner Injected Here -->
+            <!-- Content -->
+            <div id="dashboard-content" class="hidden space-y-6">
+                <h2 class="text-2xl font-black mb-6">إعدادات الإعلانات (Adsterra)</h2>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Banner Key (300x250)</label>
+                        <input type="text" id="ad-key-banner" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Popunder Script URL</label>
+                        <input type="text" id="ad-script-pop" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 font-mono text-sm">
+                    </div>
+                    <div>
+                        <label class="text-xs font-black uppercase tracking-widest text-slate-500 mb-2 block">Direct Link (Download Ad)</label>
+                        <input type="text" id="ad-link-direct" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-4 font-mono text-sm">
+                    </div>
+                </div>
+
+                <div class="flex gap-3 pt-6">
+                    <button onclick="window.saveDashboardSettings()" class="flex-1 bg-brand-primary text-white py-4 rounded-2xl font-black">حفظ الإعدادات</button>
+                    <button onclick="window.logoutDashboard()" class="px-6 bg-slate-100 dark:bg-white/5 rounded-2xl font-bold text-red-500">خروج</button>
+                </div>
+            </div>
         </div>
     </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-20 opacity-0">
+        <div class="bg-brand-dark text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-brand-primary"></i>
+            <span id="toast-msg" class="font-bold"></span>
+        </div>
+    </div>
+
+    <!-- Adsterra Container -->
+    <div class="mt-20 border-t border-slate-100 dark:border-white/5 py-10 flex flex-col items-center">
+        <p class="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">إعلانات قد تهمك</p>
+        <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
+    </div>
+
+    <script src="index.tsx" type="module"></script>
     <div id="adsterra-scripts"></div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] bg-brand-success text-white px-8 py-4 rounded-2xl font-black shadow-2xl flex items-center gap-3 transition-all translate-y-20 opacity-0">
-        <i data-lucide="check-circle" class="w-5 h-5"></i>
-        <span id="toast-msg">تم حفظ الإعدادات</span>
-    </div>
-
-    <script type="module" src="index.tsx"></script>
+    <!-- Adsterra Invoke Script -->
+    <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
 </body>
 </html>
