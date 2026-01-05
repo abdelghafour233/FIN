@@ -39,63 +39,74 @@ const applyTheme = () => {
     }, 10);
 };
 
-// تحديث روابط التواصل وإخفائها إذا كانت غير مربوطة
+// تحديث روابط التواصل والمشاركة
 const updateSocialLinksUI = () => {
-    const floatWa = document.getElementById('btn-floating-whatsapp') as HTMLAnchorElement;
-    const footerWa = document.getElementById('link-whatsapp') as HTMLAnchorElement;
-    const footerFb = document.getElementById('link-facebook') as HTMLAnchorElement;
-    const footerIg = document.getElementById('link-instagram') as HTMLAnchorElement;
-    const footerTw = document.getElementById('link-twitter') as HTMLAnchorElement;
+    const siteUrl = encodeURIComponent(window.location.href);
+    const shareText = encodeURIComponent("اكتشفت أداة رائعة لضغط ومعالجة الصور مجاناً وبجودة عالية! جربها من هنا:");
 
-    // مساعد للتحقق من الرابط
+    // 1. أزرار التواصل (العائمة وفي التذييل)
     const isValid = (val: string) => val && val.trim() !== '' && val !== '#';
 
-    // الواتساب
-    if (floatWa) {
-        if (isValid(State.socialLinks.whatsapp)) {
-            floatWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
-            floatWa.classList.remove('hidden');
-        } else {
-            floatWa.classList.add('hidden');
+    // الواتساب (تواصل)
+    const waUrl = isValid(State.socialLinks.whatsapp) ? `https://wa.me/${State.socialLinks.whatsapp}` : null;
+    ['float-whatsapp', 'link-whatsapp'].forEach(id => {
+        const el = document.getElementById(id) as HTMLAnchorElement;
+        if (el) {
+            if (waUrl) { el.href = waUrl; el.classList.remove('hidden'); }
+            else { el.classList.add('hidden'); }
         }
-    }
-    if (footerWa) {
-        if (isValid(State.socialLinks.whatsapp)) {
-            footerWa.href = `https://wa.me/${State.socialLinks.whatsapp}`;
-            footerWa.classList.remove('hidden');
-        } else {
-            footerWa.classList.add('hidden');
-        }
-    }
+    });
 
-    // فيسبوك
-    if (footerFb) {
-        if (isValid(State.socialLinks.facebook)) {
-            footerFb.href = State.socialLinks.facebook;
-            footerFb.classList.remove('hidden');
-        } else {
-            footerFb.classList.add('hidden');
+    // الفيسبوك (تواصل)
+    const fbUrl = isValid(State.socialLinks.facebook) ? State.socialLinks.facebook : null;
+    ['float-facebook', 'link-facebook'].forEach(id => {
+        const el = document.getElementById(id) as HTMLAnchorElement;
+        if (el) {
+            if (fbUrl) { el.href = fbUrl; el.classList.remove('hidden'); }
+            else { el.classList.add('hidden'); }
         }
-    }
+    });
 
-    // إنستغرام
-    if (footerIg) {
-        if (isValid(State.socialLinks.instagram)) {
-            footerIg.href = State.socialLinks.instagram;
-            footerIg.classList.remove('hidden');
-        } else {
-            footerIg.classList.add('hidden');
+    // الإنستغرام (تواصل)
+    const igUrl = isValid(State.socialLinks.instagram) ? State.socialLinks.instagram : null;
+    ['float-instagram', 'link-instagram'].forEach(id => {
+        const el = document.getElementById(id) as HTMLAnchorElement;
+        if (el) {
+            if (igUrl) { el.href = igUrl; el.classList.remove('hidden'); }
+            else { el.classList.add('hidden'); }
         }
-    }
+    });
 
-    // تويتر
-    if (footerTw) {
-        if (isValid(State.socialLinks.twitter)) {
-            footerTw.href = State.socialLinks.twitter;
-            footerTw.classList.remove('hidden');
-        } else {
-            footerTw.classList.add('hidden');
+    // تويتر (تواصل)
+    const twUrl = isValid(State.socialLinks.twitter) ? State.socialLinks.twitter : null;
+    ['float-twitter', 'link-twitter'].forEach(id => {
+        const el = document.getElementById(id) as HTMLAnchorElement;
+        if (el) {
+            if (twUrl) { el.href = twUrl; el.classList.remove('hidden'); }
+            else { el.classList.add('hidden'); }
         }
+    });
+
+    // 2. أزرار المشاركة (تحت زر التحميل) - دائماً تظهر للمشاركة بمجرد ظهور منطقة التحميل
+    const workWa = document.getElementById('work-whatsapp') as HTMLAnchorElement;
+    if (workWa) {
+        workWa.href = `https://api.whatsapp.com/send?text=${shareText}%20${siteUrl}`;
+        workWa.classList.remove('hidden');
+    }
+    const workFb = document.getElementById('work-facebook') as HTMLAnchorElement;
+    if (workFb) {
+        workFb.href = `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`;
+        workFb.classList.remove('hidden');
+    }
+    const workIg = document.getElementById('work-instagram') as HTMLAnchorElement;
+    if (workIg) {
+        workIg.href = `https://instagram.com`;
+        workIg.classList.remove('hidden');
+    }
+    const workTw = document.getElementById('work-twitter') as HTMLAnchorElement;
+    if (workTw) {
+        workTw.href = `https://twitter.com/intent/tweet?url=${siteUrl}&text=${shareText}`;
+        workTw.classList.remove('hidden');
     }
 };
 
@@ -201,7 +212,7 @@ const loadDashboardInputs = () => {
     localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
     localStorage.setItem('social_links', JSON.stringify(State.socialLinks));
     
-    showToast('تم حفظ الإعدادات وتحديث الأزرار!');
+    showToast('تم حفظ الإعدادات!');
     updateSocialLinksUI();
     setTimeout(() => (window as any).toggleDashboard(), 500);
     injectAds();
@@ -289,6 +300,7 @@ const updateActivePreview = () => {
             downloadZone.classList.remove('hidden');
             downloadAnchor.href = active.processedUrl || '#';
             downloadAnchor.download = `optimized_${active.name}`;
+            updateSocialLinksUI(); 
         } else {
             downloadZone?.classList.add('hidden');
         }
