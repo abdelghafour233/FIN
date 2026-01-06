@@ -14,38 +14,7 @@ interface ImageItem {
 const State = {
     files: [] as ImageItem[],
     selectedId: null as string | null,
-    theme: 'dark',
-    isDashboardOpen: false,
-    isAuthenticated: false,
-    dashboardPassword: 'admin123'
-};
-
-const applyTheme = () => {
-    document.documentElement.classList.add('dark');
-    if ((window as any).lucide) (window as any).lucide.createIcons();
-};
-
-(window as any).toggleTheme = () => {
-    showToast('الوضع الداكن هو الافتراضي للأداء');
-};
-
-(window as any).toggleDashboard = () => {
-    State.isDashboardOpen = !State.isDashboardOpen;
-    const view = document.getElementById('dashboard-view');
-    if (view) {
-        view.classList.toggle('hidden', !State.isDashboardOpen);
-        view.style.display = State.isDashboardOpen ? 'flex' : 'none';
-    }
-};
-
-(window as any).verifyDashboardPass = () => {
-    const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
-    if (input.value === State.dashboardPassword) {
-        State.isAuthenticated = true;
-        showToast('مرحباً بك، سيتم إضافة خيارات الربح قريباً');
-    } else {
-        showToast('كلمة المرور غير صحيحة');
-    }
+    dashboardPassword: 'admin'
 };
 
 const showToast = (msg: string) => {
@@ -55,6 +24,22 @@ const showToast = (msg: string) => {
         toastMsg.innerText = msg;
         toast.classList.remove('translate-y-20', 'opacity-0');
         setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
+    }
+};
+
+(window as any).toggleDashboard = () => {
+    const view = document.getElementById('dashboard-view');
+    if (view) {
+        view.style.display = view.style.display === 'none' ? 'flex' : 'none';
+    }
+};
+
+(window as any).verifyDashboardPass = () => {
+    const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
+    if (input.value === State.dashboardPassword) {
+        showToast('تم الحفظ. أرباحك في ازدياد!');
+    } else {
+        showToast('كلمة المرور غير صحيحة');
     }
 };
 
@@ -90,7 +75,6 @@ const renderThumbs = () => {
     list.innerHTML = State.files.map(f => `
         <div onclick="window.selectImage('${f.id}')" class="relative shrink-0 cursor-pointer group">
             <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl border-2 transition-all ${State.selectedId === f.id ? 'border-brand-primary scale-105' : 'border-transparent opacity-60 hover:opacity-100'}">
-            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
     if ((window as any).lucide) (window as any).lucide.createIcons();
@@ -104,13 +88,19 @@ const renderThumbs = () => {
 const processImage = async (item: ImageItem) => {
     if (item.status === 'done' || item.status === 'processing') return;
 
+    const loader = document.getElementById('processing-loader');
+    if (loader) loader.style.display = 'flex';
+
     item.status = 'processing';
     updateActivePreview();
 
     const quality = parseInt((document.getElementById('quality-slider') as HTMLInputElement).value) / 100;
-    const format = (document.getElementById('format-select') as HTMLSelectElement).value;
+    const format = (document.getElementById('format-select') as HTMLSelectElement).value || 'image/webp';
 
     try {
+        // تأخير وهمي لمدة 3 ثوانٍ لزيادة زمن بقاء المستخدم وعرض الإعلانات
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
         const img = new Image();
         img.src = item.preview;
         await new Promise(r => img.onload = r);
@@ -126,18 +116,20 @@ const processImage = async (item: ImageItem) => {
             item.processedSize = blob.size;
             item.processedUrl = URL.createObjectURL(blob);
             item.status = 'done';
-            showToast('تمت المعالجة بنجاح');
+            showToast('تمت المعالجة بنجاح! حمل صورتك الآن');
         }
     } catch (e) {
         item.status = 'error';
-        showToast('حدث خطأ في المعالجة');
+        showToast('حدث خطأ');
+    } finally {
+        if (loader) loader.style.display = 'none';
     }
     
     updateActivePreview();
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-    applyTheme();
+    if ((window as any).lucide) (window as any).lucide.createIcons();
     
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;
@@ -160,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!State.selectedId && State.files.length > 0) State.selectedId = State.files[0].id;
-
         document.getElementById('upload-view')?.classList.add('hidden');
         document.getElementById('workspace-view')?.classList.remove('hidden');
         updateActivePreview();
