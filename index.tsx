@@ -18,6 +18,7 @@ const State = {
     isDashboardOpen: false,
     isAuthenticated: false,
     dashboardPassword: 'admin123',
+    adsterraKey: localStorage.getItem('adsterra_key') || '0295263cf4ed8d9e3a97b6a2490864ee',
     socialLinks: JSON.parse(localStorage.getItem('social_links') || JSON.stringify({
         whatsapp: '212600000000',
         facebook: '',
@@ -31,6 +32,41 @@ const applyTheme = () => {
     setTimeout(() => {
         if ((window as any).lucide) (window as any).lucide.createIcons();
     }, 10);
+};
+
+const injectAdsterra = () => {
+    const container = document.getElementById('bottom-ad-container');
+    const wrapper = document.getElementById('ad-wrapper');
+    if (!container || !wrapper) return;
+
+    if (!State.adsterraKey || State.adsterraKey.trim() === '') {
+        wrapper.classList.add('hidden');
+        return;
+    }
+
+    wrapper.classList.remove('hidden');
+    container.innerHTML = ''; // Clear existing
+
+    // Adsterra Options
+    const scriptOptions = document.createElement('script');
+    scriptOptions.type = 'text/javascript';
+    scriptOptions.innerHTML = `
+        atOptions = {
+            'key' : '${State.adsterraKey}',
+            'format' : 'iframe',
+            'height' : 250,
+            'width' : 300,
+            'params' : {}
+        };
+    `;
+    
+    // Adsterra Invoke Script
+    const scriptInvoke = document.createElement('script');
+    scriptInvoke.type = 'text/javascript';
+    scriptInvoke.src = `https://bouncingbuzz.com/${State.adsterraKey}/invoke.js`;
+
+    container.appendChild(scriptOptions);
+    container.appendChild(scriptInvoke);
 };
 
 // تحديث روابط التواصل والمشاركة
@@ -81,7 +117,7 @@ const updateSocialLinksUI = () => {
         }
     });
 
-    // 2. أزرار المشاركة (تحت زر التحميل) - دائماً تظهر للمشاركة بمجرد ظهور منطقة التحميل
+    // 2. أزرار المشاركة (تحت زر التحميل)
     const workWa = document.getElementById('work-whatsapp') as HTMLAnchorElement;
     if (workWa) {
         workWa.href = `https://api.whatsapp.com/send?text=${shareText}%20${siteUrl}`;
@@ -91,11 +127,6 @@ const updateSocialLinksUI = () => {
     if (workFb) {
         workFb.href = `https://www.facebook.com/sharer/sharer.php?u=${siteUrl}`;
         workFb.classList.remove('hidden');
-    }
-    const workIg = document.getElementById('work-instagram') as HTMLAnchorElement;
-    if (workIg) {
-        workIg.href = `https://instagram.com`;
-        workIg.classList.remove('hidden');
     }
     const workTw = document.getElementById('work-twitter') as HTMLAnchorElement;
     if (workTw) {
@@ -179,11 +210,13 @@ const loadDashboardInputs = () => {
     const fb = document.getElementById('social-facebook') as HTMLInputElement;
     const ig = document.getElementById('social-instagram') as HTMLInputElement;
     const tw = document.getElementById('social-twitter') as HTMLInputElement;
+    const adKey = document.getElementById('adsterra-key') as HTMLInputElement;
     
     if (wa) wa.value = State.socialLinks.whatsapp || '';
     if (fb) fb.value = State.socialLinks.facebook || '';
     if (ig) ig.value = State.socialLinks.instagram || '';
     if (tw) tw.value = State.socialLinks.twitter || '';
+    if (adKey) adKey.value = State.adsterraKey || '';
 };
 
 (window as any).saveDashboardSettings = () => {
@@ -193,11 +226,14 @@ const loadDashboardInputs = () => {
         instagram: (document.getElementById('social-instagram') as HTMLInputElement).value,
         twitter: (document.getElementById('social-twitter') as HTMLInputElement).value,
     };
+    State.adsterraKey = (document.getElementById('adsterra-key') as HTMLInputElement).value;
 
     localStorage.setItem('social_links', JSON.stringify(State.socialLinks));
+    localStorage.setItem('adsterra_key', State.adsterraKey);
     
     showToast('تم حفظ الإعدادات!');
     updateSocialLinksUI();
+    injectAdsterra();
     setTimeout(() => (window as any).toggleDashboard(), 500);
 };
 
@@ -333,6 +369,7 @@ const processImage = async (item: ImageItem) => {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     updateSocialLinksUI();
+    injectAdsterra();
     
     const input = document.getElementById('file-input') as HTMLInputElement;
     const slider = document.getElementById('quality-slider') as HTMLInputElement;

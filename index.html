@@ -231,19 +231,10 @@
         </section>
 
         <!-- Adsterra Bottom Ad Section -->
-        <section class="mt-8 py-10 border-t border-slate-100 dark:border-white/5 flex flex-col items-center">
+        <section id="ad-wrapper" class="mt-8 py-10 border-t border-slate-100 dark:border-white/5 flex flex-col items-center hidden">
             <p class="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">إعلان</p>
-            <div id="bottom-ad-container" class="bg-slate-50 dark:bg-white/5 p-4 rounded-3xl overflow-hidden shadow-sm">
-                <script>
-                  atOptions = {
-                    'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-                    'format' : 'iframe',
-                    'height' : 250,
-                    'width' : 300,
-                    'params' : {}
-                  };
-                </script>
-                <script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+            <div id="bottom-ad-container" class="bg-slate-50 dark:bg-white/5 p-4 rounded-3xl overflow-hidden shadow-sm min-h-[250px] min-w-[300px] flex items-center justify-center">
+                <!-- Ad will be injected here -->
             </div>
         </section>
     </main>
@@ -273,6 +264,14 @@
             <div id="dashboard-content" class="hidden space-y-8">
                 <h2 class="text-2xl font-black mb-6">إعدادات الموقع</h2>
                 <div class="space-y-6">
+                    <div class="space-y-4">
+                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">إعدادات ADSTERRA</h3>
+                        <div>
+                            <label class="text-xs font-bold mb-1 block">مفتاح الإعلان (Ad Key)</label>
+                            <input type="text" id="adsterra-key" placeholder="0295263cf4ed8d9e3a97b6a2490864ee" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs font-mono">
+                            <p class="text-[10px] text-slate-500 mt-1">اترك الحقل فارغاً لإخفاء الإعلان تماماً.</p>
+                        </div>
+                    </div>
                     <div class="space-y-4">
                         <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">روابط التواصل الاجتماعي</h3>
                         <p class="text-[10px] text-slate-500 leading-tight">اترك الحقل فارغاً لإخفاء الزر نهائياً من الموقع.</p>
