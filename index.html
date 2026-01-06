@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>StorImage Studio | معالجة الصور الاحترافية</title>
+    
     <!-- Popunder_1 ANTI-ADBLOCK JS SYNC -->
     <script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>
+    
+    <!-- SocialBar_1 ANTI-ADBLOCK JS SYNC -->
+    <script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -22,10 +26,7 @@
                             accent: '#8b5cf6',
                             success: '#10b981',
                             dark: '#020617',
-                            card: '#0f172a',
-                            whatsapp: '#25D366',
-                            facebook: '#1877F2',
-                            twitter: '#1DA1F2'
+                            card: '#0f172a'
                         } 
                     }
                 }
@@ -33,23 +34,18 @@
         }
     </script>
     <style>
-        body { font-family: 'Cairo', sans-serif; transition: background 0.4s ease, color 0.4s ease; }
+        body { font-family: 'Cairo', sans-serif; transition: background 0.4s ease; }
         .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .dark .glass { background: rgba(15, 23, 42, 0.8); }
-        html:not(.dark) .glass { background: rgba(255, 255, 255, 0.85); border-bottom: 1px solid rgba(0,0,0,0.1); }
         .gradient-text { background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .upload-zone { border: 2px dashed rgba(255,255,255,0.1); transition: all 0.3s ease; }
-        html:not(.dark) .upload-zone { border: 2px dashed rgba(0,0,0,0.1); background: #f8fafc; }
+        .upload-zone { border: 2px dashed rgba(59, 130, 246, 0.3); transition: all 0.3s ease; }
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
         .hidden { display: none !important; }
-        .dashboard-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(2, 6, 23, 0.95); backdrop-filter: blur(15px); display: none; }
-        .dashboard-overlay.open { display: flex; }
+        .ad-container { border-radius: 1.5rem; overflow: hidden; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 10px; }
-        .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="bg-white dark:bg-brand-dark text-slate-900 dark:text-slate-100 min-h-screen pb-20">
+<body class="bg-brand-dark text-slate-100 min-h-screen">
 
     <nav class="fixed top-0 left-0 right-0 z-50 glass px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -60,11 +56,10 @@
                 <h1 class="text-xl font-black">Stor<span class="gradient-text">Image</span></h1>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="window.toggleTheme()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 transition-all font-bold text-sm">
-                    <i data-lucide="sun" class="w-5 h-5 hidden dark:block text-yellow-400"></i>
-                    <i data-lucide="moon" class="w-5 h-5 block dark:hidden text-brand-dark"></i>
+                <button onclick="window.toggleTheme()" class="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+                    <i data-lucide="sun" class="w-5 h-5 text-yellow-400"></i>
                 </button>
-                <button onclick="window.toggleDashboard()" class="p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                <button onclick="window.toggleDashboard()" class="p-2.5 rounded-xl hover:bg-white/5 transition-colors">
                     <i data-lucide="settings" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -72,37 +67,39 @@
     </nav>
 
     <main class="pt-28 px-6 max-w-6xl mx-auto">
+        <!-- قسم الرفع -->
         <section id="upload-view" class="py-12">
             <div class="text-center mb-12">
-                <h2 class="text-4xl md:text-5xl font-black mb-4">أداة معالجة الصور <span class="gradient-text">الاحترافية</span></h2>
-                <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-lg">قم بضغط، تحويل، وتعديل جودة صورك بسرعة فائقة وبدون فقدان للملامح الأساسية.</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-4">معالج الصور <span class="gradient-text">الذكي</span></h2>
+                <p class="text-slate-400 max-w-xl mx-auto text-lg">أداة احترافية لضغط وتحسين الصور مجاناً. جودة عالية، سرعة فائقة.</p>
             </div>
 
-            <div class="upload-zone relative rounded-[2.5rem] p-12 text-center group cursor-pointer bg-slate-50 dark:bg-white/5" onclick="document.getElementById('file-input').click()">
+            <div class="upload-zone relative rounded-[2.5rem] p-12 text-center group cursor-pointer bg-white/5" onclick="document.getElementById('file-input').click()">
                 <input type="file" id="file-input" class="hidden" multiple accept="image/*">
                 <div class="w-20 h-20 bg-brand-primary/10 rounded-3xl flex items-center justify-center text-brand-primary mx-auto mb-6 group-hover:scale-110 transition-transform">
                     <i data-lucide="upload-cloud" class="w-10 h-10"></i>
                 </div>
-                <p class="text-xl font-bold mb-2">اسحب الصور هنا أو اضغط للاختيار</p>
-                <p class="text-sm text-slate-500 font-medium">يدعم PNG, JPG, WebP (حتى 20MB)</p>
+                <p class="text-xl font-bold mb-2 text-white">اسحب الصور هنا أو اضغط للاختيار</p>
+                <p class="text-sm text-slate-500 font-medium">PNG, JPG, WebP (Up to 20MB)</p>
             </div>
         </section>
 
+        <!-- منطقة العمل -->
         <section id="workspace-view" class="hidden py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 space-y-6">
-                <div class="bg-slate-50 dark:bg-white/5 rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 overflow-hidden">
-                    <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-200 dark:bg-brand-dark flex items-center justify-center mb-6">
+                <div class="bg-white/5 rounded-[2.5rem] p-6 border border-white/5 overflow-hidden">
+                    <div class="aspect-video relative rounded-2xl overflow-hidden bg-brand-dark flex items-center justify-center mb-6">
                         <img id="main-preview-img" class="max-w-full max-h-full object-contain">
                     </div>
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
-                            <h3 id="active-name" class="font-bold text-xl truncate max-w-[250px]">اسم الملف</h3>
+                            <h3 id="active-name" class="font-bold text-xl text-white truncate max-w-[250px]">اسم الملف</h3>
                             <p id="active-size" class="text-sm text-slate-500 font-bold">الحجم الأصلي: 0 KB</p>
                         </div>
-                        <div id="download-zone" class="hidden">
-                             <button id="final-download-btn-trigger" class="w-full md:w-auto bg-brand-success text-white px-12 py-5 rounded-3xl font-black flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl shadow-brand-success/20">
-                                <i data-lucide="download" class="w-7 h-7"></i>
-                                تحميل النتيجة
+                        <div id="download-zone" class="hidden flex gap-3">
+                             <button id="final-download-btn-trigger" class="bg-brand-success text-white px-8 py-4 rounded-2xl font-black flex items-center gap-2 hover:scale-105 transition-all shadow-xl shadow-brand-success/20">
+                                <i data-lucide="download" class="w-5 h-5"></i>
+                                تحميل
                             </button>
                             <a id="final-download-link" class="hidden"></a>
                         </div>
@@ -112,96 +109,112 @@
             </div>
 
             <div class="lg:col-span-4 space-y-6">
-                <div class="bg-slate-50 dark:bg-white/5 rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5">
-                    <h3 class="font-black text-xl mb-6 flex items-center gap-2">
+                <div class="bg-white/5 rounded-[2.5rem] p-8 border border-white/5">
+                    <h3 class="font-black text-xl mb-6 text-white flex items-center gap-2">
                         <i data-lucide="sliders" class="w-5 h-5 text-brand-primary"></i>
                         خيارات المعالجة
                     </h3>
                     <div class="space-y-8">
                         <div>
                             <div class="flex justify-between mb-4">
-                                <label class="font-bold text-sm">مستوى الجودة</label>
+                                <label class="font-bold text-sm text-slate-300">مستوى الضغط</label>
                                 <span id="quality-val" class="text-brand-primary font-black">80%</span>
                             </div>
-                            <input type="range" id="quality-slider" min="10" max="100" value="80" class="w-full h-2 bg-slate-200 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-primary">
+                            <input type="range" id="quality-slider" min="10" max="100" value="80" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-primary">
                         </div>
                         <div>
-                            <label class="block font-bold text-sm mb-4">صيغة التصدير</label>
-                            <select id="format-select" class="w-full bg-white dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-bold outline-none">
-                                <option value="image/webp">WebP (أفضل ضغط)</option>
-                                <option value="image/jpeg">JPEG (قياسي)</option>
-                                <option value="image/png">PNG (شفافية)</option>
+                            <label class="block font-bold text-sm text-slate-300 mb-4">صيغة التصدير</label>
+                            <select id="format-select" class="w-full bg-brand-dark border border-white/10 rounded-2xl p-4 font-bold text-white outline-none">
+                                <option value="image/webp">WebP (موصى به)</option>
+                                <option value="image/jpeg">JPEG</option>
+                                <option value="image/png">PNG</option>
                             </select>
                         </div>
                         <button id="process-active-btn" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-primary/20 hover:scale-[1.02] transition-transform">
-                            ابدأ المعالجة الآن
+                            ابدأ المعالجة
                         </button>
                     </div>
                 </div>
+
+                <!-- مساحة إعلانية جانبية (إعادة توظيف 300x250) -->
+                <div class="ad-container p-4 flex flex-col items-center">
+                    <p class="text-[10px] text-slate-500 uppercase font-black mb-3">إعلان مدعوم</p>
+                    <div style="width:300px; height:250px;">
+                        <script>
+                          atOptions = {
+                            'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+                            'format' : 'iframe',
+                            'height' : 250,
+                            'width' : 300,
+                            'params' : {}
+                          };
+                        </script>
+                        <script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+                    </div>
+                </div>
             </div>
         </section>
 
-        <!-- Adsterra Section (Codes precisely as requested) -->
-        <section id="ad-section" class="mt-20 py-10 border-t border-slate-100 dark:border-white/5 flex flex-col items-center gap-10">
+        <!-- قسم الإعلانات والروابط المباشرة لزيادة الربح -->
+        <section class="mt-20 py-10 border-t border-white/5 flex flex-col items-center gap-12">
             
-            <!-- NativeBanner_1 -->
-            <div class="w-full flex flex-col items-center">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-4 font-black">محتوى مقترح (Native)</p>
-                <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
-                <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
-            </div>
-
-            <!-- 300x250_1 -->
-            <div class="w-full flex flex-col items-center">
-                <p class="text-[10px] text-slate-400 uppercase tracking-widest mb-4 font-black">إعلان</p>
-                <div class="bg-white/5 p-4 rounded-3xl overflow-hidden shadow-sm">
-                    <script>
-                      atOptions = {
-                        'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                      };
-                    </script>
-                    <script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+            <!-- Native Ads -->
+            <div class="w-full">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="text-xl font-black text-white">محتوى قد يهمك</h4>
+                    <span class="text-[10px] bg-white/5 px-3 py-1 rounded-full text-slate-500 font-bold uppercase">Promoted</span>
+                </div>
+                <div class="ad-container p-4">
+                    <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
+                    <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
                 </div>
             </div>
-            
+
+            <!-- معلومات إضافية للمستخدم -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-center">
+                <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
+                    <i data-lucide="shield-check" class="w-8 h-8 mx-auto mb-4 text-brand-success"></i>
+                    <h5 class="font-bold text-white mb-2">خصوصية تامة</h5>
+                    <p class="text-sm text-slate-500">صورك تُعالج في متصفحك ولا يتم رفعها لخوادمنا.</p>
+                </div>
+                <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
+                    <i data-lucide="zap" class="w-8 h-8 mx-auto mb-4 text-yellow-400"></i>
+                    <h5 class="font-bold text-white mb-2">سرعة فائقة</h5>
+                    <p class="text-sm text-slate-500">استخدم تقنيات WebP لضغط الصور دون فقدان الجودة.</p>
+                </div>
+                <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
+                    <i data-lucide="infinity" class="w-8 h-8 mx-auto mb-4 text-brand-primary"></i>
+                    <h5 class="font-bold text-white mb-2">غير محدود</h5>
+                    <p class="text-sm text-slate-500">عالج مئات الصور يومياً مجاناً وبدون قيود.</p>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- Dashboard -->
+    <footer class="py-12 border-t border-white/5 text-center">
+        <p class="text-slate-500 font-bold text-sm">© 2024 StorImage Studio - جميع الحقوق محفوظة</p>
+    </footer>
+
+    <!-- Dashboard (Hidden) -->
     <div id="dashboard-view" class="dashboard-overlay items-center justify-center p-6">
-        <div class="bg-white dark:bg-brand-card w-full max-w-lg rounded-[3rem] p-10 relative shadow-2xl overflow-y-auto max-h-[90vh] border border-slate-200 dark:border-white/5">
-            <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full transition-colors">
+        <div class="bg-brand-card w-full max-w-lg rounded-[3rem] p-10 relative shadow-2xl border border-white/5">
+            <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 p-2 hover:bg-white/10 rounded-full transition-colors">
                 <i data-lucide="x" class="w-6 h-6"></i>
             </button>
-            
-            <div id="dashboard-login" class="text-center py-6">
+            <div class="text-center py-6">
                 <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
                     <i data-lucide="lock" class="w-8 h-8"></i>
                 </div>
-                <h2 class="text-2xl font-black mb-2 text-brand-dark dark:text-white">منطقة الإدارة</h2>
-                <input type="password" id="dashboard-pass-input" placeholder="كلمة المرور" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl px-6 py-4 text-center font-bold outline-none mb-4">
+                <h2 class="text-2xl font-black mb-2 text-white">الإدارة</h2>
+                <p class="text-slate-400 text-sm mb-6">هذه المنطقة مخصصة لمسؤول الموقع</p>
+                <input type="password" id="dashboard-pass-input" placeholder="كلمة المرور" class="w-full bg-brand-dark border border-white/10 rounded-2xl px-6 py-4 text-center font-bold text-white outline-none mb-4">
                 <button onclick="window.verifyDashboardPass()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black">دخول</button>
-            </div>
-
-            <div id="dashboard-content" class="hidden space-y-8">
-                <h2 class="text-2xl font-black mb-6">إعدادات الموقع</h2>
-                <div class="space-y-6">
-                    <div>
-                        <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2 mb-4">معلومات إضافية</h3>
-                        <p class="text-xs text-slate-500 font-bold leading-relaxed">يمكنك التحكم في تجربة المستخدم عبر تعديل كلمة المرور أو تحديث الروابط في الكود المصدري.</p>
-                    </div>
-                </div>
-                <button onclick="window.toggleDashboard()" class="w-full bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg">خروج من الإعدادات</button>
             </div>
         </div>
     </div>
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-20 opacity-0">
-        <div class="bg-brand-dark text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-3">
+        <div class="bg-brand-card text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-3">
             <i data-lucide="info" class="w-5 h-5 text-brand-primary"></i>
             <span id="toast-msg" class="font-bold"></span>
         </div>

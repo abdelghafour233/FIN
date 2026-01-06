@@ -14,32 +14,27 @@ interface ImageItem {
 const State = {
     files: [] as ImageItem[],
     selectedId: null as string | null,
-    theme: localStorage.getItem('img-theme') || 'dark',
+    theme: 'dark',
     isDashboardOpen: false,
     isAuthenticated: false,
     dashboardPassword: 'admin123'
 };
 
 const applyTheme = () => {
-    document.documentElement.classList.toggle('dark', State.theme === 'dark');
+    document.documentElement.classList.add('dark');
     if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
 (window as any).toggleTheme = () => {
-    State.theme = State.theme === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('img-theme', State.theme);
-    applyTheme();
+    showToast('الوضع الداكن هو الافتراضي للأداء');
 };
 
 (window as any).toggleDashboard = () => {
     State.isDashboardOpen = !State.isDashboardOpen;
     const view = document.getElementById('dashboard-view');
     if (view) {
-        view.classList.toggle('open', State.isDashboardOpen);
-        if (State.isDashboardOpen && !State.isAuthenticated) {
-            document.getElementById('dashboard-login')?.classList.remove('hidden');
-            document.getElementById('dashboard-content')?.classList.add('hidden');
-        }
+        view.classList.toggle('hidden', !State.isDashboardOpen);
+        view.style.display = State.isDashboardOpen ? 'flex' : 'none';
     }
 };
 
@@ -47,11 +42,9 @@ const applyTheme = () => {
     const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
     if (input.value === State.dashboardPassword) {
         State.isAuthenticated = true;
-        document.getElementById('dashboard-login')?.classList.add('hidden');
-        document.getElementById('dashboard-content')?.classList.remove('hidden');
-        showToast('مرحباً بك في لوحة التحكم');
+        showToast('مرحباً بك، سيتم إضافة خيارات الربح قريباً');
     } else {
-        showToast('كلمة المرور خاطئة');
+        showToast('كلمة المرور غير صحيحة');
     }
 };
 
@@ -82,7 +75,7 @@ const updateActivePreview = () => {
     if (active.status === 'done' && downloadZone && downloadAnchor) {
         downloadZone.classList.remove('hidden');
         downloadAnchor.href = active.processedUrl || '#';
-        downloadAnchor.download = `processed_${active.name}`;
+        downloadAnchor.download = `StorImage_${active.name}`;
     } else {
         downloadZone?.classList.add('hidden');
     }
@@ -95,8 +88,8 @@ const renderThumbs = () => {
     if (!list) return;
 
     list.innerHTML = State.files.map(f => `
-        <div onclick="window.selectImage('${f.id}')" class="relative shrink-0 cursor-pointer transition-all">
-            <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl border-2 ${State.selectedId === f.id ? 'border-brand-primary' : 'border-transparent'}">
+        <div onclick="window.selectImage('${f.id}')" class="relative shrink-0 cursor-pointer group">
+            <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl border-2 transition-all ${State.selectedId === f.id ? 'border-brand-primary scale-105' : 'border-transparent opacity-60 hover:opacity-100'}">
             ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
@@ -137,7 +130,7 @@ const processImage = async (item: ImageItem) => {
         }
     } catch (e) {
         item.status = 'error';
-        showToast('خطأ أثناء المعالجة');
+        showToast('حدث خطأ في المعالجة');
     }
     
     updateActivePreview();
