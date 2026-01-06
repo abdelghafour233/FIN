@@ -18,12 +18,6 @@ const State = {
     isDashboardOpen: false,
     isAuthenticated: false,
     dashboardPassword: 'admin123',
-    adSettings: JSON.parse(localStorage.getItem('ad_settings') || JSON.stringify({
-        bannerKey: '5391a99b621f7fabc01edf3b98c1b6e5',
-        popunderScript: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
-        socialBarScript: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js',
-        directLink: ''
-    })),
     socialLinks: JSON.parse(localStorage.getItem('social_links') || JSON.stringify({
         whatsapp: '212600000000',
         facebook: '',
@@ -181,15 +175,11 @@ const updateSocialLinksUI = () => {
 };
 
 const loadDashboardInputs = () => {
-    const banner = document.getElementById('ad-key-banner') as HTMLInputElement;
-    const pop = document.getElementById('ad-script-pop') as HTMLInputElement;
     const wa = document.getElementById('social-whatsapp') as HTMLInputElement;
     const fb = document.getElementById('social-facebook') as HTMLInputElement;
     const ig = document.getElementById('social-instagram') as HTMLInputElement;
     const tw = document.getElementById('social-twitter') as HTMLInputElement;
     
-    if (banner) banner.value = State.adSettings.bannerKey || '';
-    if (pop) pop.value = State.adSettings.popunderScript || '';
     if (wa) wa.value = State.socialLinks.whatsapp || '';
     if (fb) fb.value = State.socialLinks.facebook || '';
     if (ig) ig.value = State.socialLinks.instagram || '';
@@ -197,11 +187,6 @@ const loadDashboardInputs = () => {
 };
 
 (window as any).saveDashboardSettings = () => {
-    State.adSettings = {
-        bannerKey: (document.getElementById('ad-key-banner') as HTMLInputElement).value,
-        popunderScript: (document.getElementById('ad-script-pop') as HTMLInputElement).value,
-        directLink: State.adSettings.directLink
-    };
     State.socialLinks = {
         whatsapp: (document.getElementById('social-whatsapp') as HTMLInputElement).value,
         facebook: (document.getElementById('social-facebook') as HTMLInputElement).value,
@@ -209,13 +194,11 @@ const loadDashboardInputs = () => {
         twitter: (document.getElementById('social-twitter') as HTMLInputElement).value,
     };
 
-    localStorage.setItem('ad_settings', JSON.stringify(State.adSettings));
     localStorage.setItem('social_links', JSON.stringify(State.socialLinks));
     
     showToast('تم حفظ الإعدادات!');
     updateSocialLinksUI();
     setTimeout(() => (window as any).toggleDashboard(), 500);
-    injectAds();
 };
 
 const showToast = (msg: string) => {
@@ -228,45 +211,7 @@ const showToast = (msg: string) => {
     }
 };
 
-const injectAds = () => {
-    const container = document.getElementById('ad-banner-300-250');
-    const scriptsContainer = document.getElementById('adsterra-scripts');
-    if (!container || !scriptsContainer) return;
-
-    container.innerHTML = '';
-    scriptsContainer.innerHTML = '';
-
-    if (State.adSettings.bannerKey) {
-        const scriptTag = document.createElement('script');
-        scriptTag.type = 'text/javascript';
-        scriptTag.innerHTML = `
-            atOptions = {
-                'key' : '${State.adSettings.bannerKey}',
-                'format' : 'iframe',
-                'height' : 250,
-                'width' : 300,
-                'params' : {}
-            };
-        `;
-        const invokeTag = document.createElement('script');
-        invokeTag.type = 'text/javascript';
-        invokeTag.src = `https://bouncingbuzz.com/${State.adSettings.bannerKey}/invoke.js`;
-        container.appendChild(scriptTag);
-        container.appendChild(invokeTag);
-    }
-
-    if (State.adSettings.popunderScript) {
-        const popTag = document.createElement('script');
-        popTag.type = 'text/javascript';
-        popTag.src = State.adSettings.popunderScript;
-        scriptsContainer.appendChild(popTag);
-    }
-};
-
 const handleDownloadWithAd = () => {
-    if (State.adSettings.directLink) {
-        window.open(State.adSettings.directLink, '_blank');
-    }
     const realDownloadLink = document.getElementById('final-download-link') as HTMLAnchorElement;
     if (realDownloadLink) {
         realDownloadLink.click();
@@ -387,7 +332,6 @@ const processImage = async (item: ImageItem) => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    injectAds(); 
     updateSocialLinksUI();
     
     const input = document.getElementById('file-input') as HTMLInputElement;
