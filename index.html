@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>StorImage Studio | معالجة الصور الاحترافية</title>
+    <!-- Adsterra Social Bar Code (أعلى ربحاً ولا يزعج الزوار) -->
+    <script type='text/javascript' src='//bouncingbuzz.com/9e/7b/3d/9e7b3d68244795b879c9f6d744b4b0a4.js'></script>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -96,22 +99,6 @@
         </div>
     </button>
 
-    <!-- Floating Social Hub (Contact) -->
-    <div class="floating-social-hub">
-        <a id="float-whatsapp" href="#" target="_blank" class="hidden floating-btn bg-brand-whatsapp">
-            <i data-lucide="phone" class="w-6 h-6"></i>
-        </a>
-        <a id="float-facebook" href="#" target="_blank" class="hidden floating-btn bg-brand-facebook">
-            <i data-lucide="facebook" class="w-6 h-6"></i>
-        </a>
-        <a id="float-instagram" href="#" target="_blank" class="hidden floating-btn insta-grad">
-            <i data-lucide="instagram" class="w-6 h-6"></i>
-        </a>
-        <a id="float-twitter" href="#" target="_blank" class="hidden floating-btn bg-black">
-            <i data-lucide="twitter" class="w-6 h-6"></i>
-        </a>
-    </div>
-
     <main class="pt-28 px-6 max-w-6xl mx-auto">
         <section id="upload-view" class="py-12">
             <div class="text-center mb-12">
@@ -136,6 +123,12 @@
                         <img id="main-preview-img" class="max-w-full max-h-full object-contain transition-opacity duration-300">
                         <div id="status-badge" class="absolute top-4 right-4 px-3 py-1 bg-brand-primary text-white text-[10px] font-black rounded-full uppercase">جاهز</div>
                     </div>
+                    
+                    <!-- Ad placement near action buttons (Very High Viewability) -->
+                    <div id="inline-ad-container" class="hidden w-full flex justify-center py-4 bg-slate-100 dark:bg-white/5 rounded-2xl mb-4">
+                         <!-- Small Ad injected here if key exists -->
+                    </div>
+
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
                             <h3 id="active-name" class="font-bold text-xl truncate max-w-[250px]">اسم الصورة</h3>
@@ -231,10 +224,19 @@
         </section>
 
         <!-- Adsterra Bottom Ad Section -->
-        <section id="ad-wrapper" class="mt-8 py-10 border-t border-slate-100 dark:border-white/5 flex flex-col items-center hidden">
+        <section id="ad-wrapper" class="mt-8 py-10 border-t border-slate-100 dark:border-white/5 flex flex-col items-center">
             <p class="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">إعلان</p>
             <div id="bottom-ad-container" class="bg-slate-50 dark:bg-white/5 p-4 rounded-3xl overflow-hidden shadow-sm min-h-[250px] min-w-[300px] flex items-center justify-center">
-                <!-- Ad will be injected here -->
+                <script>
+                  atOptions = {
+                    'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                  };
+                </script>
+                <script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
             </div>
         </section>
     </main>
@@ -267,29 +269,19 @@
                     <div class="space-y-4">
                         <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">إعدادات ADSTERRA</h3>
                         <div>
-                            <label class="text-xs font-bold mb-1 block">مفتاح الإعلان (Ad Key)</label>
+                            <label class="text-xs font-bold mb-1 block">مفتاح الإعلان الرئيسي (Ad Key)</label>
                             <input type="text" id="adsterra-key" placeholder="0295263cf4ed8d9e3a97b6a2490864ee" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs font-mono">
-                            <p class="text-[10px] text-slate-500 mt-1">اترك الحقل فارغاً لإخفاء الإعلان تماماً.</p>
                         </div>
                     </div>
                     <div class="space-y-4">
                         <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b pb-2">روابط التواصل الاجتماعي</h3>
-                        <p class="text-[10px] text-slate-500 leading-tight">اترك الحقل فارغاً لإخفاء الزر نهائياً من الموقع.</p>
                         <div>
-                            <label class="text-xs font-bold mb-1 block">رقم الواتساب (مثال: 212612345678)</label>
+                            <label class="text-xs font-bold mb-1 block">رقم الواتساب</label>
                             <input type="text" id="social-whatsapp" placeholder="212600000000" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
                         </div>
                         <div>
                             <label class="text-xs font-bold mb-1 block">رابط فيسبوك</label>
                             <input type="text" id="social-facebook" placeholder="https://facebook.com/yourpage" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold mb-1 block">رابط إنستغرام</label>
-                            <input type="text" id="social-instagram" placeholder="https://instagram.com/yourprofile" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold mb-1 block">رابط تويتر (X)</label>
-                            <input type="text" id="social-twitter" placeholder="https://twitter.com/yourhandle" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-xl p-3 text-xs">
                         </div>
                     </div>
                 </div>
