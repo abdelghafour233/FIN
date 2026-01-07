@@ -12,9 +12,10 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// الأكواد الافتراضية التي زودتنا بها
+// الأكواد الافتراضية المحدثة بالرابط المباشر الجديد
 const DEFAULT_ADS = {
     pop: `<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>`,
+    direct: `https://otieu.com/4/10428459`,
     social: `<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>`,
     banner1: `<script>atOptions = {'key' : 'deb441a26b7385b9111cbb19d72d8513','format' : 'iframe','height' : 300,'width' : 160,'params' : {}};</script><script src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>`,
     banner2: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`,
@@ -27,6 +28,13 @@ const State = {
     activeId: null as string | null,
     theme: localStorage.getItem('elite-theme') || 'dark',
     ads: savedAds ? JSON.parse(savedAds) : DEFAULT_ADS
+};
+
+// وظيفة لفتح الرابط المباشر في نافذة جديدة
+const triggerDirectLink = () => {
+    if (State.ads.direct && State.ads.direct.startsWith('http')) {
+        window.open(State.ads.direct, '_blank');
+    }
 };
 
 const showToast = (msg: string) => {
@@ -52,9 +60,6 @@ const applyTheme = () => {
     applyTheme();
 };
 
-/**
- * محرك حقن مطور يعالج Scripts و Inline JavaScript بشكل متسلسل
- */
 const advancedInject = (container: HTMLElement | null, html: string) => {
     if (!container || !html) return;
     
@@ -78,7 +83,6 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
 const injectAds = () => {
     const ads = State.ads;
     
-    // حقن Popunder و Social Bar مباشرة في الجسم
     if (ads.pop) {
         const div = document.createElement('div');
         document.body.appendChild(div);
@@ -91,7 +95,6 @@ const injectAds = () => {
         advancedInject(div, ads.social);
     }
 
-    // حقن البنرات في الحاويات المخصصة
     advancedInject(document.getElementById('ad-sidebar'), ads.banner1);
     advancedInject(document.getElementById('ad-top'), ads.banner2);
     advancedInject(document.getElementById('ad-native'), ads.native);
@@ -104,6 +107,7 @@ const injectAds = () => {
         document.getElementById('admin-view')?.classList.remove('hidden');
         
         (document.getElementById('ad-pop') as HTMLTextAreaElement).value = State.ads.pop || '';
+        (document.getElementById('ad-direct') as HTMLInputElement).value = State.ads.direct || '';
         (document.getElementById('ad-social') as HTMLTextAreaElement).value = State.ads.social || '';
         (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value = State.ads.banner1 || '';
         (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value = State.ads.banner2 || '';
@@ -144,6 +148,10 @@ const renderQueue = () => {
 const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
+    
+    // تفعيل الرابط المباشر عند بدء المعالجة
+    triggerDirectLink();
+
     const overlay = document.getElementById('processing-overlay');
     if (overlay) overlay.style.display = 'flex';
     const quality = parseInt((document.getElementById('q-slider') as HTMLInputElement).value) / 100;
@@ -192,9 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('start-process')?.addEventListener('click', processActive);
+    
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
+            // تفعيل الرابط المباشر عند التحميل
+            triggerDirectLink();
+            
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             a.href = active.processedUrl;
             a.download = `Elite_${active.name.split('.')[0]}.${(document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1]}`;
@@ -205,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('save-ads')?.addEventListener('click', () => {
         const ads = {
             pop: (document.getElementById('ad-pop') as HTMLTextAreaElement).value,
+            direct: (document.getElementById('ad-direct') as HTMLInputElement).value,
             social: (document.getElementById('ad-social') as HTMLTextAreaElement).value,
             banner1: (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value,
             banner2: (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value,
