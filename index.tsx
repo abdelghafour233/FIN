@@ -12,11 +12,21 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
+// الأكواد الافتراضية التي زودتنا بها
+const DEFAULT_ADS = {
+    pop: `<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>`,
+    social: `<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>`,
+    banner1: `<script>atOptions = {'key' : 'deb441a26b7385b9111cbb19d72d8513','format' : 'iframe','height' : 300,'width' : 160,'params' : {}};</script><script src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>`,
+    banner2: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`,
+    native: `<script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script><div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>`
+};
+
+const savedAds = localStorage.getItem('elite-ads');
 const State = {
     files: [] as ImageFile[],
     activeId: null as string | null,
     theme: localStorage.getItem('elite-theme') || 'dark',
-    ads: JSON.parse(localStorage.getItem('elite-ads') || '{}')
+    ads: savedAds ? JSON.parse(savedAds) : DEFAULT_ADS
 };
 
 const showToast = (msg: string) => {
@@ -43,41 +53,24 @@ const applyTheme = () => {
 };
 
 /**
- * المحرك المطور لحقن الإعلانات
- * يستخدم تقنية التنفيذ المباشر للسكربتات لضمان عمل Adsterra Banners
+ * محرك حقن مطور يعالج Scripts و Inline JavaScript بشكل متسلسل
  */
 const advancedInject = (container: HTMLElement | null, html: string) => {
     if (!container || !html) return;
     
-    // تنظيف الحاوية
     container.innerHTML = '';
-
-    // إنشاء قطعة ContextualFragment لتفكيك الكود
     const range = document.createRange();
     const fragment = range.createContextualFragment(html);
     
-    // استخراج كافة السكربتات
     const scripts = Array.from(fragment.querySelectorAll('script'));
-    
-    // إضافة العناصر غير البرمجية أولاً (مثل divs الإعلانات)
     const nonScripts = Array.from(fragment.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+    
     nonScripts.forEach(node => container.appendChild(node.cloneNode(true)));
 
-    // إضافة وتشغيل السكربتات واحداً تلو الآخر
     scripts.forEach(oldScript => {
         const newScript = document.createElement('script');
-        
-        // نقل الخصائص
-        Array.from(oldScript.attributes).forEach(attr => {
-            newScript.setAttribute(attr.name, attr.value);
-        });
-
-        // نقل المحتوى (مهم لتعريف المتغيرات مثل atOptions)
-        if (oldScript.innerHTML) {
-            newScript.innerHTML = oldScript.innerHTML;
-        }
-
-        // حقن السكربت في الحاوية (البنرات تحتاج أن تكون السكربتات بجانب الـ DIV الخاص بها)
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        if (oldScript.innerHTML) newScript.innerHTML = oldScript.innerHTML;
         container.appendChild(newScript);
     });
 };
@@ -85,24 +78,23 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
 const injectAds = () => {
     const ads = State.ads;
     
-    // حقن إعلانات الخلفية والشريط الاجتماعي في الـ Body
+    // حقن Popunder و Social Bar مباشرة في الجسم
     if (ads.pop) {
         const div = document.createElement('div');
-        div.style.display = 'none';
         document.body.appendChild(div);
         advancedInject(div, ads.pop);
     }
     
     if (ads.social) {
         const div = document.createElement('div');
-        div.style.display = 'none';
         document.body.appendChild(div);
         advancedInject(div, ads.social);
     }
 
-    // حقن البنرات في أماكنها المخصصة
-    advancedInject(document.getElementById('ad-top'), ads.banner1);
-    advancedInject(document.getElementById('ad-sidebar'), ads.banner2);
+    // حقن البنرات في الحاويات المخصصة
+    advancedInject(document.getElementById('ad-sidebar'), ads.banner1);
+    advancedInject(document.getElementById('ad-top'), ads.banner2);
+    advancedInject(document.getElementById('ad-native'), ads.native);
 };
 
 (window as any).openAdmin = () => {
@@ -115,24 +107,10 @@ const injectAds = () => {
         (document.getElementById('ad-social') as HTMLTextAreaElement).value = State.ads.social || '';
         (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value = State.ads.banner1 || '';
         (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value = State.ads.banner2 || '';
-        
-        showToast('لوحة التحكم جاهزة');
+        (document.getElementById('ad-banner-native') as HTMLTextAreaElement).value = State.ads.native || '';
     } else if (pass !== null) {
         alert('كلمة مرور خاطئة!');
     }
-};
-
-(window as any).share = (platform: 'whatsapp' | 'facebook' | 'x' | 'telegram') => {
-    const url = window.location.href;
-    const text = "حوّل صورك باحترافية مع Elite Image مجاناً! 🚀\n";
-    let shareUrl = "";
-    switch (platform) {
-        case 'whatsapp': shareUrl = `https://wa.me/?text=${encodeURIComponent(text + url)}`; break;
-        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`; break;
-        case 'x': shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`; break;
-        case 'telegram': shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`; break;
-    }
-    if (shareUrl) window.open(shareUrl, '_blank', 'width=600,height=400');
 };
 
 const updateUI = () => {
@@ -152,8 +130,8 @@ const renderQueue = () => {
     if (!list) return;
     list.innerHTML = State.files.map(f => `
         <div onclick="window.setActive('${f.id}')" class="shrink-0 cursor-pointer relative group">
-            <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}">
-            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full shadow-lg"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
+            <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-105 shadow-lg' : 'border-transparent opacity-60'}">
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
 };
@@ -191,9 +169,7 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    
-    // تفعيل الإعلانات بعد تحميل الصفحة بـ 1 ثانية لضمان استقرار الـ DOM
-    setTimeout(injectAds, 1000);
+    setTimeout(injectAds, 500);
 
     const input = document.getElementById('file-input') as HTMLInputElement;
     input?.addEventListener('change', (e: any) => {
@@ -223,7 +199,6 @@ document.addEventListener('DOMContentLoaded', () => {
             a.href = active.processedUrl;
             a.download = `Elite_${active.name.split('.')[0]}.${(document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1]}`;
             a.click();
-            showToast('بدأ التحميل...');
         }
     });
 
@@ -232,11 +207,12 @@ document.addEventListener('DOMContentLoaded', () => {
             pop: (document.getElementById('ad-pop') as HTMLTextAreaElement).value,
             social: (document.getElementById('ad-social') as HTMLTextAreaElement).value,
             banner1: (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value,
-            banner2: (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value
+            banner2: (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value,
+            native: (document.getElementById('ad-banner-native') as HTMLTextAreaElement).value
         };
         State.ads = ads;
         localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم الحفظ بنجاح! جاري التفعيل...');
-        setTimeout(() => window.location.reload(), 1000);
+        showToast('تم الحفظ! جاري إعادة التحميل...');
+        setTimeout(() => window.location.reload(), 800);
     });
 });

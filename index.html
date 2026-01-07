@@ -34,15 +34,13 @@
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
-        .social-btn { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease; }
-        .social-btn:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
         
-        /* Containers for Ads */
+        /* Ad Containers */
         .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; overflow: visible; min-height: 50px; text-align: center; }
         #ad-top { max-width: 728px; margin-left: auto; margin-right: auto; }
         #ad-sidebar { max-width: 300px; min-height: 250px; background: rgba(0,0,0,0.02); border-radius: 1rem; }
+        #ad-native { width: 100%; max-width: 1000px; margin: 2rem auto; }
+        .sticky-sidebar-ad { position: sticky; top: 100px; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -62,12 +60,11 @@
     </nav>
 
     <main id="main-content" class="pt-28 px-4 max-w-6xl mx-auto pb-20">
-        <!-- Banner Ad Top -->
+        <!-- Banner Ad Top (728x90 placeholder) -->
         <div id="ad-top" class="ad-slot"></div>
 
-        <!-- App Views -->
         <div id="app-container">
-            <!-- قسم الرفع -->
+            <!-- Upload Section -->
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
@@ -82,9 +79,12 @@
                     <p class="text-3xl font-black mb-3">اسحب الصور هنا أو اضغط للرفع</p>
                     <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">معالجة فورية داخل المتصفح</p>
                 </div>
+                
+                <!-- Native Ad Slot after upload area -->
+                <div id="ad-native" class="ad-slot"></div>
             </section>
 
-            <!-- منطقة العمل -->
+            <!-- Workspace Section -->
             <section id="workspace-view" class="hidden py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-8 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
@@ -97,26 +97,17 @@
                             <img id="main-preview" class="max-w-full max-h-full object-contain">
                         </div>
                         
-                        <div id="action-area" class="hidden flex flex-col gap-8 w-full">
+                        <div id="action-area" class="hidden flex flex-col gap-4 w-full">
                             <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl w-full">
                                 <i data-lucide="download" class="w-7 h-7"></i>
                                 <span>تحميل الصورة المعالجة</span>
                             </button>
-
-                            <div class="pt-6 border-t border-slate-100 dark:border-white/5 text-center">
-                                <p class="text-sm font-bold text-slate-500 dark:text-slate-400 mb-5">شارك الموقع مع أصدقائك:</p>
-                                <div class="flex justify-center items-center gap-4">
-                                    <button onclick="window.share('whatsapp')" class="social-btn w-12 h-12 rounded-xl bg-[#25D366] text-white flex items-center justify-center shadow-lg"><i data-lucide="message-circle" class="w-6 h-6"></i></button>
-                                    <button onclick="window.share('facebook')" class="social-btn w-12 h-12 rounded-xl bg-[#1877F2] text-white flex items-center justify-center shadow-lg"><i data-lucide="facebook" class="w-6 h-6"></i></button>
-                                    <button onclick="window.share('x')" class="social-btn w-12 h-12 rounded-xl bg-black text-white flex items-center justify-center shadow-lg"><i data-lucide="twitter" class="w-6 h-6"></i></button>
-                                    <button onclick="window.share('telegram')" class="social-btn w-12 h-12 rounded-xl bg-[#0088cc] text-white flex items-center justify-center shadow-lg"><i data-lucide="send" class="w-6 h-6"></i></button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
                 </div>
 
+                <!-- Sidebar with 300x250 Ad -->
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl">
                         <h3 class="font-black text-xl mb-8 flex items-center gap-3"><i data-lucide="sliders" class="w-6 h-6 text-brand-primary"></i> الإعدادات</h3>
@@ -134,55 +125,51 @@
                             <button id="start-process" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">ابدأ المعالجة</button>
                         </div>
                     </div>
-                    <div id="ad-sidebar" class="ad-slot"></div>
+                    
+                    <div class="sticky-sidebar-ad">
+                        <div id="ad-sidebar" class="ad-slot"></div>
+                    </div>
                 </div>
             </section>
         </div>
 
-        <!-- لوحة التحكم -->
+        <!-- Admin Control Panel -->
         <section id="admin-view" class="hidden py-12">
             <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
                 <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="settings-2" class="w-8 h-8 text-brand-primary"></i> لوحة تحكم الإعلانات</h2>
+                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="settings-2" class="w-8 h-8 text-brand-primary"></i> إدارة الإعلانات</h2>
                     <button onclick="window.location.reload()" class="text-slate-500 hover:text-brand-primary"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
                 </div>
 
-                <div class="space-y-8">
-                    <div class="p-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-2xl text-blue-800 dark:text-blue-300">
-                        <h4 class="font-black mb-2 flex items-center gap-2"><i data-lucide="info" class="w-5 h-5"></i> تعليمات هامة:</h4>
-                        <ul class="text-sm list-disc list-inside space-y-1 opacity-80">
-                            <li>تأكد من تعطيل Ad-blocker في متصفحك لتتمكن من رؤية النتائج.</li>
-                            <li>انسخ الكود بالكامل كما هو من Adsterra (بما في ذلك وسوم script).</li>
-                            <li>إذا كان الكود يحتوي على معرفات (IDs)، سيقوم النظام بوضعها في مكانها الصحيح تلقائياً.</li>
-                        </ul>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <label class="block font-bold">Pop-under</label>
+                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-4">
-                            <label class="block font-bold">Pop-under (كود الخلفية)</label>
-                            <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary" placeholder="انسخ كود Pop-under هنا..."></textarea>
-                        </div>
-                        <div class="space-y-4">
-                            <label class="block font-bold">Social Bar (الشريط الاجتماعي)</label>
-                            <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary" placeholder="انسخ كود Social Bar هنا..."></textarea>
-                        </div>
-                        <div class="space-y-4">
-                            <label class="block font-bold">Banner Top (بنر علوي 728x90)</label>
-                            <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary" placeholder="انسخ كود البنر هنا..."></textarea>
-                        </div>
-                        <div class="space-y-4">
-                            <label class="block font-bold">Banner Sidebar (بنر جانبي 300x250)</label>
-                            <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary" placeholder="انسخ كود البنر هنا..."></textarea>
-                        </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold">Social Bar</label>
+                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
-                    
-                    <button id="save-ads" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">حفظ وتفعيل الإعلانات فوراً</button>
+                    <div class="space-y-4">
+                        <label class="block font-bold">Banner 1 (160x300)</label>
+                        <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold">Banner 2 (300x250)</label>
+                        <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
+                    </div>
+                    <div class="space-y-4 md:col-span-2">
+                        <label class="block font-bold">Native Banner</label>
+                        <textarea id="ad-banner-native" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
+                    </div>
                 </div>
+                
+                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">حفظ التغييرات</button>
             </div>
         </section>
     </main>
 
-    <footer class="py-10 text-center opacity-30 hover:opacity-100 transition-opacity">
+    <footer class="py-10 text-center opacity-30">
         <button onclick="window.openAdmin()" class="flex items-center gap-2 mx-auto text-xs font-bold text-slate-500">
             <i data-lucide="lock" class="w-3 h-3"></i> لوحة التحكم
         </button>
