@@ -12,18 +12,18 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin";
 
-// الروابط الربحية الجديدة التي تم تزويدنا بها
+// قائمة الروابط الربحية المحدثة (تم إضافة الروابط الجديدة)
 const REWARD_LINKS = [
+    "https://otieu.com/4/10428459",
     "https://otieu.com/4/10430934",
     "https://otieu.com/4/10428864",
-    "https://otieu.com/4/10428641",
-    "https://otieu.com/4/10428459"
+    "https://otieu.com/4/10428641"
 ];
 
-// وظيفة للحصول على رابط عشوائي لتدوير الأرباح
+// وظيفة للحصول على رابط عشوائي من القائمة لتدوير الأرباح
 const getRandomLink = () => REWARD_LINKS[Math.floor(Math.random() * REWARD_LINKS.length)];
 
-const SHARE_TEXT = "اكتشفت أداة رائعة لمعالجة الصور مجاناً وباحترافية! جربها الآن:";
+const SHARE_TEXT = "أفضل أداة مجانية لمعالجة الصور وضغطها باحترافية! جربها الآن:";
 
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
@@ -89,8 +89,9 @@ const applyTheme = () => {
 
 (window as any).copyLink = () => {
     const link = getRandomLink();
-    navigator.clipboard.writeText(link);
-    showToast('تم نسخ رابط المشاركة الربحي!');
+    navigator.clipboard.writeText(link).then(() => {
+        showToast('تم نسخ الرابط الربحي!');
+    });
 };
 
 (window as any).nativeShare = async () => {
@@ -105,17 +106,27 @@ const applyTheme = () => {
 };
 
 const setupShareLinks = () => {
-    const link = getRandomLink();
-    const url = encodeURIComponent(link);
-    const text = encodeURIComponent(SHARE_TEXT);
-    const wa = document.getElementById('share-whatsapp') as HTMLAnchorElement;
-    if (wa) wa.href = `https://wa.me/?text=${text}%20${url}`;
-    const fb = document.getElementById('share-facebook') as HTMLAnchorElement;
-    if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-    const tw = document.getElementById('share-twitter') as HTMLAnchorElement;
-    if (tw) tw.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-    const tg = document.getElementById('share-telegram') as HTMLAnchorElement;
-    if (tg) tg.href = `https://t.me/share/url?url=${url}&text=${text}`;
+    // تحديث الروابط في الواجهة عند كل تحميل/تغيير
+    const refreshLinks = () => {
+        const link = getRandomLink();
+        const url = encodeURIComponent(link);
+        const text = encodeURIComponent(SHARE_TEXT);
+        
+        const wa = document.getElementById('share-whatsapp') as HTMLAnchorElement;
+        if (wa) wa.href = `https://wa.me/?text=${text}%20${url}`;
+        
+        const fb = document.getElementById('share-facebook') as HTMLAnchorElement;
+        if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        
+        const tw = document.getElementById('share-twitter') as HTMLAnchorElement;
+        if (tw) tw.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+        
+        const tg = document.getElementById('share-telegram') as HTMLAnchorElement;
+        if (tg) tg.href = `https://t.me/share/url?url=${url}&text=${text}`;
+    };
+    refreshLinks();
+    // تغيير الرابط كل 10 ثواني لضمان التدوير
+    setInterval(refreshLinks, 10000);
 };
 
 const updateUI = () => {
@@ -222,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // فتح رابط عشوائي لزيادة الأرباح عند التحميل
+            // فتح أحد الروابط الربحية عشوائياً عند الضغط على التحميل لزيادة الأرباح
             window.open(getRandomLink(), '_blank');
             
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
