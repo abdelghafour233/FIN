@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Elite Image | معالجة الصور الاحترافية</title>
+    <title>إيليت إيميج | معالجة الصور الاحترافية</title>
     
-    <!-- Monetag Verification Code -->
+    <!-- Monetag Verification -->
     <meta name="monetag" content="a3ee7d0ba0217eccc65608ab9a142c05">
     
     <!-- Monetag Smart Tag -->
@@ -40,12 +40,11 @@
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
+        .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; min-height: 50px; }
         
-        .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; overflow: visible; min-height: 50px; text-align: center; }
-        #ad-top { max-width: 728px; margin-left: auto; margin-right: auto; }
-        #ad-sidebar { max-width: 300px; min-height: 250px; background: rgba(0,0,0,0.02); border-radius: 1rem; }
-        #ad-native { width: 100%; max-width: 1000px; margin: 2rem auto; }
-        .sticky-sidebar-ad { position: sticky; top: 100px; }
+        /* تحسين أزرار المشاركة */
+        .share-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(45px, 1fr)); gap: 12px; width: 100%; max-width: 320px; }
+        .share-btn { @apply w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all hover:scale-110 shadow-lg active:scale-95; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -68,6 +67,7 @@
         <div id="ad-top" class="ad-slot"></div>
 
         <div id="app-container">
+            <!-- Upload View -->
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
@@ -82,10 +82,9 @@
                     <p class="text-3xl font-black mb-3">اسحب الصور هنا أو اضغط للرفع</p>
                     <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">أداء سريع وأمان عالٍ</p>
                 </div>
-                
-                <div id="ad-native" class="ad-slot"></div>
             </section>
 
+            <!-- Workspace View -->
             <section id="workspace-view" class="hidden py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-8 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
@@ -93,96 +92,34 @@
                             <div class="w-14 h-14 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-6"></div>
                             <p class="font-black text-white text-xl">جاري المعالجة...</p>
                         </div>
-
-                        <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-dark flex items-center justify-center mb-6 border border-slate-200 dark:border-white/10">
+                        <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-dark flex items-center justify-center mb-6">
                             <img id="main-preview" class="max-w-full max-h-full object-contain">
                         </div>
-                        
-                        <div id="action-area" class="hidden flex flex-col gap-4 w-full">
+                        <div id="action-area" class="hidden flex flex-col items-center">
                             <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl w-full">
                                 <i data-lucide="download" class="w-7 h-7"></i>
                                 <span>تحميل الصورة المعالجة</span>
                             </button>
-                        </div>
-                    </div>
-                    <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
-                </div>
-
-                <div class="lg:col-span-4 space-y-6">
-                    <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl">
-                        <h3 class="font-black text-xl mb-8 flex items-center gap-3"><i data-lucide="sliders" class="w-6 h-6 text-brand-primary"></i> الإعدادات</h3>
-                        <div class="space-y-8">
-                            <div>
-                                <div class="flex justify-between mb-4 text-sm font-bold"><span>جودة الضغط</span><span id="q-label" class="text-brand-primary">85%</span></div>
-                                <input type="range" id="q-slider" min="10" max="100" value="85" class="w-full accent-brand-primary h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold mb-4">تحويل إلى</label>
-                                <select id="f-select" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-bold outline-none">
-                                    <option value="image/webp">WebP</option><option value="image/jpeg">JPEG</option><option value="image/png">PNG</option>
-                                </select>
-                            </div>
-                            <button id="start-process" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">ابدأ المعالجة</button>
-                        </div>
-                    </div>
-                    
-                    <div class="sticky-sidebar-ad">
-                        <div id="ad-sidebar" class="ad-slot"></div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <section id="admin-view" class="hidden py-12">
-            <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
-                <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات Monetag</h2>
-                    <button onclick="window.location.reload()" class="text-slate-500 hover:text-brand-primary"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div class="space-y-4">
-                        <label class="block font-bold">Popunder Tag (Script)</label>
-                        <textarea id="ad-pop" placeholder="ضع كود Popunder هنا" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <label class="block font-bold">Direct Link URLs (يمكن وضع عدة روابط مفصولة بفاصلة للتدوير)</label>
-                        <input type="text" id="ad-direct" placeholder="https://link1.com, https://link2.com" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none">
-                    </div>
-                    <div class="space-y-4">
-                        <label class="block font-bold">In-Page Push / Social</label>
-                        <textarea id="ad-social" placeholder="ضع كود Social Tag هنا" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <label class="block font-bold">Vignette Banner (Left)</label>
-                        <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <label class="block font-bold">Banner Ad (Top)</label>
-                        <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
-                    </div>
-                    <div class="space-y-4 md:col-span-2">
-                        <label class="block font-bold">Native / MultiTag</label>
-                        <textarea id="ad-banner-native" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
-                    </div>
-                </div>
-                
-                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">تفعيل إعلانات Monetag</button>
-            </div>
-        </section>
-    </main>
-
-    <footer class="py-10 text-center opacity-30">
-        <button onclick="window.openAdmin()" class="flex items-center gap-2 mx-auto text-xs font-bold text-slate-500">
-            <i data-lucide="lock" class="w-3 h-3"></i> إدارة النظام
-        </button>
-    </footer>
-
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
-        <div class="bg-white dark:bg-brand-card px-8 py-4 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary" id="toast-msg"></div>
-    </div>
-
-    <script src="index.tsx" type="module"></script>
-    <a id="hidden-dl" class="hidden"></a>
-</body>
-</html>
+                            
+                            <!-- قسم المشاركة المحدث -->
+                            <div class="mt-10 p-6 bg-slate-50 dark:bg-brand-dark/50 rounded-3xl border border-slate-200 dark:border-white/5 w-full text-center">
+                                <h4 class="text-sm font-black text-slate-500 mb-6 uppercase tracking-widest flex items-center justify-center gap-2">
+                                    <i data-lucide="share-2" class="w-4 h-4"></i> مشاركة الموقع مع الأصدقاء
+                                </h4>
+                                <div class="flex flex-wrap justify-center gap-3">
+                                    <button onclick="window.share('facebook')" class="share-btn bg-[#1877F2]" title="فيسبوك">
+                                        <i data-lucide="facebook" class="w-6 h-6"></i>
+                                    </button>
+                                    <button onclick="window.share('twitter')" class="share-btn bg-[#000000]" title="X (تويتر)">
+                                        <i data-lucide="twitter" class="w-6 h-6"></i>
+                                    </button>
+                                    <button onclick="window.share('whatsapp')" class="share-btn bg-[#25D366]" title="واتساب">
+                                        <i data-lucide="message-circle" class="w-6 h-6"></i>
+                                    </button>
+                                    <button onclick="window.share('telegram')" class="share-btn bg-[#0088cc]" title="تليجرام">
+                                        <i data-lucide="send" class="w-6 h-6"></i>
+                                    </button>
+                                    <button onclick="window.share('pinterest')" class="share-btn bg-[#E60023]" title="بينتريست">
+                                        <i data-lucide="pin" class="w-6 h-6"></i>
+                                    </button>
+                                    <button onclick="window.share('copy')" class="share-btn

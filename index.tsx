@@ -22,18 +22,26 @@ const DEFAULT_ADS = {
     native: ``
 };
 
-const savedAds = localStorage.getItem('elite-ads');
+// حماية ضد البيانات التالفة في localStorage
+const getSavedAds = () => {
+    try {
+        const saved = localStorage.getItem('elite-ads');
+        return saved ? JSON.parse(saved) : DEFAULT_ADS;
+    } catch (e) {
+        return DEFAULT_ADS;
+    }
+};
+
 const State = {
     files: [] as ImageFile[],
     activeId: null as string | null,
     theme: localStorage.getItem('elite-theme') || 'dark',
-    ads: savedAds ? JSON.parse(savedAds) : DEFAULT_ADS
+    ads: getSavedAds()
 };
 
 // وظيفة لاختيار رابط عشوائي من القائمة وفتحه في نافذة جديدة
 const triggerDirectLink = () => {
     if (State.ads.direct) {
-        // تقسيم الروابط عبر الفاصلة وتنظيف المسافات
         const links = State.ads.direct.split(',').map((l: string) => l.trim()).filter((l: string) => l.startsWith('http'));
         if (links.length > 0) {
             const randomLink = links[Math.floor(Math.random() * links.length)];
@@ -65,18 +73,33 @@ const applyTheme = () => {
     applyTheme();
 };
 
+(window as any).share = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("ألقِ نظرة على Elite Image، أفضل أداة مجانية لمعالجة وتحويل الصور باحترافية!");
+    
+    let shareUrl = '';
+    switch(platform) {
+        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+        case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`; break;
+        case 'whatsapp': shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`; break;
+        case 'telegram': shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; break;
+        case 'copy':
+            navigator.clipboard.writeText(window.location.href);
+            showToast('تم نسخ رابط الموقع!');
+            return;
+    }
+    
+    if (shareUrl) window.open(shareUrl, '_blank');
+};
+
 const advancedInject = (container: HTMLElement | null, html: string) => {
     if (!container || !html || html.trim() === '') return;
-    
     container.innerHTML = '';
     const range = document.createRange();
     const fragment = range.createContextualFragment(html);
-    
     const scripts = Array.from(fragment.querySelectorAll('script'));
     const nonScripts = Array.from(fragment.childNodes).filter(node => node.nodeName !== 'SCRIPT');
-    
     nonScripts.forEach(node => container.appendChild(node.cloneNode(true)));
-
     scripts.forEach(oldScript => {
         const newScript = document.createElement('script');
         Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
@@ -87,48 +110,66 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
 
 const injectAds = () => {
     const ads = State.ads;
-    
     if (ads.pop && ads.pop.trim() !== '') {
         const div = document.createElement('div');
         div.className = "monetag-pop";
         document.body.appendChild(div);
         advancedInject(div, ads.pop);
     }
-    
     if (ads.social && ads.social.trim() !== '') {
         const div = document.createElement('div');
         div.className = "monetag-social";
         document.body.appendChild(div);
         advancedInject(div, ads.social);
     }
-
     if (ads.banner1) advancedInject(document.getElementById('ad-sidebar'), ads.banner1);
     if (ads.banner2) advancedInject(document.getElementById('ad-top'), ads.banner2);
     if (ads.native) advancedInject(document.getElementById('ad-native'), ads.native);
 };
 
+// إصلاح دالة فتح لوحة التحكم وتأمينها
 (window as any).openAdmin = () => {
     const pass = prompt("الرجاء إدخال كلمة مرور الإدارة:");
     if (pass === AD_PASSWORD) {
-        document.getElementById('app-container')?.classList.add('hidden');
-        document.getElementById('admin-view')?.classList.remove('hidden');
+        const appContainer = document.getElementById('app-container');
+        const adminView = document.getElementById('admin-view');
         
-        (document.getElementById('ad-pop') as HTMLTextAreaElement).value = State.ads.pop || '';
-        (document.getElementById('ad-direct') as HTMLInputElement).value = State.ads.direct || '';
-        (document.getElementById('ad-social') as HTMLTextAreaElement).value = State.ads.social || '';
-        (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value = State.ads.banner1 || '';
-        (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value = State.ads.banner2 || '';
-        (document.getElementById('ad-banner-native') as HTMLTextAreaElement).value = State.ads.native || '';
+        if (appContainer) appContainer.classList.add('hidden');
+        if (adminView) adminView.classList.remove('hidden');
+        
+        // تعبئة الحقول بالبيانات الحالية
+        const fields = {
+            'ad-pop': State.ads.pop,
+            'ad-direct': State.ads.direct,
+            'ad-social': State.ads.social,
+            'ad-banner-1': State.ads.banner1,
+            'ad-banner-2': State.ads.banner2,
+            'ad-banner-native': State.ads.native
+        };
+
+        Object.entries(fields).forEach(([id, value]) => {
+            const el = document.getElementById(id) as (HTMLTextAreaElement | HTMLInputElement);
+            if (el) el.value = value || '';
+        });
+        
+        if ((window as any).lucide) (window as any).lucide.createIcons();
     } else if (pass !== null) {
         alert('كلمة مرور خاطئة!');
     }
+};
+
+(window as any).closeAdmin = () => {
+    const appContainer = document.getElementById('app-container');
+    const adminView = document.getElementById('admin-view');
+    if (adminView) adminView.classList.add('hidden');
+    if (appContainer) appContainer.classList.remove('hidden');
 };
 
 const updateUI = () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     const img = document.getElementById('main-preview') as HTMLImageElement;
-    img.src = active.preview;
+    if (img) img.src = active.preview;
     const actions = document.getElementById('action-area');
     if (active.status === 'done') actions?.classList.remove('hidden');
     else actions?.classList.add('hidden');
@@ -156,13 +197,15 @@ const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     
-    // تفعيل أحد الروابط المباشرة عشوائياً عند بدء المعالجة
     triggerDirectLink();
 
     const overlay = document.getElementById('processing-overlay');
     if (overlay) overlay.style.display = 'flex';
-    const quality = parseInt((document.getElementById('q-slider') as HTMLInputElement).value) / 100;
-    const format = (document.getElementById('f-select') as HTMLSelectElement).value;
+    const qualityInput = document.getElementById('q-slider') as HTMLInputElement;
+    const formatInput = document.getElementById('f-select') as HTMLSelectElement;
+    const quality = qualityInput ? parseInt(qualityInput.value) / 100 : 0.85;
+    const format = formatInput ? formatInput.value : 'image/webp';
+
     try {
         const img = new Image();
         img.src = active.preview;
@@ -211,11 +254,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // تفعيل رابط مباشر عشوائي عند التحميل لزيادة الأرباح
             triggerDirectLink();
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
+            const formatSelect = document.getElementById('f-select') as HTMLSelectElement;
             a.href = active.processedUrl;
-            a.download = `Elite_${active.name.split('.')[0]}.${(document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1]}`;
+            a.download = `Elite_${active.name.split('.')[0]}.${formatSelect.value.split('/')[1]}`;
             a.click();
         }
     });
@@ -231,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         State.ads = ads;
         localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم التحديث! جاري إعادة التحميل...');
+        showToast('تم الحفظ! جاري إعادة التحميل...');
         setTimeout(() => window.location.reload(), 800);
     });
 });
