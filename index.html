@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>إيليت إيميج | معالجة الصور الاحترافية</title>
     
-    <!-- Monetag Verification -->
-    <meta name="monetag" content="a3ee7d0ba0217eccc65608ab9a142c05">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -37,7 +34,7 @@
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; min-height: 50px; }
+        .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; min-height: 20px; }
         .share-btn { @apply w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all hover:scale-110 shadow-lg active:scale-95; }
     </style>
 </head>
@@ -60,14 +57,12 @@
     </nav>
 
     <main id="main-content" class="pt-28 px-4 max-w-6xl mx-auto pb-20">
-        <div id="ad-top" class="ad-slot"></div>
-
         <div id="app-container">
             <!-- Upload View -->
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
-                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl">أداة معالجة الصور المتوافقة مع معايير الويب الحديثة.</p>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl">أداة معالجة الصور المتوافقة مع معايير الويب الحديثة، الآن بدون إعلانات.</p>
                 </div>
 
                 <div class="upload-zone rounded-[3rem] p-16 md:p-24 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5" onclick="document.getElementById('file-input').click()">
@@ -135,7 +130,6 @@
                             <button id="start-process" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">ابدأ المعالجة</button>
                         </div>
                     </div>
-                    <div id="ad-sidebar" class="ad-slot"></div>
                 </div>
             </section>
         </div>
@@ -144,17 +138,17 @@
         <section id="admin-view" class="hidden py-12">
             <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
                 <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات Monetag</h2>
+                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات مخصصة</h2>
                     <button onclick="window.closeAdmin()" class="text-slate-500 hover:text-brand-primary"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-4 md:col-span-2">
-                        <label class="block font-bold text-sm text-brand-primary">Smart Tag</label>
-                        <textarea id="ad-smart" class="w-full h-24 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
+                        <label class="block font-bold text-sm text-brand-primary">Smart Scripts</label>
+                        <textarea id="ad-smart" class="w-full h-24 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none" placeholder="أدخل السكربتات هنا إذا رغبت مستقبلاً"></textarea>
                     </div>
                     <div class="space-y-4 md:col-span-2">
                         <label class="block font-bold text-sm">Direct Links</label>
-                        <input type="text" id="ad-direct" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none">
+                        <input type="text" id="ad-direct" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none" placeholder="https://...">
                     </div>
                     <div class="space-y-4">
                         <label class="block font-bold text-sm">Popunder Tag</label>
@@ -165,7 +159,7 @@
                         <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                 </div>
-                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">حفظ كافة الإعدادات</button>
+                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">حفظ التغييرات</button>
             </div>
         </section>
         

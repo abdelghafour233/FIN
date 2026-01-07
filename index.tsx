@@ -12,11 +12,11 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// الإعدادات الافتراضية مع الرابط الجديد الذي طلبته
+// تم تفريغ كافة الإعدادات الإعلانية الافتراضية
 const DEFAULT_ADS = {
-    smart: `<script src="https://quge5.com/88/tag.min.js" data-zone="199687" async data-cfasync="false"></script>`,
+    smart: ``,
     pop: ``,
-    direct: `https://otieu.com/4/10428641`, // الرابط المباشر الخاص بك
+    direct: ``,
     social: ``,
     banner1: ``,
     banner2: ``,
@@ -39,16 +39,7 @@ const State = {
     ads: getSavedAds()
 };
 
-// --- وظائف Monetag ---
-const triggerDirectLink = () => {
-    if (State.ads.direct) {
-        const links = State.ads.direct.split(',').map((l: string) => l.trim()).filter((l: string) => l.startsWith('http'));
-        if (links.length > 0) {
-            // فتح الرابط في نافذة جديدة عند النقر
-            window.open(links[0], '_blank');
-        }
-    }
-};
+// --- إزالة وظيفة triggerDirectLink تماماً لضمان عدم ظهور أي إعلانات منبثقة ---
 
 const advancedInject = (container: HTMLElement | null, html: string) => {
     if (!container || !html || html.trim() === '') return;
@@ -70,6 +61,7 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
 
 const injectAds = () => {
     const ads = State.ads;
+    // يتم الحقن فقط إذا كان هناك محتوى فعلي مدخل من لوحة التحكم
     if (ads.smart) advancedInject(document.getElementById('ad-global-container'), ads.smart);
     if (ads.pop && ads.pop.trim() !== '') {
         const div = document.createElement('div');
@@ -126,7 +118,6 @@ const applyTheme = () => {
             return;
     }
     if (shareUrl) {
-        // تم إزالة triggerDirectLink() من هنا لتمكين المشاركة دون إعلانات منبثقة
         window.open(shareUrl, '_blank', 'width=600,height=400');
     }
 };
@@ -163,9 +154,6 @@ const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     
-    // تفعيل الرابط المباشر عند بدء المعالجة
-    triggerDirectLink();
-
     const overlay = document.getElementById('processing-overlay');
     if (overlay) overlay.style.display = 'flex';
     
@@ -250,8 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // تفعيل الرابط المباشر عند محاولة التحميل
-            triggerDirectLink();
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             const formatSelect = document.getElementById('f-select') as HTMLSelectElement;
             a.href = active.processedUrl;
@@ -270,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         State.ads = ads;
         localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم الحفظ! جاري إعادة التحميل...');
+        showToast('تم الحفظ بنجاح!');
         setTimeout(() => window.location.reload(), 800);
     });
 });
