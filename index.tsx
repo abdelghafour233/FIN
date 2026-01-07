@@ -11,8 +11,19 @@ interface ImageFile {
 }
 
 const AD_PASSWORD = "admin";
-const DIRECT_LINK = "https://otieu.com/4/10428459";
-const SHARE_TEXT = "حوّل صورك واضغطها باحترافية مجاناً مع Elite Image! جرب الأداة الآن:";
+
+// الروابط الربحية الجديدة التي تم تزويدنا بها
+const REWARD_LINKS = [
+    "https://otieu.com/4/10430934",
+    "https://otieu.com/4/10428864",
+    "https://otieu.com/4/10428641",
+    "https://otieu.com/4/10428459"
+];
+
+// وظيفة للحصول على رابط عشوائي لتدوير الأرباح
+const getRandomLink = () => REWARD_LINKS[Math.floor(Math.random() * REWARD_LINKS.length)];
+
+const SHARE_TEXT = "اكتشفت أداة رائعة لمعالجة الصور مجاناً وباحترافية! جربها الآن:";
 
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
@@ -40,10 +51,7 @@ const injectAds = () => {
                              document.body.innerHTML.includes('10430766') || 
                              document.head.innerHTML.includes('10430766');
 
-    if (isAlreadyPresent) {
-        console.log("✅ Monetag System Active.");
-        return;
-    }
+    if (isAlreadyPresent) return;
 
     const container = document.getElementById('ad-global-container');
     if (container && ads.smart) {
@@ -80,39 +88,32 @@ const applyTheme = () => {
 };
 
 (window as any).copyLink = () => {
-    navigator.clipboard.writeText(DIRECT_LINK);
-    showToast('تم نسخ الرابط الربحي!');
+    const link = getRandomLink();
+    navigator.clipboard.writeText(link);
+    showToast('تم نسخ رابط المشاركة الربحي!');
 };
 
 (window as any).nativeShare = async () => {
+    const link = getRandomLink();
     if (navigator.share) {
         try {
-            await navigator.share({
-                title: 'Elite Image',
-                text: SHARE_TEXT,
-                url: DIRECT_LINK,
-            });
-        } catch (err) {
-            console.error('Error sharing:', err);
-        }
+            await navigator.share({ title: 'Elite Image', text: SHARE_TEXT, url: link });
+        } catch (err) {}
     } else {
         (window as any).copyLink();
     }
 };
 
 const setupShareLinks = () => {
-    const url = encodeURIComponent(DIRECT_LINK);
+    const link = getRandomLink();
+    const url = encodeURIComponent(link);
     const text = encodeURIComponent(SHARE_TEXT);
-    
     const wa = document.getElementById('share-whatsapp') as HTMLAnchorElement;
     if (wa) wa.href = `https://wa.me/?text=${text}%20${url}`;
-    
     const fb = document.getElementById('share-facebook') as HTMLAnchorElement;
     if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-    
     const tw = document.getElementById('share-twitter') as HTMLAnchorElement;
     if (tw) tw.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
-    
     const tg = document.getElementById('share-telegram') as HTMLAnchorElement;
     if (tg) tg.href = `https://t.me/share/url?url=${url}&text=${text}`;
 };
@@ -148,14 +149,10 @@ const renderQueue = () => {
 const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
-    
     const overlay = document.getElementById('processing-overlay');
     if (overlay) overlay.style.display = 'flex';
-    
-    const qualityInput = document.getElementById('q-slider') as HTMLInputElement;
-    const formatInput = document.getElementById('f-select') as HTMLSelectElement;
-    const quality = parseInt(qualityInput.value) / 100;
-    const format = formatInput.value;
+    const quality = parseInt((document.getElementById('q-slider') as HTMLInputElement).value) / 100;
+    const format = (document.getElementById('f-select') as HTMLSelectElement).value;
 
     try {
         const img = new Image();
@@ -187,8 +184,6 @@ const processActive = async () => {
         document.getElementById('admin-view')?.classList.remove('hidden');
         const area = document.getElementById('ad-smart') as HTMLTextAreaElement;
         if (area) area.value = State.ads.smart;
-    } else if (pass !== null) {
-        alert("خطأ!");
     }
 };
 
@@ -227,8 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // Monetization: Open direct link in new tab when downloading
-            window.open(DIRECT_LINK, '_blank');
+            // فتح رابط عشوائي لزيادة الأرباح عند التحميل
+            window.open(getRandomLink(), '_blank');
             
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             const formatSelect = document.getElementById('f-select') as HTMLSelectElement;
@@ -242,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const smartValue = (document.getElementById('ad-smart') as HTMLTextAreaElement).value;
         State.ads.smart = smartValue;
         localStorage.setItem('elite-ads', JSON.stringify(State.ads));
-        showToast('تم الحفظ وتنشيط الإعلانات الجديدة!');
+        showToast('تم الحفظ!');
         setTimeout(() => window.location.reload(), 800);
     });
 });
