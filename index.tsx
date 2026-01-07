@@ -13,10 +13,23 @@ interface ImageFile {
 const AD_PASSWORD = "admin";
 
 const DEFAULT_ADS = {
-    smart: `<!-- Adsterra: 28274571 -->
+    smart: `<!-- Adsterra Zone 1: 28274571 -->
 <script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>
-<!-- Adsterra: 28274607 -->
-<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>`,
+
+<!-- Adsterra Zone 2: 28274607 -->
+<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>
+
+<!-- Adsterra Zone 3 (Banner): 28293476 -->
+<script type="text/javascript">
+  atOptions = {
+    'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+    'format' : 'iframe',
+    'height' : 250,
+    'width' : 300,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`,
 };
 
 const getSavedAds = () => {
