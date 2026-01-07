@@ -12,7 +12,6 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin";
 
-// الكود الافتراضي (Smart Tag)
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
 };
@@ -33,27 +32,22 @@ const State = {
     ads: getSavedAds()
 };
 
-// وظيفة حقن الإعلانات المتقدمة
 const injectAds = () => {
     const ads = State.ads;
-    
-    // التحقق من وجود الكود في أي مكان بالصفحة (الرأس أو الجسم)
     const isAlreadyPresent = document.querySelector('script[src*="10430766"]') || 
                              document.body.innerHTML.includes('10430766') || 
                              document.head.innerHTML.includes('10430766');
 
     if (isAlreadyPresent) {
-        console.log("✅ Monetag System: Smart Tag detected and active.");
+        console.log("✅ Monetag System Active.");
         return;
     }
 
-    // إذا لم يكن موجوداً، نقوم بحقنه في الحاوية المخصصة
     const container = document.getElementById('ad-global-container');
     if (container && ads.smart) {
         const range = document.createRange();
         const fragment = range.createContextualFragment(ads.smart);
         container.appendChild(fragment);
-        console.log("🚀 Monetag System: Smart Tag injected manually.");
     }
 };
 
@@ -81,6 +75,28 @@ const applyTheme = () => {
     State.theme = State.theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('elite-theme', State.theme);
     applyTheme();
+};
+
+(window as any).copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    showToast('تم نسخ رابط الموقع!');
+};
+
+const setupShareLinks = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("اكتشفت أداة رائعة لمعالجة الصور مجاناً وباحترافية! جربها الآن:");
+    
+    const wa = document.getElementById('share-whatsapp') as HTMLAnchorElement;
+    if (wa) wa.href = `https://wa.me/?text=${text}%20${url}`;
+    
+    const fb = document.getElementById('share-facebook') as HTMLAnchorElement;
+    if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    
+    const tw = document.getElementById('share-twitter') as HTMLAnchorElement;
+    if (tw) tw.href = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+    
+    const tg = document.getElementById('share-telegram') as HTMLAnchorElement;
+    if (tg) tg.href = `https://t.me/share/url?url=${url}&text=${text}`;
 };
 
 const updateUI = () => {
@@ -165,8 +181,8 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    // تفعيل فوري للإعلانات
     injectAds();
+    setupShareLinks();
 
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
     fileInput?.addEventListener('change', (e: any) => {
