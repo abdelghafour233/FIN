@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Elite Image | معالجة الصور الاحترافية</title>
     
-    <!-- تم إزالة أكواد Popunder و Social Bar لضمان نظافة المحتوى -->
+    <!-- Adsterra Popunder (أرباح عالية جداً) -->
+    <script type='text/javascript' src='//bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js'></script>
+    
+    <!-- Adsterra Social Bar (أعلى نسبة نقر CTR) -->
+    <script type='text/javascript' src='//bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js'></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -34,19 +38,23 @@
         .dark .glass { background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255,255,255,0.08); }
         .upload-zone { border: 2px dashed rgba(59, 130, 246, 0.3); transition: all 0.3s ease; }
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        .ad-slot { border-radius: 1.5rem; overflow: hidden; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; min-height: 100px; position: relative; }
+        .ad-slot { border-radius: 1.5rem; overflow: hidden; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; min-height: 100px; margin: 10px 0; }
         .dark .ad-slot { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
-        .ad-slot::after { content: 'مساحة إعلانية آمنة'; position: absolute; font-size: 10px; color: gray; top: 5px; right: 10px; opacity: 0.5; }
         .hidden { display: none !important; }
-        .monetag-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); animation: pulse-glow 2s infinite; }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.8); } 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } }
-        .share-btn { @apply flex items-center justify-center w-12 h-12 rounded-full transition-all hover:scale-110 shadow-lg text-white; }
+        .monetag-premium { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); animation: pulse-glow 1.5s infinite; border: 2px solid rgba(255,255,255,0.2); }
+        @keyframes pulse-glow { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 20px 10px rgba(251, 191, 36, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); } }
+        .sticky-ad { position: fixed; bottom: 0; left: 0; right: 0; z-index: 90; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); display: flex; justify-content: center; padding: 5px; border-top: 1px solid rgba(255,255,255,0.1); }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
 
-    <nav class="fixed top-0 left-0 right-0 z-[100] glass px-6 py-4">
+    <!-- شريط Monetag العلوي للحث على النقر -->
+    <div class="bg-amber-500 text-white text-center py-2 text-xs font-black tracking-wide">
+        تنبيه: عرض لفترة محدودة! <a href="https://otieu.com/4/10428459" target="_blank" class="underline ml-2">احصل على اشتراك VIP مجاني لتسريع معالجة الصور</a>
+    </div>
+
+    <nav class="sticky top-0 z-[100] glass px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3 cursor-pointer" onclick="location.reload()">
                 <div class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-xl">
@@ -60,127 +68,140 @@
         </div>
     </nav>
 
-    <main class="pt-28 px-4 max-w-6xl mx-auto pb-20">
+    <main class="px-4 max-w-6xl mx-auto pb-32">
         <!-- قسم الرفع -->
-        <section id="upload-view" class="py-6">
-            <div class="text-center mb-8">
-                <h2 class="text-4xl md:text-5xl font-black mb-4">أسرع معالج <span class="text-brand-primary">صور احترافي</span></h2>
-                <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-lg font-medium">حوّل، اضغط، وعدل صورك بدقة فائقة وبشكل مجاني تماماً.</p>
+        <section id="upload-view" class="py-12">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl md:text-6xl font-black mb-6 leading-tight">احترافية <span class="text-brand-primary">بكبسة زر</span></h2>
+                <p class="text-slate-500 dark:text-slate-400 max-w-2xl mx-auto text-xl">الأداة رقم 1 عالمياً لتحويل وضغط الصور بأعلى دقة متوفرة.</p>
             </div>
 
-            <!-- مساحة إعلانية علوية (يمكنك وضع كود البنر النظيف هنا) -->
-            <div class="flex justify-center mb-8">
-                <div class="ad-slot min-w-[300px] min-h-[100px] border-dashed border-2">
-                    <!-- ضع كود البنر الآمن هنا -->
-                    <span class="text-slate-400 text-xs font-bold">إعلان نظيف 300x250</span>
-                </div>
+            <!-- Adsterra High Visibility 300x250 -->
+            <div class="ad-slot">
+                <script type="text/javascript">
+                    atOptions = { 'key' : '0295263cf4ed8d9e3a97b6a2490864ee', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                </script>
+                <script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
             </div>
 
-            <div class="upload-zone rounded-[2.5rem] p-12 md:p-20 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5" onclick="document.getElementById('file-input').click()">
+            <div class="upload-zone rounded-[3rem] p-16 md:p-24 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5 mt-8" onclick="document.getElementById('file-input').click()">
                 <input type="file" id="file-input" class="hidden" multiple accept="image/*">
-                <div class="w-24 h-24 bg-brand-primary/10 rounded-3xl flex items-center justify-center text-brand-primary mx-auto mb-8 group-hover:scale-110 transition-transform">
-                    <i data-lucide="upload-cloud" class="w-12 h-12"></i>
+                <div class="w-28 h-28 bg-brand-primary/10 rounded-[2rem] flex items-center justify-center text-brand-primary mx-auto mb-10 group-hover:scale-110 transition-transform">
+                    <i data-lucide="upload-cloud" class="w-14 h-14"></i>
                 </div>
-                <p class="text-2xl font-black mb-3">اسحب الصور أو اضغط هنا للبدء</p>
-                <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">WebP, PNG, JPG - جودة عالية 4K</p>
+                <p class="text-3xl font-black mb-4">ابدأ المعالجة الآن</p>
+                <p class="text-slate-500 font-bold uppercase tracking-tighter text-sm">مجاني تماماً - جودة 4K فائقة</p>
             </div>
         </section>
 
         <!-- منطقة العمل -->
-        <section id="workspace-view" class="hidden py-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-8 space-y-6">
-                <!-- Monetag Reward Slot -->
-                <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 p-4 rounded-2xl flex items-center justify-between">
-                    <div class="flex items-center gap-3 text-amber-700 dark:text-amber-500">
-                        <i data-lucide="award" class="w-6 h-6"></i>
-                        <span class="font-black text-sm">احصل على سرعة تحميل مضاعفة وجودة 4K مجاناً</span>
-                    </div>
-                    <a href="https://otieu.com/4/10428459" target="_blank" class="bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-black hover:bg-amber-600 transition-all">تفعيل الآن</a>
+        <section id="workspace-view" class="hidden py-10 grid grid-cols-1 lg:grid-cols-12 gap-10">
+            <div class="lg:col-span-8 space-y-8">
+                
+                <!-- Adsterra 728x90 or Banner above image -->
+                <div class="ad-slot bg-transparent border-none">
+                    <script type="text/javascript">
+                        atOptions = { 'key' : '0295263cf4ed8d9e3a97b6a2490864ee', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+                    </script>
+                    <script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
                 </div>
 
-                <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
-                    <div id="processing-overlay" class="processing-loader rounded-[2.5rem]">
-                        <div class="w-14 h-14 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-6"></div>
-                        <p class="font-black text-white text-xl">جاري المعالجة الذكية...</p>
+                <div class="bg-white dark:bg-brand-card rounded-[3rem] p-8 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
+                    <div id="processing-overlay" class="processing-loader rounded-[3rem]">
+                        <div class="w-16 h-16 border-4 border-amber-500 border-t-transparent rounded-full animate-spin mb-8"></div>
+                        <p class="font-black text-white text-2xl mb-2">جاري المعالجة الفائقة...</p>
+                        <p class="text-amber-500 font-bold text-sm">لا تغلق الصفحة لضمان جودة 4K</p>
                     </div>
 
-                    <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-dark flex items-center justify-center mb-6 border border-slate-200 dark:border-white/10">
+                    <div class="aspect-video relative rounded-3xl overflow-hidden bg-slate-100 dark:bg-brand-dark flex items-center justify-center mb-8 border border-slate-200 dark:border-white/10">
                         <img id="main-preview" class="max-w-full max-h-full object-contain">
                     </div>
                     
-                    <div id="action-area" class="hidden flex flex-col gap-8 w-full">
-                        <!-- Monetag Direct Link Button -->
-                        <div class="flex flex-col gap-4">
-                            <a href="https://otieu.com/4/10428459" target="_blank" class="monetag-btn text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl text-xl w-full">
-                                <i data-lucide="zap" class="w-7 h-7 fill-current"></i>
-                                <span>تحميل فائق السرعة (آمن)</span>
+                    <!-- Adsterra Native Banner (تحت الصورة مباشرة - أعلى CTR) -->
+                    <div class="my-6">
+                        <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
+                        <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
+                    </div>
+
+                    <div id="action-area" class="hidden flex flex-col gap-6 w-full">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Monetag Premium Link (الأولوية القصوى) -->
+                            <a href="https://otieu.com/4/10428459" target="_blank" class="monetag-premium text-white px-8 py-6 rounded-2xl font-black flex flex-col items-center justify-center gap-1 transition-all shadow-2xl text-xl">
+                                <div class="flex items-center gap-3">
+                                    <i data-lucide="crown" class="w-7 h-7"></i>
+                                    <span>تحميل VIP (سرعة + 4K)</span>
+                                </div>
+                                <span class="text-[10px] opacity-80 uppercase tracking-widest">يوصى به للمحترفين (Monetag)</span>
                             </a>
                             
-                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full">
-                                <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl shadow-brand-success/20 text-xl flex-1">
+                            <!-- Adsterra Secondary Download (لزيادة الظهور) -->
+                            <button id="download-btn" class="bg-brand-success text-white px-8 py-6 rounded-2xl font-black flex flex-col items-center justify-center gap-1 hover:bg-opacity-90 transition-all shadow-xl text-xl">
+                                <div class="flex items-center gap-3">
                                     <i data-lucide="download" class="w-7 h-7"></i>
-                                    <span>تحميل الملف العادي</span>
-                                </button>
-                            </div>
+                                    <span>تحميل ملف عادي</span>
+                                </div>
+                                <span class="text-[10px] opacity-80 uppercase tracking-widest">معالجة أساسية فقط</span>
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Queue & Social -->
                 <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
-                
-                <div class="pt-6 text-center">
-                    <p class="text-sm font-bold text-slate-500 mb-6">شارك الخدمة مع أصدقائك:</p>
-                    <div class="flex items-center justify-center gap-6">
-                        <a id="share-whatsapp" href="#" target="_blank" class="share-btn bg-[#25D366]"><i data-lucide="phone"></i></a>
-                        <a id="share-facebook" href="#" target="_blank" class="share-btn bg-[#1877F2]"><i data-lucide="facebook"></i></a>
-                        <a id="share-twitter" href="#" target="_blank" class="share-btn bg-[#000000]"><i data-lucide="twitter"></i></a>
-                        <a id="share-telegram" href="#" target="_blank" class="share-btn bg-[#0088cc]"><i data-lucide="send"></i></a>
-                    </div>
-                </div>
             </div>
 
             <!-- Sidebar -->
-            <div class="lg:col-span-4 space-y-6">
-                <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl">
-                    <h3 class="font-black text-xl mb-8 flex items-center gap-3">
-                        <i data-lucide="sliders" class="w-6 h-6 text-brand-primary"></i>
-                        الإعدادات
+            <div class="lg:col-span-4 space-y-8">
+                <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/5 shadow-2xl">
+                    <h3 class="font-black text-2xl mb-10 flex items-center gap-4">
+                        <i data-lucide="settings-2" class="w-8 h-8 text-brand-primary"></i>
+                        التحكم الذكي
                     </h3>
-                    <div class="space-y-8">
+                    <div class="space-y-10">
                         <div>
-                            <div class="flex justify-between mb-4 text-sm font-bold">
-                                <span>نسبة الضغط</span>
+                            <div class="flex justify-between mb-5 text-sm font-black uppercase">
+                                <span>جودة الصورة</span>
                                 <span id="q-label" class="text-brand-primary">85%</span>
                             </div>
-                            <input type="range" id="q-slider" min="10" max="100" value="85" class="w-full accent-brand-primary h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            <input type="range" id="q-slider" min="10" max="100" value="85" class="w-full accent-brand-primary h-3 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer">
                         </div>
                         <div>
-                            <label class="block text-sm font-bold mb-4">التنسيق المطلوب</label>
-                            <select id="f-select" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-bold outline-none">
-                                <option value="image/webp">WebP (أصغر حجم)</option>
-                                <option value="image/jpeg">JPG (أفضل توافق)</option>
-                                <option value="image/png">PNG (بدون فقدان)</option>
+                            <label class="block text-sm font-black mb-5 uppercase">صيغة الملف</label>
+                            <select id="f-select" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-5 font-black outline-none focus:ring-2 ring-brand-primary">
+                                <option value="image/webp">WebP (موصى به للأرباح)</option>
+                                <option value="image/jpeg">JPEG (أفضل توافق)</option>
+                                <option value="image/png">PNG (جودة أصلية)</option>
                             </select>
                         </div>
-                        <button id="start-process" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] active:scale-95 transition-all">
-                            معالجة الآن
+                        <button id="start-process" class="w-full bg-brand-primary text-white py-6 rounded-[2rem] font-black text-2xl shadow-2xl hover:scale-[1.03] active:scale-95 transition-all">
+                            تنفيذ المعالجة
                         </button>
                     </div>
                 </div>
 
-                <!-- مساحة إعلانية جانبية آمنة -->
-                <div class="flex justify-center">
-                    <div class="ad-slot min-w-[300px] min-h-[250px] border-dashed border-2">
-                        <span class="text-slate-400 text-xs font-bold">إعلان نظيف 300x250</span>
-                    </div>
+                <!-- Adsterra Sidebar 160x600 or 300x250 -->
+                <div class="ad-slot min-h-[300px]">
+                    <script type="text/javascript">
+                        atOptions = { 'key' : 'deb441a26b7385b9111cbb19d72d8513', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };
+                    </script>
+                    <script type="text/javascript" src="//bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>
                 </div>
             </div>
         </section>
     </main>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
-        <div class="bg-white dark:bg-brand-card px-8 py-4 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary" id="toast-msg"></div>
+    <!-- Sticky Ad at Bottom (لضمان المشاهدة المستمرة) -->
+    <div class="sticky-ad">
+        <div class="max-w-[728px] w-full flex justify-center">
+            <!-- ضع كود البنر 728x90 هنا إذا كان لديك، أو بنر 320x50 للجوال -->
+            <script type="text/javascript">
+                atOptions = { 'key' : '0295263cf4ed8d9e3a97b6a2490864ee', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
+            </script>
+            <script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
+        <div class="bg-white dark:bg-brand-card px-10 py-5 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary text-lg" id="toast-msg"></div>
     </div>
 
     <script src="index.tsx" type="module"></script>
