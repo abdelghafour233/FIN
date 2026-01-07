@@ -126,7 +126,7 @@ const applyTheme = () => {
             return;
     }
     if (shareUrl) {
-        triggerDirectLink(); // تفعيل الرابط عند المشاركة أيضاً
+        // تم إزالة triggerDirectLink() من هنا لتمكين المشاركة دون إعلانات منبثقة
         window.open(shareUrl, '_blank', 'width=600,height=400');
     }
 };
