@@ -14,7 +14,8 @@ interface ImageItem {
 const State = {
     files: [] as ImageItem[],
     selectedId: null as string | null,
-    dashboardPassword: 'admin'
+    dashboardPassword: 'admin',
+    theme: localStorage.getItem('storimage-theme') || 'dark'
 };
 
 const showToast = (msg: string) => {
@@ -32,6 +33,23 @@ const showToast = (msg: string) => {
     if (view) {
         view.style.display = view.style.display === 'none' ? 'flex' : 'none';
     }
+};
+
+(window as any).toggleTheme = () => {
+    State.theme = State.theme === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('storimage-theme', State.theme);
+    applyTheme();
+};
+
+const applyTheme = () => {
+    const html = document.documentElement;
+    if (State.theme === 'dark') {
+        html.classList.add('dark');
+    } else {
+        html.classList.remove('dark');
+    }
+    // Re-trigger icons refresh for theme changes
+    if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
 (window as any).socialShare = (platform: string) => {
@@ -150,6 +168,7 @@ const processImage = async (item: ImageItem) => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
     if ((window as any).lucide) (window as any).lucide.createIcons();
     
     const input = document.getElementById('file-input') as HTMLInputElement;
