@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Elite Image | معالجة الصور الاحترافية</title>
     
-    <!-- Adsterra Popunder -->
-    <script type='text/javascript' src='//bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js'></script>
-    
-    <!-- Adsterra Social Bar -->
-    <script type='text/javascript' src='//bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js'></script>
+    <!-- تم إزالة أكواد Popunder و Social Bar لضمان نظافة المحتوى -->
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -38,11 +34,12 @@
         .dark .glass { background: rgba(15, 23, 42, 0.85); border-bottom: 1px solid rgba(255,255,255,0.08); }
         .upload-zone { border: 2px dashed rgba(59, 130, 246, 0.3); transition: all 0.3s ease; }
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
-        .ad-slot { border-radius: 1rem; overflow: hidden; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; min-height: 100px; }
-        .dark .ad-slot { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.05); }
+        .ad-slot { border-radius: 1.5rem; overflow: hidden; background: rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; min-height: 100px; position: relative; }
+        .dark .ad-slot { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+        .ad-slot::after { content: 'مساحة إعلانية آمنة'; position: absolute; font-size: 10px; color: gray; top: 5px; right: 10px; opacity: 0.5; }
         .hidden { display: none !important; }
-        .btn-glow { box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); animation: pulse-glow 2s infinite; }
-        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.7); } 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } }
+        .monetag-btn { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); animation: pulse-glow 2s infinite; }
+        @keyframes pulse-glow { 0% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } 50% { box-shadow: 0 0 25px rgba(245, 158, 11, 0.8); } 100% { box-shadow: 0 0 5px rgba(245, 158, 11, 0.4); } }
         .share-btn { @apply flex items-center justify-center w-12 h-12 rounded-full transition-all hover:scale-110 shadow-lg text-white; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
     </style>
@@ -65,19 +62,17 @@
 
     <main class="pt-28 px-4 max-w-6xl mx-auto pb-20">
         <!-- قسم الرفع -->
-        <section id="upload-view" class="py-12">
-            <div class="text-center mb-12">
+        <section id="upload-view" class="py-6">
+            <div class="text-center mb-8">
                 <h2 class="text-4xl md:text-5xl font-black mb-4">أسرع معالج <span class="text-brand-primary">صور احترافي</span></h2>
                 <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-lg font-medium">حوّل، اضغط، وعدل صورك بدقة فائقة وبشكل مجاني تماماً.</p>
             </div>
 
-            <!-- Adsterra 300x250 Top -->
-            <div class="flex justify-center mb-12">
-                <div id="ad-300x250-top" class="ad-slot min-w-[300px] min-h-[250px]">
-                    <script type="text/javascript">
-                        atOptions = { 'key' : '0295263cf4ed8d9e3a97b6a2490864ee', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
-                    </script>
-                    <script type="text/javascript" src="//bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+            <!-- مساحة إعلانية علوية (يمكنك وضع كود البنر النظيف هنا) -->
+            <div class="flex justify-center mb-8">
+                <div class="ad-slot min-w-[300px] min-h-[100px] border-dashed border-2">
+                    <!-- ضع كود البنر الآمن هنا -->
+                    <span class="text-slate-400 text-xs font-bold">إعلان نظيف 300x250</span>
                 </div>
             </div>
 
@@ -94,6 +89,15 @@
         <!-- منطقة العمل -->
         <section id="workspace-view" class="hidden py-4 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-8 space-y-6">
+                <!-- Monetag Reward Slot -->
+                <div class="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 p-4 rounded-2xl flex items-center justify-between">
+                    <div class="flex items-center gap-3 text-amber-700 dark:text-amber-500">
+                        <i data-lucide="award" class="w-6 h-6"></i>
+                        <span class="font-black text-sm">احصل على سرعة تحميل مضاعفة وجودة 4K مجاناً</span>
+                    </div>
+                    <a href="https://otieu.com/4/10428459" target="_blank" class="bg-amber-500 text-white px-4 py-2 rounded-xl text-xs font-black hover:bg-amber-600 transition-all">تفعيل الآن</a>
+                </div>
+
                 <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
                     <div id="processing-overlay" class="processing-loader rounded-[2.5rem]">
                         <div class="w-14 h-14 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-6"></div>
@@ -105,35 +109,34 @@
                     </div>
                     
                     <div id="action-area" class="hidden flex flex-col gap-8 w-full">
-                        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full">
-                            <a id="adsterra-direct" href="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js" target="_blank" class="btn-glow bg-amber-500 text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-amber-600 transition-all shadow-xl text-xl flex-1">
+                        <!-- Monetag Direct Link Button -->
+                        <div class="flex flex-col gap-4">
+                            <a href="https://otieu.com/4/10428459" target="_blank" class="monetag-btn text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl text-xl w-full">
                                 <i data-lucide="zap" class="w-7 h-7 fill-current"></i>
-                                <span>تحميل سريع (عالي الجودة)</span>
+                                <span>تحميل فائق السرعة (آمن)</span>
                             </a>
-                            <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl shadow-brand-success/20 text-xl flex-1">
-                                <i data-lucide="download" class="w-7 h-7"></i>
-                                <span>حفظ الملف النهائي</span>
-                            </button>
-                        </div>
-
-                        <!-- المشاركة لزيادة الزوار -->
-                        <div class="pt-6 border-t border-slate-100 dark:border-white/5 text-center">
-                            <p class="text-sm font-bold text-slate-500 mb-6">شارك الخدمة مع أصدقائك:</p>
-                            <div class="flex items-center justify-center gap-6">
-                                <a id="share-whatsapp" href="#" target="_blank" class="share-btn bg-[#25D366]"><i data-lucide="phone"></i></a>
-                                <a id="share-facebook" href="#" target="_blank" class="share-btn bg-[#1877F2]"><i data-lucide="facebook"></i></a>
-                                <a id="share-twitter" href="#" target="_blank" class="share-btn bg-[#000000]"><i data-lucide="twitter"></i></a>
-                                <a id="share-telegram" href="#" target="_blank" class="share-btn bg-[#0088cc]"><i data-lucide="send"></i></a>
+                            
+                            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full">
+                                <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl shadow-brand-success/20 text-xl flex-1">
+                                    <i data-lucide="download" class="w-7 h-7"></i>
+                                    <span>تحميل الملف العادي</span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Queue & Social -->
                 <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
                 
-                <!-- Adsterra Native Banner -->
-                <div class="mt-12">
-                    <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
-                    <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
+                <div class="pt-6 text-center">
+                    <p class="text-sm font-bold text-slate-500 mb-6">شارك الخدمة مع أصدقائك:</p>
+                    <div class="flex items-center justify-center gap-6">
+                        <a id="share-whatsapp" href="#" target="_blank" class="share-btn bg-[#25D366]"><i data-lucide="phone"></i></a>
+                        <a id="share-facebook" href="#" target="_blank" class="share-btn bg-[#1877F2]"><i data-lucide="facebook"></i></a>
+                        <a id="share-twitter" href="#" target="_blank" class="share-btn bg-[#000000]"><i data-lucide="twitter"></i></a>
+                        <a id="share-telegram" href="#" target="_blank" class="share-btn bg-[#0088cc]"><i data-lucide="send"></i></a>
+                    </div>
                 </div>
             </div>
 
@@ -166,13 +169,10 @@
                     </div>
                 </div>
 
-                <!-- Adsterra 160x300 Sidebar -->
+                <!-- مساحة إعلانية جانبية آمنة -->
                 <div class="flex justify-center">
-                    <div class="ad-slot min-w-[160px] min-h-[300px]">
-                        <script type="text/javascript">
-                            atOptions = { 'key' : 'deb441a26b7385b9111cbb19d72d8513', 'format' : 'iframe', 'height' : 300, 'width' : 160, 'params' : {} };
-                        </script>
-                        <script type="text/javascript" src="//bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>
+                    <div class="ad-slot min-w-[300px] min-h-[250px] border-dashed border-2">
+                        <span class="text-slate-400 text-xs font-bold">إعلان نظيف 300x250</span>
                     </div>
                 </div>
             </div>

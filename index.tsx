@@ -79,7 +79,7 @@ const renderQueue = () => {
     list.innerHTML = State.files.map(f => `
         <div onclick="window.setActive('${f.id}')" class="shrink-0 cursor-pointer relative group">
             <img src="${f.preview}" class="w-20 h-20 object-cover rounded-xl border-4 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}">
-            ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1 rounded-full shadow-md"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
+            ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1 rounded-full shadow-md"><i data-lucide="check" class="w-3.5 h-3.5"></i></div>' : ''}
         </div>
     `).join('');
 };
@@ -100,7 +100,7 @@ const processActive = async () => {
     const format = (document.getElementById('f-select') as HTMLSelectElement).value;
 
     try {
-        await new Promise(r => setTimeout(r, 1500)); // محاكاة المعالجة
+        await new Promise(r => setTimeout(r, 1500)); 
         const img = new Image();
         img.src = active.preview;
         await new Promise(r => img.onload = r);
