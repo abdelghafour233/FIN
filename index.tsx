@@ -62,5 +62,92 @@ const renderQueue = () => {
     if (!list) return;
     list.innerHTML = State.files.map(f => `
         <div onclick="window.setActive('${f.id}')" class="shrink-0 cursor-pointer relative group">
-            <img src="${f.preview}" class="w-24 h-24 object-cover rounded-[1.5rem] border-4 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-110 shadow-2xl' : 'border-transparent opacity-50 hover:opacity-100'}">
-            ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-
+            <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-105 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}">
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full shadow-lg"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
+        </div>
+    `).join('');
+};
+
+(window as any).setActive = (id: string) => {
+    State.activeId = id;
+    updateUI();
+};
+
+const processActive = async () => {
+    const active = State.files.find(f => f.id === State.activeId);
+    if (!active) return;
+
+    const overlay = document.getElementById('processing-overlay');
+    if (overlay) overlay.style.display = 'flex';
+
+    const quality = parseInt((document.getElementById('q-slider') as HTMLInputElement).value) / 100;
+    const format = (document.getElementById('f-select') as HTMLSelectElement).value;
+
+    try {
+        // معالجة فورية حقيقية بدون تأخير إعلاني
+        const img = new Image();
+        img.src = active.preview;
+        await new Promise(r => img.onload = r);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0);
+
+        const blob = await new Promise<Blob | null>(r => canvas.toBlob(r, format, quality));
+        if (blob) {
+            if (active.processedUrl) URL.revokeObjectURL(active.processedUrl);
+            active.processedUrl = URL.createObjectURL(blob);
+            active.status = 'done';
+            showToast('تمت المعالجة بنجاح!');
+        }
+    } catch (e) {
+        showToast('حدث خطأ أثناء المعالجة');
+    } finally {
+        if (overlay) overlay.style.display = 'none';
+        updateUI();
+    }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    applyTheme();
+
+    const input = document.getElementById('file-input') as HTMLInputElement;
+    input?.addEventListener('change', (e: any) => {
+        const items = Array.from(e.target.files as FileList);
+        items.forEach(file => {
+            State.files.push({
+                id: Math.random().toString(36).substr(2, 9),
+                file,
+                name: file.name,
+                size: file.size,
+                preview: URL.createObjectURL(file),
+                status: 'idle'
+            });
+        });
+
+        if (!State.activeId && State.files.length > 0) State.activeId = State.files[0].id;
+        document.getElementById('upload-view')?.classList.add('hidden');
+        document.getElementById('workspace-view')?.classList.remove('hidden');
+        updateUI();
+    });
+
+    document.getElementById('q-slider')?.addEventListener('input', (e: any) => {
+        const lab = document.getElementById('q-label');
+        if (lab) lab.innerText = e.target.value + '%';
+    });
+
+    document.getElementById('start-process')?.addEventListener('click', processActive);
+    
+    document.getElementById('download-btn')?.addEventListener('click', () => {
+        const active = State.files.find(f => f.id === State.activeId);
+        if (active?.processedUrl) {
+            const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
+            a.href = active.processedUrl;
+            a.download = `Elite_${active.name.split('.')[0]}.${(document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1]}`;
+            a.click();
+            showToast('بدأ التحميل...');
+        }
+    });
+});
