@@ -64,6 +64,21 @@ const injectAds = () => {
     }
 };
 
+const setupShareLinks = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("اكتشف إيليت إيميج - أفضل أداة لمعالجة الصور وتغيير صيغها مجاناً!");
+    
+    const wa = document.getElementById('share-wa') as HTMLAnchorElement;
+    const fb = document.getElementById('share-fb') as HTMLAnchorElement;
+    const tw = document.getElementById('share-tw') as HTMLAnchorElement;
+    const tg = document.getElementById('share-tg') as HTMLAnchorElement;
+    
+    if (wa) wa.href = `https://wa.me/?text=${text}%20${url}`;
+    if (fb) fb.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+    if (tw) tw.href = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+    if (tg) tg.href = `https://t.me/share/url?url=${url}&text=${text}`;
+};
+
 const showToast = (msg: string) => {
     const t = document.getElementById('toast');
     const m = document.getElementById('toast-msg');
@@ -170,6 +185,7 @@ const processImage = async (file: ImageFile) => {
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
     injectAds();
+    setupShareLinks();
 
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
     fileInput?.addEventListener('change', (e: any) => {

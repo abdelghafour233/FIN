@@ -68,6 +68,8 @@
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .btn-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
         .ad-link-btn { background: linear-gradient(90deg, #f59e0b, #ef4444); animation: pulse-ad 2s infinite; }
+        .share-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .share-btn:hover { transform: translateY(-5px) scale(1.1); }
         @keyframes pulse-ad {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
             70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
@@ -136,10 +138,29 @@
                             <img id="main-preview" class="max-w-full max-h-full object-contain">
                         </div>
                         <div id="action-area" class="hidden">
-                            <button id="download-btn" class="w-full bg-brand-success text-white py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl btn-glow">
+                            <button id="download-btn" class="w-full bg-brand-success text-white py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl btn-glow mb-8">
                                 <i data-lucide="download" class="w-6 h-6"></i>
                                 <span>تحميل الصورة المعدلة</span>
                             </button>
+
+                            <!-- Social Share Section -->
+                            <div class="border-t border-slate-200 dark:border-white/10 pt-8 text-center">
+                                <p class="text-sm font-black text-slate-400 mb-6 uppercase tracking-widest">شارك الموقع مع أصدقائك</p>
+                                <div class="flex justify-center gap-4">
+                                    <a id="share-wa" href="#" target="_blank" class="share-btn w-14 h-14 bg-[#25D366] text-white rounded-full flex items-center justify-center shadow-lg">
+                                        <i data-lucide="message-circle" class="w-7 h-7"></i>
+                                    </a>
+                                    <a id="share-fb" href="#" target="_blank" class="share-btn w-14 h-14 bg-[#1877F2] text-white rounded-full flex items-center justify-center shadow-lg">
+                                        <i data-lucide="facebook" class="w-7 h-7"></i>
+                                    </a>
+                                    <a id="share-tw" href="#" target="_blank" class="share-btn w-14 h-14 bg-[#000000] text-white rounded-full flex items-center justify-center shadow-lg">
+                                        <i data-lucide="twitter" class="w-7 h-7"></i>
+                                    </a>
+                                    <a id="share-tg" href="#" target="_blank" class="share-btn w-14 h-14 bg-[#0088cc] text-white rounded-full flex items-center justify-center shadow-lg">
+                                        <i data-lucide="send" class="w-7 h-7"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4"></div>
