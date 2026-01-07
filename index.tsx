@@ -13,9 +13,8 @@ interface ImageFile {
 const AD_PASSWORD = "admin";
 
 const DEFAULT_ADS = {
-    smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>
-<script src="https://quge5.com/88/tag.min.js" data-zone="199698" async data-cfasync="false"></script>
-<script src="https://quge5.com/88/tag.min.js" data-zone="199687" async data-cfasync="false"></script>`,
+    smart: `<!-- Adsterra: 28274571 -->
+<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>`,
 };
 
 const getSavedAds = () => {
@@ -138,10 +137,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const overlay = document.getElementById('processing-overlay');
         if (overlay) overlay.style.display = 'flex';
         
-        // محاكاة المعالجة
+        // Simulating processing
         setTimeout(() => {
             active.status = 'done';
-            active.processedUrl = active.preview; // في الواقع سنقوم بمعالجة Canvas هنا
+            active.processedUrl = active.preview;
             if (overlay) overlay.style.display = 'none';
             updateUI();
             showToast('تمت المعالجة!');
