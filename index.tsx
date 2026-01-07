@@ -39,6 +39,32 @@ const applyTheme = () => {
     applyTheme();
 };
 
+// وظيفة المشاركة الاجتماعية
+(window as any).share = (platform: 'whatsapp' | 'facebook' | 'x' | 'telegram') => {
+    const url = window.location.href;
+    const text = "أنصحكم باستخدام Elite Image، أفضل أداة لمعالجة وتحويل الصور بجودة عالية ومجاناً! 🚀\n";
+    
+    let shareUrl = "";
+    switch (platform) {
+        case 'whatsapp':
+            shareUrl = `https://wa.me/?text=${encodeURIComponent(text + url)}`;
+            break;
+        case 'facebook':
+            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            break;
+        case 'x':
+            shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            break;
+        case 'telegram':
+            shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            break;
+    }
+    
+    if (shareUrl) {
+        window.open(shareUrl, '_blank', 'width=600,height=400');
+    }
+};
+
 const updateUI = () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
@@ -84,7 +110,6 @@ const processActive = async () => {
     const format = (document.getElementById('f-select') as HTMLSelectElement).value;
 
     try {
-        // معالجة فورية حقيقية بدون تأخير إعلاني
         const img = new Image();
         img.src = active.preview;
         await new Promise(r => img.onload = r);
