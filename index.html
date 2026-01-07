@@ -41,7 +41,6 @@
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
         
-        /* Ad Containers */
         .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; overflow: visible; min-height: 50px; text-align: center; }
         #ad-top { max-width: 728px; margin-left: auto; margin-right: auto; }
         #ad-sidebar { max-width: 300px; min-height: 250px; background: rgba(0,0,0,0.02); border-radius: 1rem; }
@@ -66,15 +65,13 @@
     </nav>
 
     <main id="main-content" class="pt-28 px-4 max-w-6xl mx-auto pb-20">
-        <!-- Banner Ad Top -->
         <div id="ad-top" class="ad-slot"></div>
 
         <div id="app-container">
-            <!-- Upload Section -->
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
-                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl">أداة مجانية وسريعة لرفع، ضغط، وتحويل الصور بجودة عالية.</p>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl">أداة معالجة الصور المتوافقة مع معايير الويب الحديثة.</p>
                 </div>
 
                 <div class="upload-zone rounded-[3rem] p-16 md:p-24 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5" onclick="document.getElementById('file-input').click()">
@@ -83,14 +80,12 @@
                         <i data-lucide="upload-cloud" class="w-12 h-12"></i>
                     </div>
                     <p class="text-3xl font-black mb-3">اسحب الصور هنا أو اضغط للرفع</p>
-                    <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">معالجة فورية داخل المتصفح</p>
+                    <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">أداء سريع وأمان عالٍ</p>
                 </div>
                 
-                <!-- Native Ad Slot after upload area -->
                 <div id="ad-native" class="ad-slot"></div>
             </section>
 
-            <!-- Workspace Section -->
             <section id="workspace-view" class="hidden py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-8 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
@@ -113,7 +108,6 @@
                     <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
                 </div>
 
-                <!-- Sidebar with Ad -->
                 <div class="lg:col-span-4 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl">
                         <h3 class="font-black text-xl mb-8 flex items-center gap-3"><i data-lucide="sliders" class="w-6 h-6 text-brand-primary"></i> الإعدادات</h3>
@@ -139,49 +133,48 @@
             </section>
         </div>
 
-        <!-- Admin Control Panel -->
         <section id="admin-view" class="hidden py-12">
             <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
                 <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="settings-2" class="w-8 h-8 text-brand-primary"></i> إدارة الإعلانات</h2>
+                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات Monetag</h2>
                     <button onclick="window.location.reload()" class="text-slate-500 hover:text-brand-primary"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-4">
-                        <label class="block font-bold">Pop-under Script</label>
-                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
+                        <label class="block font-bold">Popunder Tag (Script)</label>
+                        <textarea id="ad-pop" placeholder="ضع كود Popunder هنا" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                     <div class="space-y-4">
-                        <label class="block font-bold">Direct Link URL</label>
+                        <label class="block font-bold">Direct Link URL (Monetag)</label>
                         <input type="text" id="ad-direct" placeholder="https://..." class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none">
                     </div>
                     <div class="space-y-4">
-                        <label class="block font-bold">Social Bar</label>
-                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
+                        <label class="block font-bold">In-Page Push / Social</label>
+                        <textarea id="ad-social" placeholder="ضع كود Social Tag هنا" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                     <div class="space-y-4">
-                        <label class="block font-bold">Banner 1 (160x300)</label>
+                        <label class="block font-bold">Vignette Banner (Left)</label>
                         <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                     <div class="space-y-4">
-                        <label class="block font-bold">Banner 2 (300x250)</label>
+                        <label class="block font-bold">Banner Ad (Top)</label>
                         <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                     <div class="space-y-4 md:col-span-2">
-                        <label class="block font-bold">Native Banner</label>
+                        <label class="block font-bold">Native / MultiTag</label>
                         <textarea id="ad-banner-native" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                 </div>
                 
-                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">حفظ التغييرات</button>
+                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">تفعيل إعلانات Monetag</button>
             </div>
         </section>
     </main>
 
     <footer class="py-10 text-center opacity-30">
         <button onclick="window.openAdmin()" class="flex items-center gap-2 mx-auto text-xs font-bold text-slate-500">
-            <i data-lucide="lock" class="w-3 h-3"></i> لوحة التحكم
+            <i data-lucide="lock" class="w-3 h-3"></i> إدارة النظام
         </button>
     </footer>
 

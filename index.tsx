@@ -12,8 +12,7 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// تم تفريغ الأكواد لضمان عدم ظهور إعلانات غير لائقة تلقائياً
-// يمكنك إضافة الأكواد النظيفة (Mainstream) من لوحة التحكم في الموقع
+// تم تفريغ الأكواد تماماً لضمان العمل بنظام Monetag فقط
 const DEFAULT_ADS = {
     pop: ``,
     direct: ``,
@@ -31,7 +30,6 @@ const State = {
     ads: savedAds ? JSON.parse(savedAds) : DEFAULT_ADS
 };
 
-// وظيفة لفتح الرابط المباشر في نافذة جديدة
 const triggerDirectLink = () => {
     if (State.ads.direct && State.ads.direct.startsWith('http')) {
         window.open(State.ads.direct, '_blank');
@@ -86,12 +84,14 @@ const injectAds = () => {
     
     if (ads.pop && ads.pop.trim() !== '') {
         const div = document.createElement('div');
+        div.className = "monetag-pop";
         document.body.appendChild(div);
         advancedInject(div, ads.pop);
     }
     
     if (ads.social && ads.social.trim() !== '') {
         const div = document.createElement('div');
+        div.className = "monetag-social";
         document.body.appendChild(div);
         advancedInject(div, ads.social);
     }
@@ -102,7 +102,7 @@ const injectAds = () => {
 };
 
 (window as any).openAdmin = () => {
-    const pass = prompt("الرجاء إدخال كلمة مرور لوحة التحكم:");
+    const pass = prompt("الرجاء إدخال كلمة مرور الإدارة:");
     if (pass === AD_PASSWORD) {
         document.getElementById('app-container')?.classList.add('hidden');
         document.getElementById('admin-view')?.classList.remove('hidden');
@@ -150,7 +150,7 @@ const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     
-    // تفعيل الرابط المباشر عند بدء المعالجة
+    // تفعيل Monetag Direct Link عند التفاعل
     triggerDirectLink();
 
     const overlay = document.getElementById('processing-overlay');
@@ -205,9 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // تفعيل الرابط المباشر عند التحميل
             triggerDirectLink();
-            
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             a.href = active.processedUrl;
             a.download = `Elite_${active.name.split('.')[0]}.${(document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1]}`;
@@ -226,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         State.ads = ads;
         localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم الحفظ! جاري إعادة التحميل...');
+        showToast('تم التفعيل! جاري تحديث الموقع...');
         setTimeout(() => window.location.reload(), 800);
     });
 });
