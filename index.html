@@ -97,9 +97,10 @@
                                 <span>تحميل الصورة المعالجة</span>
                             </button>
                             
+                            <!-- قسم المشاركة -->
                             <div class="mt-10 p-6 bg-slate-50 dark:bg-brand-dark/50 rounded-3xl border border-slate-200 dark:border-white/5 w-full text-center">
                                 <h4 class="text-sm font-black text-slate-500 mb-6 uppercase tracking-widest flex items-center justify-center gap-2">
-                                    <i data-lucide="share-2" class="w-4 h-4"></i> مشاركة الموقع مع الأصدقاء
+                                    <i data-lucide="share-2" class="w-4 h-4"></i> شارك الموقع مع الأصدقاء
                                 </h4>
                                 <div class="flex flex-wrap justify-center gap-3">
                                     <button onclick="window.share('facebook')" class="share-btn bg-[#1877F2]" title="فيسبوك"><i data-lucide="facebook" class="w-6 h-6"></i></button>
@@ -143,40 +144,28 @@
         <section id="admin-view" class="hidden py-12">
             <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
                 <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات Monetag المتقدمة</h2>
+                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات Monetag</h2>
                     <button onclick="window.closeAdmin()" class="text-slate-500 hover:text-brand-primary"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-4 md:col-span-2">
-                        <label class="block font-bold text-sm text-brand-primary">Smart Tag / Global Script (أكواد السكربت العامة)</label>
-                        <textarea id="ad-smart" placeholder="الصق كود Smart Tag هنا..." class="w-full h-24 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                        <label class="block font-bold text-sm text-brand-primary">Smart Tag</label>
+                        <textarea id="ad-smart" class="w-full h-24 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                     <div class="space-y-4 md:col-span-2">
-                        <label class="block font-bold text-sm">Direct Link URLs (روابط التدوير مفصولة بفاصلة)</label>
-                        <input type="text" id="ad-direct" placeholder="https://link1.com, https://link2.com" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-colors">
+                        <label class="block font-bold text-sm">Direct Links</label>
+                        <input type="text" id="ad-direct" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none">
                     </div>
                     <div class="space-y-4">
                         <label class="block font-bold text-sm">Popunder Tag</label>
-                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                     <div class="space-y-4">
-                        <label class="block font-bold text-sm">In-Page Push / Social</label>
-                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <label class="block font-bold text-sm">Vignette Banner (Left)</label>
-                        <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <label class="block font-bold text-sm">Banner Ad (Top)</label>
-                        <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
-                    </div>
-                    <div class="space-y-4 md:col-span-2">
-                        <label class="block font-bold text-sm">Native / MultiTag</label>
-                        <textarea id="ad-banner-native" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                        <label class="block font-bold text-sm">Social / Push Tag</label>
+                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none"></textarea>
                     </div>
                 </div>
-                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.01] active:scale-95 transition-all">تفعيل وحفظ التعديلات</button>
+                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">حفظ كافة الإعدادات</button>
             </div>
         </section>
         
