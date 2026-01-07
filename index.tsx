@@ -27,7 +27,8 @@ const SHARE_TEXT = "أفضل أداة مجانية لمعالجة الصور و�
 
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>
-<script src="https://quge5.com/88/tag.min.js" data-zone="199698" async data-cfasync="false"></script>`,
+<script src="https://quge5.com/88/tag.min.js" data-zone="199698" async data-cfasync="false"></script>
+<script src="https://quge5.com/88/tag.min.js" data-zone="199687" async data-cfasync="false"></script>`,
 };
 
 const getSavedAds = () => {
@@ -50,7 +51,8 @@ const injectAds = () => {
     const ads = State.ads;
     // التحقق من وجود الأكواد لتجنب التكرار
     const isAlreadyPresent = document.querySelector('script[src*="10430766"]') || 
-                             document.querySelector('script[src*="199698"]');
+                             document.querySelector('script[src*="199698"]') ||
+                             document.querySelector('script[src*="199687"]');
 
     if (isAlreadyPresent) return;
 
