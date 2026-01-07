@@ -12,14 +12,15 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// الأكواد الافتراضية المحدثة بالرابط المباشر الجديد
+// تم تفريغ الأكواد لضمان عدم ظهور إعلانات غير لائقة تلقائياً
+// يمكنك إضافة الأكواد النظيفة (Mainstream) من لوحة التحكم في الموقع
 const DEFAULT_ADS = {
-    pop: `<script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>`,
-    direct: `https://otieu.com/4/10428459`,
-    social: `<script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>`,
-    banner1: `<script>atOptions = {'key' : 'deb441a26b7385b9111cbb19d72d8513','format' : 'iframe','height' : 300,'width' : 160,'params' : {}};</script><script src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>`,
-    banner2: `<script>atOptions = {'key' : '0295263cf4ed8d9e3a97b6a2490864ee','format' : 'iframe','height' : 250,'width' : 300,'params' : {}};</script><script src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`,
-    native: `<script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script><div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>`
+    pop: ``,
+    direct: ``,
+    social: ``,
+    banner1: ``,
+    banner2: ``,
+    native: ``
 };
 
 const savedAds = localStorage.getItem('elite-ads');
@@ -61,7 +62,7 @@ const applyTheme = () => {
 };
 
 const advancedInject = (container: HTMLElement | null, html: string) => {
-    if (!container || !html) return;
+    if (!container || !html || html.trim() === '') return;
     
     container.innerHTML = '';
     const range = document.createRange();
@@ -83,21 +84,21 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
 const injectAds = () => {
     const ads = State.ads;
     
-    if (ads.pop) {
+    if (ads.pop && ads.pop.trim() !== '') {
         const div = document.createElement('div');
         document.body.appendChild(div);
         advancedInject(div, ads.pop);
     }
     
-    if (ads.social) {
+    if (ads.social && ads.social.trim() !== '') {
         const div = document.createElement('div');
         document.body.appendChild(div);
         advancedInject(div, ads.social);
     }
 
-    advancedInject(document.getElementById('ad-sidebar'), ads.banner1);
-    advancedInject(document.getElementById('ad-top'), ads.banner2);
-    advancedInject(document.getElementById('ad-native'), ads.native);
+    if (ads.banner1) advancedInject(document.getElementById('ad-sidebar'), ads.banner1);
+    if (ads.banner2) advancedInject(document.getElementById('ad-top'), ads.banner2);
+    if (ads.native) advancedInject(document.getElementById('ad-native'), ads.native);
 };
 
 (window as any).openAdmin = () => {
