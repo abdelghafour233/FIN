@@ -37,7 +37,8 @@ const showToast = (msg: string) => {
 (window as any).verifyDashboardPass = () => {
     const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
     if (input.value === State.dashboardPassword) {
-        showToast('تم الحفظ. أرباحك في ازدياد!');
+        showToast('تم حفظ الإعدادات بنجاح');
+        (window as any).toggleDashboard();
     } else {
         showToast('كلمة المرور غير صحيحة');
     }
@@ -55,7 +56,12 @@ const updateActivePreview = () => {
 
     mainImg.src = active.preview;
     if (nameEl) nameEl.innerText = active.name;
-    if (sizeEl) sizeEl.innerText = `الحجم: ${(active.originalSize/1024).toFixed(1)} KB ${active.processedSize ? ` ➔ ${(active.processedSize/1024).toFixed(1)} KB` : ''}`;
+    
+    const sizeText = active.processedSize 
+        ? `الحجم: ${(active.originalSize/1024).toFixed(1)} KB ➔ ${(active.processedSize/1024).toFixed(1)} KB` 
+        : `الحجم الأصلي: ${(active.originalSize/1024).toFixed(1)} KB`;
+    
+    if (sizeEl) sizeEl.innerText = sizeText;
     
     if (active.status === 'done' && downloadZone && downloadAnchor) {
         downloadZone.classList.remove('hidden');
@@ -66,6 +72,7 @@ const updateActivePreview = () => {
     }
 
     renderThumbs();
+    if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
 const renderThumbs = () => {
@@ -74,10 +81,10 @@ const renderThumbs = () => {
 
     list.innerHTML = State.files.map(f => `
         <div onclick="window.selectImage('${f.id}')" class="relative shrink-0 cursor-pointer group">
-            <img src="${f.preview}" class="w-16 h-16 object-cover rounded-xl border-2 transition-all ${State.selectedId === f.id ? 'border-brand-primary scale-105' : 'border-transparent opacity-60 hover:opacity-100'}">
+            <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.selectedId === f.id ? 'border-brand-primary scale-105 shadow-lg shadow-brand-primary/20' : 'border-transparent opacity-50 hover:opacity-100'}">
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
-    if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
 (window as any).selectImage = (id: string) => {
@@ -86,7 +93,7 @@ const renderThumbs = () => {
 };
 
 const processImage = async (item: ImageItem) => {
-    if (item.status === 'done' || item.status === 'processing') return;
+    if (item.status === 'processing') return;
 
     const loader = document.getElementById('processing-loader');
     if (loader) loader.style.display = 'flex';
@@ -98,7 +105,7 @@ const processImage = async (item: ImageItem) => {
     const format = (document.getElementById('format-select') as HTMLSelectElement).value || 'image/webp';
 
     try {
-        // تأخير وهمي لمدة 3 ثوانٍ لزيادة زمن بقاء المستخدم وعرض الإعلانات
+        // تأخير 3 ثوانٍ لزيادة زمن المشاهدة وتحسين أرباح الإعلانات
         await new Promise(resolve => setTimeout(resolve, 3000));
 
         const img = new Image();
@@ -116,11 +123,11 @@ const processImage = async (item: ImageItem) => {
             item.processedSize = blob.size;
             item.processedUrl = URL.createObjectURL(blob);
             item.status = 'done';
-            showToast('تمت المعالجة بنجاح! حمل صورتك الآن');
+            showToast('اكتملت المعالجة! يمكنك التحميل الآن');
         }
     } catch (e) {
         item.status = 'error';
-        showToast('حدث خطأ');
+        showToast('فشلت المعالجة، حاول مرة أخرى');
     } finally {
         if (loader) loader.style.display = 'none';
     }
@@ -138,6 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     input?.addEventListener('change', (e: any) => {
         const incoming = Array.from(e.target.files as FileList);
+        if (incoming.length === 0) return;
+
         incoming.forEach(file => {
             State.files.push({
                 id: Math.random().toString(36).substr(2, 9),
@@ -152,8 +161,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (!State.selectedId && State.files.length > 0) State.selectedId = State.files[0].id;
+        
         document.getElementById('upload-view')?.classList.add('hidden');
         document.getElementById('workspace-view')?.classList.remove('hidden');
+        
         updateActivePreview();
     });
 
@@ -168,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     downloadTriggerBtn?.addEventListener('click', () => {
-        (document.getElementById('final-download-link') as HTMLAnchorElement).click();
+        const link = document.getElementById('final-download-link') as HTMLAnchorElement;
+        if (link) link.click();
     });
 });
