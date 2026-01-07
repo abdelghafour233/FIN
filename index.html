@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>إيليت إيميج | معالجة الصور الاحترافية</title>
     
-    <!-- MONETAG SMART TAG - ACTIVE -->
+    <!-- MONETAG SMART TAG -->
     <script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,13 +37,12 @@
         .upload-zone:hover { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); }
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; min-height: 20px; }
-        .share-btn { @apply w-12 h-12 rounded-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-95 text-white shadow-lg; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .share-icon { @apply w-11 h-11 rounded-2xl flex items-center justify-center text-white transition-all hover:scale-110 active:scale-95 shadow-lg; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
 
-    <!-- حاوية الإعلانات الاحتياطية -->
     <div id="ad-global-container"></div>
 
     <nav class="fixed top-0 left-0 right-0 z-[100] glass px-6 py-4">
@@ -90,29 +89,33 @@
                         <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-dark flex items-center justify-center mb-6">
                             <img id="main-preview" class="max-w-full max-h-full object-contain">
                         </div>
-                        <div id="action-area" class="hidden flex flex-col items-center w-full">
-                            <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl w-full">
-                                <i data-lucide="download" class="w-7 h-7"></i>
-                                <span>تحميل الصورة المعالجة</span>
-                            </button>
+                        
+                        <!-- Action Area & Sharing -->
+                        <div class="flex flex-col items-center w-full">
+                            <div id="action-area" class="hidden w-full mb-8">
+                                <button id="download-btn" class="bg-brand-success text-white px-8 py-5 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl w-full">
+                                    <i data-lucide="download" class="w-7 h-7"></i>
+                                    <span>تحميل الصورة المعالجة</span>
+                                </button>
+                            </div>
 
-                            <!-- Social Media Share Section -->
-                            <div class="mt-8 pt-8 border-t border-slate-200 dark:border-white/5 w-full text-center">
-                                <p class="text-sm font-black text-slate-500 dark:text-slate-400 mb-6 uppercase tracking-widest">شارك الأداة مع أصدقائك</p>
+                            <!-- Social Sharing Section -->
+                            <div class="w-full pt-8 border-t border-slate-200 dark:border-white/5 text-center">
+                                <p class="text-xs font-black text-slate-400 dark:text-slate-500 mb-6 uppercase tracking-[0.2em]">مشاركة الموقع</p>
                                 <div class="flex flex-wrap justify-center gap-4">
-                                    <a href="#" id="share-whatsapp" target="_blank" class="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#25D366] text-white shadow-lg hover:scale-110 transition-transform">
+                                    <a href="#" id="share-whatsapp" target="_blank" class="share-icon bg-[#25D366]">
                                         <i data-lucide="message-circle" class="w-6 h-6"></i>
                                     </a>
-                                    <a href="#" id="share-facebook" target="_blank" class="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#1877F2] text-white shadow-lg hover:scale-110 transition-transform">
+                                    <a href="#" id="share-facebook" target="_blank" class="share-icon bg-[#1877F2]">
                                         <i data-lucide="facebook" class="w-6 h-6"></i>
                                     </a>
-                                    <a href="#" id="share-twitter" target="_blank" class="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#000000] text-white shadow-lg hover:scale-110 transition-transform">
+                                    <a href="#" id="share-twitter" target="_blank" class="share-icon bg-[#000000]">
                                         <i data-lucide="twitter" class="w-6 h-6"></i>
                                     </a>
-                                    <a href="#" id="share-telegram" target="_blank" class="w-12 h-12 rounded-2xl flex items-center justify-center bg-[#0088cc] text-white shadow-lg hover:scale-110 transition-transform">
+                                    <a href="#" id="share-telegram" target="_blank" class="share-icon bg-[#0088cc]">
                                         <i data-lucide="send" class="w-6 h-6"></i>
                                     </a>
-                                    <button onclick="window.copyLink()" class="w-12 h-12 rounded-2xl flex items-center justify-center bg-brand-primary text-white shadow-lg hover:scale-110 transition-transform">
+                                    <button onclick="window.copyLink()" class="share-icon bg-brand-primary">
                                         <i data-lucide="link" class="w-6 h-6"></i>
                                     </button>
                                 </div>
@@ -154,13 +157,13 @@
                 </div>
                 <div class="space-y-8">
                     <div class="p-6 bg-green-50 dark:bg-green-900/10 rounded-2xl border border-green-200 dark:border-green-800/20">
-                        <p class="text-sm font-bold text-green-600 dark:text-green-400">الإعلانات مفعلة حالياً باستخدام الكود الأساسي في الرأس (Head).</p>
+                        <p class="text-sm font-bold text-green-600 dark:text-green-400">نظام الإعلانات نشط حالياً.</p>
                     </div>
                     <div class="space-y-4">
                         <label class="block font-black text-lg">تعديل كود Monetag</label>
                         <textarea id="ad-smart" class="w-full h-48 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-6 font-mono text-sm outline-none focus:border-brand-primary transition-all shadow-inner" placeholder="ضع كود Monetag هنا..."></textarea>
                     </div>
-                    <button id="save-ads" class="w-full bg-brand-primary text-white py-6 rounded-2xl font-black text-xl shadow-2xl hover:scale-[1.01] active:scale-95 transition-all">حفظ وتنشيط الإعلانات</button>
+                    <button id="save-ads" class="w-full bg-brand-primary text-white py-6 rounded-2xl font-black text-xl shadow-2xl hover:scale-[1.01] transition-all">حفظ الإعدادات</button>
                 </div>
             </div>
         </section>
@@ -169,7 +172,7 @@
     <footer class="py-10 text-center border-t border-slate-200 dark:border-white/5">
         <p class="text-slate-400 text-sm mb-4 font-bold">© 2024 إيليت إيميج - جميع الحقوق محفوظة</p>
         <button onclick="window.openAdmin()" class="px-6 py-2 rounded-full border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 opacity-30 hover:opacity-100 transition-all">
-            <i data-lucide="settings" class="inline w-3 h-3 ml-1"></i> إدارة الإعلانات
+            <i data-lucide="settings" class="inline w-3 h-3 ml-1"></i> الإدارة
         </button>
     </footer>
 
