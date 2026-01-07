@@ -11,6 +11,8 @@ interface ImageFile {
 }
 
 const AD_PASSWORD = "admin";
+const DIRECT_LINK = "https://otieu.com/4/10428459";
+const SHARE_TEXT = "حوّل صورك واضغطها باحترافية مجاناً مع Elite Image! جرب الأداة الآن:";
 
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
@@ -78,13 +80,29 @@ const applyTheme = () => {
 };
 
 (window as any).copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    showToast('تم نسخ رابط الموقع!');
+    navigator.clipboard.writeText(DIRECT_LINK);
+    showToast('تم نسخ الرابط الربحي!');
+};
+
+(window as any).nativeShare = async () => {
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: 'Elite Image',
+                text: SHARE_TEXT,
+                url: DIRECT_LINK,
+            });
+        } catch (err) {
+            console.error('Error sharing:', err);
+        }
+    } else {
+        (window as any).copyLink();
+    }
 };
 
 const setupShareLinks = () => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("اكتشفت أداة رائعة لمعالجة الصور مجاناً وباحترافية! جربها الآن:");
+    const url = encodeURIComponent(DIRECT_LINK);
+    const text = encodeURIComponent(SHARE_TEXT);
     
     const wa = document.getElementById('share-whatsapp') as HTMLAnchorElement;
     if (wa) wa.href = `https://wa.me/?text=${text}%20${url}`;
@@ -209,6 +227,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
+            // Monetization: Open direct link in new tab when downloading
+            window.open(DIRECT_LINK, '_blank');
+            
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             const formatSelect = document.getElementById('f-select') as HTMLSelectElement;
             a.href = active.processedUrl;
