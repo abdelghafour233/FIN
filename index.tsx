@@ -33,7 +33,19 @@ const DEFAULT_ADS = {
 
 <!-- Adsterra Zone 4: 28310268 -->
 <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
-<div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>`,
+<div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
+
+<!-- Adsterra Zone 5 (Vertical): 28317448 -->
+<script type="text/javascript">
+  atOptions = {
+    'key' : 'deb441a26b7385b9111cbb19d72d8513',
+    'format' : 'iframe',
+    'height' : 300,
+    'width' : 160,
+    'params' : {}
+  };
+</script>
+<script type="text/javascript" src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>`,
 };
 
 const getSavedAds = () => {
