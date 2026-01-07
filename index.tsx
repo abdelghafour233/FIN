@@ -45,7 +45,11 @@ const DEFAULT_ADS = {
     'params' : {}
   };
 </script>
-<script type="text/javascript" src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>`,
+<script type="text/javascript" src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>
+
+<!-- Adsterra Zone 6 (Direct Link): 28325072 -->
+<!-- URL: https://bouncingbuzz.com/x93g7iqhij?key=7f6751f640538f788a6e6fa2e10591a8 -->
+<a href="https://bouncingbuzz.com/x93g7iqhij?key=7f6751f640538f788a6e6fa2e10591a8" target="_blank" style="display: block; width: 100%; background: linear-gradient(90deg, #f59e0b, #ef4444); color: white; text-align: center; padding: 15px; border-radius: 12px; font-weight: 900; text-decoration: none; margin: 10px 0;">اضغط هنا للحصول على العرض</a>`,
 };
 
 const getSavedAds = () => {
