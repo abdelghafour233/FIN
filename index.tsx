@@ -34,6 +34,21 @@ const showToast = (msg: string) => {
     }
 };
 
+(window as any).socialShare = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("اكتشفت أداة رائعة لمعالجة الصور بجودة 4K مجاناً! جرب StorImage Studio الآن:");
+    let shareUrl = "";
+
+    switch(platform) {
+        case 'whatsapp': shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`; break;
+        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+        case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`; break;
+        case 'telegram': shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; break;
+    }
+
+    if(shareUrl) window.open(shareUrl, '_blank');
+};
+
 (window as any).verifyDashboardPass = () => {
     const input = document.getElementById('dashboard-pass-input') as HTMLInputElement;
     if (input.value === State.dashboardPassword) {
@@ -105,7 +120,6 @@ const processImage = async (item: ImageItem) => {
     const format = (document.getElementById('format-select') as HTMLSelectElement).value || 'image/webp';
 
     try {
-        // تأخير 3 ثوانٍ لزيادة زمن المشاهدة وتحسين أرباح الإعلانات
         await new Promise(resolve => setTimeout(resolve, 3000));
 
         const img = new Image();

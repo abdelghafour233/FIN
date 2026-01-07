@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>StorImage Studio | معالجة الصور الاحترافية</title>
     
-    <!-- SocialBar_1 (أرباح عالية - تأكد من فلترة المحتوى من لوحة Adsterra) -->
+    <!-- SocialBar_1 (أرباح عالية) -->
     <script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -43,6 +43,13 @@
         .pulse-border { animation: pulse 2s infinite; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); } 70% { box-shadow: 0 0 0 20px rgba(59, 130, 246, 0); } 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); } }
         .hide-scroll::-webkit-scrollbar { display: none; }
+        
+        /* Social Buttons Styling */
+        .social-btn { @apply w-11 h-11 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 transition-all hover:scale-110 active:scale-95; }
+        .social-btn.whatsapp:hover { @apply bg-green-500 text-white border-green-400; }
+        .social-btn.facebook:hover { @apply bg-blue-600 text-white border-blue-500; }
+        .social-btn.twitter:hover { @apply bg-black text-white border-slate-700; }
+        .social-btn.telegram:hover { @apply bg-sky-500 text-white border-sky-400; }
     </style>
 </head>
 <body class="bg-brand-dark text-slate-100 min-h-screen">
@@ -71,7 +78,6 @@
                 <p class="text-slate-400 max-w-xl mx-auto text-lg">أداة سريعة ومجانية لرفع جودة صورك وتغيير صيغها.</p>
             </div>
 
-            <!-- إعلان علوي -->
             <div class="ad-container mb-12 p-2 flex justify-center">
                 <script type="text/javascript">
                     atOptions = { 'key' : '0295263cf4ed8d9e3a97b6a2490864ee', 'format' : 'iframe', 'height' : 250, 'width' : 300, 'params' : {} };
@@ -94,7 +100,6 @@
             <div class="lg:col-span-8 space-y-6">
                 <div class="bg-white/5 rounded-[2.5rem] p-6 border border-white/5 relative overflow-hidden">
                     
-                    <!-- واجهة المعالجة (Loader) -->
                     <div id="processing-loader" class="processing-overlay rounded-[2.5rem]">
                         <div class="w-16 h-16 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-6"></div>
                         <p class="text-xl font-black mb-4">جاري التحسين والضغط...</p>
@@ -105,32 +110,50 @@
                         <img id="main-preview-img" class="max-w-full max-h-full object-contain">
                     </div>
                     
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
                         <div class="overflow-hidden">
                             <h3 id="active-name" class="font-bold text-xl text-white truncate">اسم الملف</h3>
                             <p id="active-size" class="text-sm text-slate-500 font-bold mt-1">الحجم: 0 KB</p>
                         </div>
                         
-                        <!-- أزرار التحميل -->
-                        <div id="download-zone" class="hidden flex flex-col sm:flex-row gap-3">
-                            <a href="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js" target="_blank" class="direct-link-btn action-btn text-white px-6 py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:opacity-90 transition-all">
-                                <i data-lucide="zap" class="w-5 h-5"></i>
-                                تحميل سريع (Ads)
-                            </a>
-                            <button id="final-download-btn-trigger" class="bg-brand-success action-btn text-white px-6 py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-brand-success/20">
-                                <i data-lucide="download" class="w-5 h-5"></i>
-                                تحميل الصورة
-                            </button>
-                            <a id="final-download-link" class="hidden"></a>
+                        <!-- حاوية الأزرار مع قسم المشاركة -->
+                        <div id="download-zone" class="hidden flex flex-col gap-6 w-full md:w-auto">
+                            <div class="flex flex-col sm:flex-row gap-3">
+                                <a href="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js" target="_blank" class="direct-link-btn action-btn text-white px-6 py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:opacity-90 transition-all">
+                                    <i data-lucide="zap" class="w-5 h-5"></i>
+                                    تحميل سريع (Ads)
+                                </a>
+                                <button id="final-download-btn-trigger" class="bg-brand-success action-btn text-white px-6 py-4 rounded-2xl font-black flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-brand-success/20">
+                                    <i data-lucide="download" class="w-5 h-5"></i>
+                                    تحميل الصورة
+                                </button>
+                                <a id="final-download-link" class="hidden"></a>
+                            </div>
+
+                            <!-- أزرار مشاركة الموقع (Social Share) -->
+                            <div class="border-t border-white/10 pt-4">
+                                <p class="text-[10px] font-black text-slate-500 mb-3 text-center md:text-right uppercase tracking-wider">شارك الموقع مع أصدقائك</p>
+                                <div class="flex items-center justify-center md:justify-start gap-3">
+                                    <a href="#" onclick="window.socialShare('whatsapp')" class="social-btn whatsapp" title="واتساب">
+                                        <i data-lucide="message-circle" class="w-5 h-5"></i>
+                                    </a>
+                                    <a href="#" onclick="window.socialShare('facebook')" class="social-btn facebook" title="فيسبوك">
+                                        <i data-lucide="facebook" class="w-5 h-5"></i>
+                                    </a>
+                                    <a href="#" onclick="window.socialShare('twitter')" class="social-btn twitter" title="إكس / تويتر">
+                                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                                    </a>
+                                    <a href="#" onclick="window.socialShare('telegram')" class="social-btn telegram" title="تلغرام">
+                                        <i data-lucide="send" class="w-5 h-5"></i>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <!-- مصغرات الصور -->
                 <div id="thumbs-list" class="flex gap-4 overflow-x-auto pb-4 hide-scroll"></div>
             </div>
 
-            <!-- خيارات التحكم -->
             <div class="lg:col-span-4 space-y-6">
                 <div class="bg-white/5 rounded-[2.5rem] p-8 border border-white/5 action-btn">
                     <h3 class="font-black text-xl mb-8 text-white flex items-center gap-2">
@@ -159,7 +182,6 @@
                     </div>
                 </div>
 
-                <!-- إعلان جانبي -->
                 <div class="ad-container p-4">
                      <p class="text-[10px] text-center mb-4 text-slate-500 font-black">ADVERTISEMENT</p>
                      <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
@@ -168,7 +190,6 @@
             </div>
         </section>
         
-        <!-- إعلانات Native سفلية -->
         <section class="mt-20 py-10 border-t border-white/5">
             <h4 class="text-center text-xl font-black mb-10 text-slate-300">مواضيع قد تهمك</h4>
             <div class="ad-container p-6 min-h-[300px]">
@@ -182,7 +203,6 @@
         <p class="text-slate-500 font-bold text-sm">© 2024 StorImage Studio - معالجة سحابية آمنة</p>
     </footer>
 
-    <!-- لوحة التحكم -->
     <div id="dashboard-view" class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md items-center justify-center p-6" style="display:none;">
         <div class="bg-brand-card w-full max-w-lg rounded-[3rem] p-10 relative shadow-2xl border border-white/5">
             <button onclick="window.toggleDashboard()" class="absolute top-8 left-8 p-2 hover:bg-white/10 rounded-full transition-colors text-white">
@@ -198,7 +218,6 @@
         </div>
     </div>
 
-    <!-- التنبيهات -->
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none">
         <div class="bg-brand-card text-white px-8 py-4 rounded-2xl shadow-2xl border border-white/10 flex items-center gap-3">
             <i data-lucide="info" class="w-5 h-5 text-brand-primary"></i>
