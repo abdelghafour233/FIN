@@ -43,65 +43,72 @@ const applyTheme = () => {
 };
 
 /**
- * وظيفة متطورة لحقن الأكواد وتشغيل السكربتات
- * المتصفحات تمنع تشغيل السكربتات المضافة عبر innerHTML
+ * المحرك المطور لحقن الإعلانات
+ * يستخدم تقنية التنفيذ المباشر للسكربتات لضمان عمل Adsterra Banners
  */
-const runScriptsInElement = (element: HTMLElement, html: string) => {
-    if (!html) return;
+const advancedInject = (container: HTMLElement | null, html: string) => {
+    if (!container || !html) return;
     
-    // وضع المحتوى غير البرمجي أولاً
-    element.innerHTML = html;
+    // تنظيف الحاوية
+    container.innerHTML = '';
 
-    // البحث عن كافة وسوم السكربت وإعادة إنشائها يدوياً لتفعيلها
-    const scripts = element.getElementsByTagName('script');
-    for (let i = 0; i < scripts.length; i++) {
-        const oldScript = scripts[i];
+    // إنشاء قطعة ContextualFragment لتفكيك الكود
+    const range = document.createRange();
+    const fragment = range.createContextualFragment(html);
+    
+    // استخراج كافة السكربتات
+    const scripts = Array.from(fragment.querySelectorAll('script'));
+    
+    // إضافة العناصر غير البرمجية أولاً (مثل divs الإعلانات)
+    const nonScripts = Array.from(fragment.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+    nonScripts.forEach(node => container.appendChild(node.cloneNode(true)));
+
+    // إضافة وتشغيل السكربتات واحداً تلو الآخر
+    scripts.forEach(oldScript => {
         const newScript = document.createElement('script');
         
-        // نسخ كافة الخصائص (src, async, type, etc)
+        // نقل الخصائص
         Array.from(oldScript.attributes).forEach(attr => {
             newScript.setAttribute(attr.name, attr.value);
         });
-        
-        // نسخ المحتوى النصي (للسكربتات المباشرة)
-        newScript.textContent = oldScript.textContent;
-        
-        // حذف القديم وإضافة الجديد في الـ body لضمان التشغيل
-        document.body.appendChild(newScript);
-    }
+
+        // نقل المحتوى (مهم لتعريف المتغيرات مثل atOptions)
+        if (oldScript.innerHTML) {
+            newScript.innerHTML = oldScript.innerHTML;
+        }
+
+        // حقن السكربت في الحاوية (البنرات تحتاج أن تكون السكربتات بجانب الـ DIV الخاص بها)
+        container.appendChild(newScript);
+    });
 };
 
 const injectAds = () => {
     const ads = State.ads;
     
-    // حقن Pop-under و Social Bar (يتم تشغيلهم في الخلفية)
+    // حقن إعلانات الخلفية والشريط الاجتماعي في الـ Body
     if (ads.pop) {
-        const tempDiv = document.createElement('div');
-        runScriptsInElement(tempDiv, ads.pop);
+        const div = document.createElement('div');
+        div.style.display = 'none';
+        document.body.appendChild(div);
+        advancedInject(div, ads.pop);
     }
     
     if (ads.social) {
-        const tempDiv = document.createElement('div');
-        runScriptsInElement(tempDiv, ads.social);
+        const div = document.createElement('div');
+        div.style.display = 'none';
+        document.body.appendChild(div);
+        advancedInject(div, ads.social);
     }
 
     // حقن البنرات في أماكنها المخصصة
-    if (ads.banner1) {
-        const target = document.getElementById('ad-top');
-        if (target) runScriptsInElement(target, ads.banner1);
-    }
-    
-    if (ads.banner2) {
-        const target = document.getElementById('ad-sidebar');
-        if (target) runScriptsInElement(target, ads.banner2);
-    }
+    advancedInject(document.getElementById('ad-top'), ads.banner1);
+    advancedInject(document.getElementById('ad-sidebar'), ads.banner2);
 };
 
 (window as any).openAdmin = () => {
     const pass = prompt("الرجاء إدخال كلمة مرور لوحة التحكم:");
     if (pass === AD_PASSWORD) {
-        document.getElementById('upload-view')?.classList.add('hidden');
-        document.getElementById('workspace-view')?.classList.add('hidden');
+        document.getElementById('app-container')?.classList.add('hidden');
         document.getElementById('admin-view')?.classList.remove('hidden');
         
         (document.getElementById('ad-pop') as HTMLTextAreaElement).value = State.ads.pop || '';
@@ -109,7 +116,7 @@ const injectAds = () => {
         (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value = State.ads.banner1 || '';
         (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value = State.ads.banner2 || '';
         
-        showToast('مرحباً بك في لوحة التحكم');
+        showToast('لوحة التحكم جاهزة');
     } else if (pass !== null) {
         alert('كلمة مرور خاطئة!');
     }
@@ -117,7 +124,7 @@ const injectAds = () => {
 
 (window as any).share = (platform: 'whatsapp' | 'facebook' | 'x' | 'telegram') => {
     const url = window.location.href;
-    const text = "أنصحكم باستخدام Elite Image، أفضل أداة لمعالجة وتحويل الصور بجودة عالية ومجاناً! 🚀\n";
+    const text = "حوّل صورك باحترافية مع Elite Image مجاناً! 🚀\n";
     let shareUrl = "";
     switch (platform) {
         case 'whatsapp': shareUrl = `https://wa.me/?text=${encodeURIComponent(text + url)}`; break;
@@ -184,7 +191,9 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    injectAds(); 
+    
+    // تفعيل الإعلانات بعد تحميل الصفحة بـ 1 ثانية لضمان استقرار الـ DOM
+    setTimeout(injectAds, 1000);
 
     const input = document.getElementById('file-input') as HTMLInputElement;
     input?.addEventListener('change', (e: any) => {
@@ -227,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         State.ads = ads;
         localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم حفظ الإعلانات بنجاح! جاري التحديث...');
-        setTimeout(() => window.location.reload(), 1500);
+        showToast('تم الحفظ بنجاح! جاري التفعيل...');
+        setTimeout(() => window.location.reload(), 1000);
     });
 });
