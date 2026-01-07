@@ -10,10 +10,13 @@ interface ImageFile {
     status: 'idle' | 'processing' | 'done';
 }
 
+const AD_PASSWORD = "admin123"; // يمكنك تغيير كلمة المرور من هنا
+
 const State = {
     files: [] as ImageFile[],
     activeId: null as string | null,
-    theme: localStorage.getItem('elite-theme') || 'dark'
+    theme: localStorage.getItem('elite-theme') || 'dark',
+    ads: JSON.parse(localStorage.getItem('elite-ads') || '{}')
 };
 
 const showToast = (msg: string) => {
@@ -37,6 +40,65 @@ const applyTheme = () => {
     State.theme = State.theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('elite-theme', State.theme);
     applyTheme();
+};
+
+// وظيفة حقن الإعلانات
+const injectAds = () => {
+    const ads = State.ads;
+    
+    // حقن Pop-under و Social Bar في الـ head أو body
+    if (ads.pop) {
+        const div = document.createElement('div');
+        div.innerHTML = ads.pop;
+        const scripts = div.getElementsByTagName('script');
+        for (let s of Array.from(scripts)) {
+            const newS = document.createElement('script');
+            if (s.src) newS.src = s.src;
+            else newS.textContent = s.textContent;
+            document.body.appendChild(newS);
+        }
+    }
+
+    if (ads.social) {
+        const div = document.createElement('div');
+        div.innerHTML = ads.social;
+        const scripts = div.getElementsByTagName('script');
+        for (let s of Array.from(scripts)) {
+            const newS = document.createElement('script');
+            if (s.src) newS.src = s.src;
+            else newS.textContent = s.textContent;
+            document.body.appendChild(newS);
+        }
+    }
+
+    // حقن البنرات في أماكنها
+    if (ads.banner1) {
+        const el = document.getElementById('ad-top');
+        if (el) el.innerHTML = ads.banner1;
+    }
+    if (ads.banner2) {
+        const el = document.getElementById('ad-sidebar');
+        if (el) el.innerHTML = ads.banner2;
+    }
+};
+
+(window as any).openAdmin = () => {
+    const pass = prompt("الرجاء إدخال كلمة مرور لوحة التحكم:");
+    if (pass === AD_PASSWORD) {
+        document.getElementById('upload-view')?.classList.add('hidden');
+        document.getElementById('workspace-view')?.classList.add('hidden');
+        document.getElementById('admin-view')?.classList.remove('hidden');
+        
+        // تعبئة البيانات الحالية
+        (document.getElementById('ad-pop') as HTMLTextAreaElement).value = State.ads.pop || '';
+        (document.getElementById('ad-social') as HTMLTextAreaElement).value = State.ads.social || '';
+        (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value = State.ads.banner1 || '';
+        (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value = State.ads.banner2 || '';
+        
+        showToast('مرحباً بك في لوحة التحكم');
+    } else if (pass !== null) {
+        alert('كلمة مرور خاطئة!');
+    }
 };
 
 // وظيفة المشاركة الاجتماعية
@@ -137,6 +199,7 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
+    injectAds(); // تفعيل الإعلانات عند التحميل
 
     const input = document.getElementById('file-input') as HTMLInputElement;
     input?.addEventListener('change', (e: any) => {
@@ -174,5 +237,19 @@ document.addEventListener('DOMContentLoaded', () => {
             a.click();
             showToast('بدأ التحميل...');
         }
+    });
+
+    // حفظ الإعلانات
+    document.getElementById('save-ads')?.addEventListener('click', () => {
+        const ads = {
+            pop: (document.getElementById('ad-pop') as HTMLTextAreaElement).value,
+            social: (document.getElementById('ad-social') as HTMLTextAreaElement).value,
+            banner1: (document.getElementById('ad-banner-1') as HTMLTextAreaElement).value,
+            banner2: (document.getElementById('ad-banner-2') as HTMLTextAreaElement).value
+        };
+        State.ads = ads;
+        localStorage.setItem('elite-ads', JSON.stringify(ads));
+        showToast('تم حفظ الإعلانات بنجاح!');
+        setTimeout(() => window.location.reload(), 1000); // إعادة التحميل لتفعيل الأكواد الجديدة
     });
 });

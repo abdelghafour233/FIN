@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Elite Image | معالجة الصور الاحترافية</title>
     
-    <!-- الموقع الآن نظيف تماماً من أي أكواد إعلانية خارجية -->
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -40,6 +38,9 @@
         ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
         .social-btn { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease; }
         .social-btn:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
+        
+        /* Ad Slots Placeholder */
+        .ad-slot { min-height: 90px; width: 100%; display: flex; align-items: center; justify-content: center; margin: 1rem 0; overflow: hidden; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -59,6 +60,9 @@
     </nav>
 
     <main class="pt-28 px-4 max-w-6xl mx-auto pb-20">
+        <!-- Banner Ad Top -->
+        <div id="ad-top" class="ad-slot"></div>
+
         <!-- قسم الرفع -->
         <section id="upload-view" class="py-12">
             <div class="text-center mb-12">
@@ -148,6 +152,8 @@
                     </div>
                 </div>
                 
+                <div id="ad-sidebar" class="ad-slot"></div>
+
                 <div class="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10">
                     <h4 class="font-bold text-brand-primary mb-2 flex items-center gap-2 text-sm">
                         <i data-lucide="info" class="w-4 h-4"></i> تنبيه الأمان
@@ -156,7 +162,53 @@
                 </div>
             </div>
         </section>
+
+        <!-- لوحة التحكم (مخفية) -->
+        <section id="admin-view" class="hidden py-12">
+            <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-10">
+                    <h2 class="text-3xl font-black flex items-center gap-3">
+                        <i data-lucide="settings-2" class="w-8 h-8 text-brand-primary"></i>
+                        لوحة تحكم الإعلانات
+                    </h2>
+                    <button onclick="window.location.reload()" class="text-slate-500 hover:text-brand-primary transition-colors">
+                        <i data-lucide="x-circle" class="w-8 h-8"></i>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 gap-8">
+                    <div class="space-y-4">
+                        <label class="block font-bold text-lg">كود Pop-under (Adsterra)</label>
+                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold text-lg">كود Social Bar</label>
+                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <label class="block font-bold text-lg">كود بنر علوي (Top)</label>
+                            <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                        </div>
+                        <div class="space-y-4">
+                            <label class="block font-bold text-lg">كود بنر جانبي (Sidebar)</label>
+                            <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                        </div>
+                    </div>
+                    <button id="save-ads" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">
+                        حفظ الإعدادات وتفعيل الإعلانات
+                    </button>
+                </div>
+            </div>
+        </section>
     </main>
+
+    <footer class="py-10 text-center opacity-50 hover:opacity-100 transition-opacity">
+        <button onclick="window.openAdmin()" class="flex items-center gap-2 mx-auto text-xs font-bold text-slate-500">
+            <i data-lucide="lock" class="w-3 h-3"></i>
+            لوحة التحكم
+        </button>
+    </footer>
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
         <div class="bg-white dark:bg-brand-card px-8 py-4 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary" id="toast-msg"></div>
