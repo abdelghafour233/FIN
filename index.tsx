@@ -10,9 +10,9 @@ interface ImageFile {
     status: 'idle' | 'processing' | 'done';
 }
 
-const AD_PASSWORD = "admin"; // كلمة السر للوصول للإعدادات
+const AD_PASSWORD = "admin";
 
-// الكود الذي طلبته تم تثبيته كقيمة افتراضية هنا لضمان عمله دائماً
+// الكود الافتراضي (Smart Tag)
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
 };
@@ -33,20 +33,27 @@ const State = {
     ads: getSavedAds()
 };
 
-// وظيفة حقن الإعلانات - تتأكد من أن الكود موجود في الصفحة
+// وظيفة حقن الإعلانات المتقدمة
 const injectAds = () => {
     const ads = State.ads;
+    
+    // التحقق من وجود الكود في أي مكان بالصفحة (الرأس أو الجسم)
+    const isAlreadyPresent = document.querySelector('script[src*="10430766"]') || 
+                             document.body.innerHTML.includes('10430766') || 
+                             document.head.innerHTML.includes('10430766');
+
+    if (isAlreadyPresent) {
+        console.log("✅ Monetag System: Smart Tag detected and active.");
+        return;
+    }
+
+    // إذا لم يكن موجوداً، نقوم بحقنه في الحاوية المخصصة
     const container = document.getElementById('ad-global-container');
     if (container && ads.smart) {
-        // نتحقق من وجود المعرف الرقمي الخاص بك لضمان عدم تكرار الحقن
-        if (document.body.innerHTML.includes('10430766')) {
-            console.log("Monetag Ad Script is already active.");
-            return;
-        }
-        
         const range = document.createRange();
         const fragment = range.createContextualFragment(ads.smart);
         container.appendChild(fragment);
+        console.log("🚀 Monetag System: Smart Tag injected manually.");
     }
 };
 
@@ -129,10 +136,10 @@ const processActive = async () => {
             if (active.processedUrl) URL.revokeObjectURL(active.processedUrl);
             active.processedUrl = URL.createObjectURL(blob);
             active.status = 'done';
-            showToast('تمت معالجة الصورة بنجاح!');
+            showToast('تمت المعالجة بنجاح!');
         }
     } catch (e) {
-        showToast('حدث خطأ أثناء معالجة الصورة');
+        showToast('خطأ في المعالجة');
     } finally {
         if (overlay) overlay.style.display = 'none';
         updateUI();
@@ -140,14 +147,14 @@ const processActive = async () => {
 };
 
 (window as any).openAdmin = () => {
-    const pass = prompt("أدخل كلمة السر (admin):");
+    const pass = prompt("كلمة السر (admin):");
     if (pass === AD_PASSWORD) {
         document.getElementById('app-container')?.classList.add('hidden');
         document.getElementById('admin-view')?.classList.remove('hidden');
         const area = document.getElementById('ad-smart') as HTMLTextAreaElement;
         if (area) area.value = State.ads.smart;
     } else if (pass !== null) {
-        alert("كلمة سر خاطئة");
+        alert("خطأ!");
     }
 };
 
@@ -158,7 +165,7 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    // تفعيل الإعلانات فوراً
+    // تفعيل فوري للإعلانات
     injectAds();
 
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -198,7 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const smartValue = (document.getElementById('ad-smart') as HTMLTextAreaElement).value;
         State.ads.smart = smartValue;
         localStorage.setItem('elite-ads', JSON.stringify(State.ads));
-        showToast('تم حفظ وتحديث أكواد الإعلانات!');
-        setTimeout(() => window.location.reload(), 1000);
+        showToast('تم الحفظ وتنشيط الإعلانات الجديدة!');
+        setTimeout(() => window.location.reload(), 800);
     });
 });
