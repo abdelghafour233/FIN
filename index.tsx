@@ -12,8 +12,9 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// دعم تدوير الروابط المباشرة (Rotation) لزيادة أرباح Monetag
+// الإعدادات الافتراضية مع دعم الوسم الذكي الجديد
 const DEFAULT_ADS = {
+    smart: `<script src="https://quge5.com/88/tag.min.js" data-zone="199687" async data-cfasync="false"></script>`,
     pop: ``,
     direct: `https://otieu.com/4/10428459, https://otieu.com/4/10428641`,
     social: ``,
@@ -22,7 +23,6 @@ const DEFAULT_ADS = {
     native: ``
 };
 
-// حماية ضد البيانات التالفة في localStorage
 const getSavedAds = () => {
     try {
         const saved = localStorage.getItem('elite-ads');
@@ -39,7 +39,6 @@ const State = {
     ads: getSavedAds()
 };
 
-// وظيفة لاختيار رابط عشوائي من القائمة وفتحه في نافذة جديدة
 const triggerDirectLink = () => {
     if (State.ads.direct) {
         const links = State.ads.direct.split(',').map((l: string) => l.trim()).filter((l: string) => l.startsWith('http'));
@@ -74,8 +73,8 @@ const applyTheme = () => {
 };
 
 (window as any).share = (platform: string) => {
-    const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("ألقِ نظرة على Elite Image، أفضل أداة مجانية لمعالجة وتحويل الصور باحترافية!");
+    const url = encodeURIComponent(window.location.origin);
+    const text = encodeURIComponent("ألقِ نظرة على Elite Image، أفضل أداة مجانية لمعالجة وتحويل الصور باحترافية وسهولة!");
     
     let shareUrl = '';
     switch(platform) {
@@ -83,13 +82,15 @@ const applyTheme = () => {
         case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`; break;
         case 'whatsapp': shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`; break;
         case 'telegram': shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; break;
+        case 'pinterest': shareUrl = `https://pinterest.com/pin/create/button/?url=${url}&description=${text}`; break;
         case 'copy':
-            navigator.clipboard.writeText(window.location.href);
-            showToast('تم نسخ رابط الموقع!');
+            navigator.clipboard.writeText(window.location.origin).then(() => {
+                showToast('تم نسخ رابط الموقع بنجاح!');
+            });
             return;
     }
     
-    if (shareUrl) window.open(shareUrl, '_blank');
+    if (shareUrl) window.open(shareUrl, '_blank', 'width=600,height=400');
 };
 
 const advancedInject = (container: HTMLElement | null, html: string) => {
@@ -99,10 +100,14 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
     const fragment = range.createContextualFragment(html);
     const scripts = Array.from(fragment.querySelectorAll('script'));
     const nonScripts = Array.from(fragment.childNodes).filter(node => node.nodeName !== 'SCRIPT');
+    
     nonScripts.forEach(node => container.appendChild(node.cloneNode(true)));
+    
     scripts.forEach(oldScript => {
         const newScript = document.createElement('script');
-        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        Array.from(oldScript.attributes).forEach(attr => {
+            newScript.setAttribute(attr.name, attr.value);
+        });
         if (oldScript.innerHTML) newScript.innerHTML = oldScript.innerHTML;
         container.appendChild(newScript);
     });
@@ -110,6 +115,12 @@ const advancedInject = (container: HTMLElement | null, html: string) => {
 
 const injectAds = () => {
     const ads = State.ads;
+    
+    // حقن الوسم الذكي العام
+    if (ads.smart) {
+        advancedInject(document.getElementById('ad-global-container'), ads.smart);
+    }
+    
     if (ads.pop && ads.pop.trim() !== '') {
         const div = document.createElement('div');
         div.className = "monetag-pop";
@@ -127,7 +138,6 @@ const injectAds = () => {
     if (ads.native) advancedInject(document.getElementById('ad-native'), ads.native);
 };
 
-// إصلاح دالة فتح لوحة التحكم وتأمينها
 (window as any).openAdmin = () => {
     const pass = prompt("الرجاء إدخال كلمة مرور الإدارة:");
     if (pass === AD_PASSWORD) {
@@ -137,8 +147,8 @@ const injectAds = () => {
         if (appContainer) appContainer.classList.add('hidden');
         if (adminView) adminView.classList.remove('hidden');
         
-        // تعبئة الحقول بالبيانات الحالية
         const fields = {
+            'ad-smart': State.ads.smart,
             'ad-pop': State.ads.pop,
             'ad-direct': State.ads.direct,
             'ad-social': State.ads.social,
@@ -265,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('save-ads')?.addEventListener('click', () => {
         const ads = {
+            smart: (document.getElementById('ad-smart') as HTMLTextAreaElement).value,
             pop: (document.getElementById('ad-pop') as HTMLTextAreaElement).value,
             direct: (document.getElementById('ad-direct') as HTMLInputElement).value,
             social: (document.getElementById('ad-social') as HTMLTextAreaElement).value,

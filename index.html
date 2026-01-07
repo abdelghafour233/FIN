@@ -8,9 +8,6 @@
     <!-- Monetag Verification -->
     <meta name="monetag" content="a3ee7d0ba0217eccc65608ab9a142c05">
     
-    <!-- Monetag Smart Tag -->
-    <script src="https://quge5.com/88/tag.min.js" data-zone="199687" async data-cfasync="false"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -41,13 +38,12 @@
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; min-height: 50px; }
-        
-        /* تحسين أزرار المشاركة */
-        .share-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(45px, 1fr)); gap: 12px; width: 100%; max-width: 320px; }
         .share-btn { @apply w-12 h-12 rounded-2xl flex items-center justify-center text-white transition-all hover:scale-110 shadow-lg active:scale-95; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
+
+    <div id="ad-global-container"></div>
 
     <nav class="fixed top-0 left-0 right-0 z-[100] glass px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -101,25 +97,103 @@
                                 <span>تحميل الصورة المعالجة</span>
                             </button>
                             
-                            <!-- قسم المشاركة المحدث -->
                             <div class="mt-10 p-6 bg-slate-50 dark:bg-brand-dark/50 rounded-3xl border border-slate-200 dark:border-white/5 w-full text-center">
                                 <h4 class="text-sm font-black text-slate-500 mb-6 uppercase tracking-widest flex items-center justify-center gap-2">
                                     <i data-lucide="share-2" class="w-4 h-4"></i> مشاركة الموقع مع الأصدقاء
                                 </h4>
                                 <div class="flex flex-wrap justify-center gap-3">
-                                    <button onclick="window.share('facebook')" class="share-btn bg-[#1877F2]" title="فيسبوك">
-                                        <i data-lucide="facebook" class="w-6 h-6"></i>
-                                    </button>
-                                    <button onclick="window.share('twitter')" class="share-btn bg-[#000000]" title="X (تويتر)">
-                                        <i data-lucide="twitter" class="w-6 h-6"></i>
-                                    </button>
-                                    <button onclick="window.share('whatsapp')" class="share-btn bg-[#25D366]" title="واتساب">
-                                        <i data-lucide="message-circle" class="w-6 h-6"></i>
-                                    </button>
-                                    <button onclick="window.share('telegram')" class="share-btn bg-[#0088cc]" title="تليجرام">
-                                        <i data-lucide="send" class="w-6 h-6"></i>
-                                    </button>
-                                    <button onclick="window.share('pinterest')" class="share-btn bg-[#E60023]" title="بينتريست">
-                                        <i data-lucide="pin" class="w-6 h-6"></i>
-                                    </button>
-                                    <button onclick="window.share('copy')" class="share-btn
+                                    <button onclick="window.share('facebook')" class="share-btn bg-[#1877F2]" title="فيسبوك"><i data-lucide="facebook" class="w-6 h-6"></i></button>
+                                    <button onclick="window.share('twitter')" class="share-btn bg-[#000000]" title="X (تويتر)"><i data-lucide="twitter" class="w-6 h-6"></i></button>
+                                    <button onclick="window.share('whatsapp')" class="share-btn bg-[#25D366]" title="واتساب"><i data-lucide="message-circle" class="w-6 h-6"></i></button>
+                                    <button onclick="window.share('telegram')" class="share-btn bg-[#0088cc]" title="تليجرام"><i data-lucide="send" class="w-6 h-6"></i></button>
+                                    <button onclick="window.share('pinterest')" class="share-btn bg-[#E60023]" title="بينتريست"><i data-lucide="pin" class="w-6 h-6"></i></button>
+                                    <button onclick="window.share('copy')" class="share-btn bg-brand-primary" title="نسخ الرابط"><i data-lucide="copy" class="w-6 h-6"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="image-queue" class="flex gap-4 overflow-x-auto pb-4 no-scrollbar"></div>
+                </div>
+
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl">
+                        <h3 class="font-black text-xl mb-8 flex items-center gap-3"><i data-lucide="sliders" class="w-6 h-6 text-brand-primary"></i> الإعدادات</h3>
+                        <div class="space-y-8">
+                            <div>
+                                <div class="flex justify-between mb-4 text-sm font-bold"><span>جودة الضغط</span><span id="q-label" class="text-brand-primary">85%</span></div>
+                                <input type="range" id="q-slider" min="10" max="100" value="85" class="w-full accent-brand-primary h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold mb-4">تحويل إلى</label>
+                                <select id="f-select" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-bold outline-none">
+                                    <option value="image/webp">WebP</option>
+                                    <option value="image/jpeg">JPEG</option>
+                                    <option value="image/png">PNG</option>
+                                </select>
+                            </div>
+                            <button id="start-process" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">ابدأ المعالجة</button>
+                        </div>
+                    </div>
+                    <div id="ad-sidebar" class="ad-slot"></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Admin Section -->
+        <section id="admin-view" class="hidden py-12">
+            <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-10">
+                    <h2 class="text-3xl font-black flex items-center gap-3"><i data-lucide="shield-check" class="w-8 h-8 text-brand-primary"></i> إعدادات Monetag المتقدمة</h2>
+                    <button onclick="window.closeAdmin()" class="text-slate-500 hover:text-brand-primary"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4 md:col-span-2">
+                        <label class="block font-bold text-sm text-brand-primary">Smart Tag / Global Script (أكواد السكربت العامة)</label>
+                        <textarea id="ad-smart" placeholder="الصق كود Smart Tag هنا..." class="w-full h-24 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                    </div>
+                    <div class="space-y-4 md:col-span-2">
+                        <label class="block font-bold text-sm">Direct Link URLs (روابط التدوير مفصولة بفاصلة)</label>
+                        <input type="text" id="ad-direct" placeholder="https://link1.com, https://link2.com" class="w-full bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-colors">
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold text-sm">Popunder Tag</label>
+                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold text-sm">In-Page Push / Social</label>
+                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold text-sm">Vignette Banner (Left)</label>
+                        <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                    </div>
+                    <div class="space-y-4">
+                        <label class="block font-bold text-sm">Banner Ad (Top)</label>
+                        <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                    </div>
+                    <div class="space-y-4 md:col-span-2">
+                        <label class="block font-bold text-sm">Native / MultiTag</label>
+                        <textarea id="ad-banner-native" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-colors"></textarea>
+                    </div>
+                </div>
+                <button id="save-ads" class="mt-8 w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.01] active:scale-95 transition-all">تفعيل وحفظ التعديلات</button>
+            </div>
+        </section>
+        
+        <div id="ad-native" class="ad-slot"></div>
+    </main>
+
+    <footer class="py-10 text-center opacity-30">
+        <button onclick="window.openAdmin()" class="flex items-center gap-2 mx-auto text-xs font-bold text-slate-500 hover:opacity-100 transition-opacity">
+            <i data-lucide="lock" class="w-3 h-3"></i> إدارة النظام
+        </button>
+    </footer>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
+        <div class="bg-white dark:bg-brand-card px-8 py-4 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary" id="toast-msg"></div>
+    </div>
+
+    <script src="index.tsx" type="module"></script>
+    <a id="hidden-dl" class="hidden"></a>
+</body>
+</html>
