@@ -12,10 +12,10 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// تم تفريغ الأكواد تماماً لضمان العمل بنظام Monetag فقط
+// تم وضع الرابط المباشر الخاص بك كإعداد افتراضي
 const DEFAULT_ADS = {
     pop: ``,
-    direct: ``,
+    direct: `https://otieu.com/4/10428459`,
     social: ``,
     banner1: ``,
     banner2: ``,
@@ -30,6 +30,7 @@ const State = {
     ads: savedAds ? JSON.parse(savedAds) : DEFAULT_ADS
 };
 
+// وظيفة لفتح الرابط المباشر في نافذة جديدة
 const triggerDirectLink = () => {
     if (State.ads.direct && State.ads.direct.startsWith('http')) {
         window.open(State.ads.direct, '_blank');
@@ -150,7 +151,7 @@ const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     
-    // تفعيل Monetag Direct Link عند التفاعل
+    // تفعيل الرابط المباشر عند بدء المعالجة
     triggerDirectLink();
 
     const overlay = document.getElementById('processing-overlay');
@@ -205,6 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
+            // تفعيل الرابط المباشر عند التحميل لزيادة الأرباح
             triggerDirectLink();
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             a.href = active.processedUrl;
@@ -224,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         State.ads = ads;
         localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم التفعيل! جاري تحديث الموقع...');
+        showToast('تم التحديث! جاري إعادة التحميل...');
         setTimeout(() => window.location.reload(), 800);
     });
 });
