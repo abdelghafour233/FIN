@@ -12,7 +12,7 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin";
 
-// قائمة الروابط الربحية المحدثة (تم إضافة الروابط الجديدة)
+// الروابط الربحية الجديدة والمحدثة
 const REWARD_LINKS = [
     "https://otieu.com/4/10428459",
     "https://otieu.com/4/10430934",
@@ -20,13 +20,14 @@ const REWARD_LINKS = [
     "https://otieu.com/4/10428641"
 ];
 
-// وظيفة للحصول على رابط عشوائي من القائمة لتدوير الأرباح
+// اختيار رابط عشوائي عند كل تفاعل
 const getRandomLink = () => REWARD_LINKS[Math.floor(Math.random() * REWARD_LINKS.length)];
 
 const SHARE_TEXT = "أفضل أداة مجانية لمعالجة الصور وضغطها باحترافية! جربها الآن:";
 
 const DEFAULT_ADS = {
-    smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
+    smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>
+<script src="https://quge5.com/88/tag.min.js" data-zone="199698" async data-cfasync="false"></script>`,
 };
 
 const getSavedAds = () => {
@@ -47,9 +48,9 @@ const State = {
 
 const injectAds = () => {
     const ads = State.ads;
+    // التحقق من وجود الأكواد لتجنب التكرار
     const isAlreadyPresent = document.querySelector('script[src*="10430766"]') || 
-                             document.body.innerHTML.includes('10430766') || 
-                             document.head.innerHTML.includes('10430766');
+                             document.querySelector('script[src*="199698"]');
 
     if (isAlreadyPresent) return;
 
@@ -106,7 +107,6 @@ const applyTheme = () => {
 };
 
 const setupShareLinks = () => {
-    // تحديث الروابط في الواجهة عند كل تحميل/تغيير
     const refreshLinks = () => {
         const link = getRandomLink();
         const url = encodeURIComponent(link);
@@ -125,8 +125,7 @@ const setupShareLinks = () => {
         if (tg) tg.href = `https://t.me/share/url?url=${url}&text=${text}`;
     };
     refreshLinks();
-    // تغيير الرابط كل 10 ثواني لضمان التدوير
-    setInterval(refreshLinks, 10000);
+    setInterval(refreshLinks, 8000); // تدوير أسرع للروابط
 };
 
 const updateUI = () => {
@@ -233,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // فتح أحد الروابط الربحية عشوائياً عند الضغط على التحميل لزيادة الأرباح
+            // فتح رابط عشوائي عند التحميل لزيادة العائد
             window.open(getRandomLink(), '_blank');
             
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
