@@ -12,10 +12,10 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// تم وضع الرابط المباشر الخاص بك كإعداد افتراضي
+// دعم تدوير الروابط المباشرة (Rotation) لزيادة أرباح Monetag
 const DEFAULT_ADS = {
     pop: ``,
-    direct: `https://otieu.com/4/10428459`,
+    direct: `https://otieu.com/4/10428459, https://otieu.com/4/10428641`,
     social: ``,
     banner1: ``,
     banner2: ``,
@@ -30,10 +30,15 @@ const State = {
     ads: savedAds ? JSON.parse(savedAds) : DEFAULT_ADS
 };
 
-// وظيفة لفتح الرابط المباشر في نافذة جديدة
+// وظيفة لاختيار رابط عشوائي من القائمة وفتحه في نافذة جديدة
 const triggerDirectLink = () => {
-    if (State.ads.direct && State.ads.direct.startsWith('http')) {
-        window.open(State.ads.direct, '_blank');
+    if (State.ads.direct) {
+        // تقسيم الروابط عبر الفاصلة وتنظيف المسافات
+        const links = State.ads.direct.split(',').map((l: string) => l.trim()).filter((l: string) => l.startsWith('http'));
+        if (links.length > 0) {
+            const randomLink = links[Math.floor(Math.random() * links.length)];
+            window.open(randomLink, '_blank');
+        }
     }
 };
 
@@ -151,7 +156,7 @@ const processActive = async () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     
-    // تفعيل الرابط المباشر عند بدء المعالجة
+    // تفعيل أحد الروابط المباشرة عشوائياً عند بدء المعالجة
     triggerDirectLink();
 
     const overlay = document.getElementById('processing-overlay');
@@ -206,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('download-btn')?.addEventListener('click', () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (active?.processedUrl) {
-            // تفعيل الرابط المباشر عند التحميل لزيادة الأرباح
+            // تفعيل رابط مباشر عشوائي عند التحميل لزيادة الأرباح
             triggerDirectLink();
             const a = document.getElementById('hidden-dl') as HTMLAnchorElement;
             a.href = active.processedUrl;
