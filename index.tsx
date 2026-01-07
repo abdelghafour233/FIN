@@ -29,7 +29,11 @@ const DEFAULT_ADS = {
     'params' : {}
   };
 </script>
-<script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>`,
+<script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+
+<!-- Adsterra Zone 4: 28310268 -->
+<script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
+<div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>`,
 };
 
 const getSavedAds = () => {
