@@ -93,7 +93,7 @@ const updateUI = () => {
     const active = State.files.find(f => f.id === State.activeId);
     if (!active) return;
     const img = document.getElementById('main-preview') as HTMLImageElement;
-    if (img) img.src = active.preview;
+    if (img) img.src = active.processedUrl || active.preview;
     const actions = document.getElementById('action-area');
     if (active.status === 'done') actions?.classList.remove('hidden');
     else actions?.classList.add('hidden');
@@ -106,8 +106,10 @@ const renderQueue = () => {
     list.innerHTML = State.files.map(f => `
         <div onclick="window.setActive('${f.id}')" class="shrink-0 cursor-pointer relative">
             <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-110' : 'border-transparent opacity-50'}">
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-0.5 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
+    if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
 (window as any).setActive = (id: string) => {
@@ -130,6 +132,39 @@ const renderQueue = () => {
 (window as any).closeAdmin = () => {
     document.getElementById('admin-view')?.classList.add('hidden');
     document.getElementById('app-container')?.classList.remove('hidden');
+};
+
+const downloadImage = async (file: ImageFile) => {
+    if (!file.processedUrl) return;
+    const link = document.createElement('a');
+    link.href = file.processedUrl;
+    const extension = (document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1];
+    link.download = `${file.name.split('.')[0]}_elite.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+};
+
+const processImage = async (file: ImageFile) => {
+    return new Promise<string>((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return resolve(file.preview);
+            
+            ctx.drawImage(img, 0, 0);
+            
+            const quality = parseInt((document.getElementById('q-slider') as HTMLInputElement).value) / 100;
+            const format = (document.getElementById('f-select') as HTMLSelectElement).value;
+            
+            const dataUrl = canvas.toDataURL(format, quality);
+            resolve(dataUrl);
+        };
+        img.src = file.preview;
+    });
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -169,15 +204,28 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('start-process')?.addEventListener('click', async () => {
         const active = State.files.find(f => f.id === State.activeId);
         if (!active) return;
+        
         const overlay = document.getElementById('processing-overlay');
         if (overlay) overlay.style.display = 'flex';
         
-        setTimeout(() => {
+        try {
+            const processedDataUrl = await processImage(active);
             active.status = 'done';
-            active.processedUrl = active.preview;
+            active.processedUrl = processedDataUrl;
+            showToast('تمت معالجة الصورة بنجاح!');
+        } catch (err) {
+            console.error(err);
+            showToast('حدث خطأ أثناء المعالجة');
+        } finally {
             if (overlay) overlay.style.display = 'none';
             updateUI();
-            showToast('تمت معالجة الصورة بنجاح!');
-        }, 1500);
+        }
+    });
+
+    document.getElementById('download-btn')?.addEventListener('click', () => {
+        const active = State.files.find(f => f.id === State.activeId);
+        if (active && active.status === 'done') {
+            downloadImage(active);
+        }
     });
 });
