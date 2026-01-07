@@ -12,15 +12,8 @@ interface ImageFile {
 
 const AD_PASSWORD = "admin123";
 
-// تم تفريغ كافة الإعدادات الإعلانية الافتراضية
 const DEFAULT_ADS = {
-    smart: ``,
-    pop: ``,
-    direct: ``,
-    social: ``,
-    banner1: ``,
-    banner2: ``,
-    native: ``
+    smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
 };
 
 const getSavedAds = () => {
@@ -39,44 +32,17 @@ const State = {
     ads: getSavedAds()
 };
 
-// --- إزالة وظيفة triggerDirectLink تماماً لضمان عدم ظهور أي إعلانات منبثقة ---
-
-const advancedInject = (container: HTMLElement | null, html: string) => {
-    if (!container || !html || html.trim() === '') return;
-    container.innerHTML = '';
-    const range = document.createRange();
-    const fragment = range.createContextualFragment(html);
-    const scripts = Array.from(fragment.querySelectorAll('script'));
-    const nonScripts = Array.from(fragment.childNodes).filter(node => node.nodeName !== 'SCRIPT');
-    
-    nonScripts.forEach(node => container.appendChild(node.cloneNode(true)));
-    
-    scripts.forEach(oldScript => {
-        const newScript = document.createElement('script');
-        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
-        if (oldScript.innerHTML) newScript.innerHTML = oldScript.innerHTML;
-        container.appendChild(newScript);
-    });
-};
-
 const injectAds = () => {
     const ads = State.ads;
-    // يتم الحقن فقط إذا كان هناك محتوى فعلي مدخل من لوحة التحكم
-    if (ads.smart) advancedInject(document.getElementById('ad-global-container'), ads.smart);
-    if (ads.pop && ads.pop.trim() !== '') {
-        const div = document.createElement('div');
-        advancedInject(div, ads.pop);
-        document.body.appendChild(div);
+    const container = document.getElementById('ad-global-container');
+    if (container && ads.smart) {
+        container.innerHTML = '';
+        const range = document.createRange();
+        const fragment = range.createContextualFragment(ads.smart);
+        container.appendChild(fragment);
     }
-    if (ads.social && ads.social.trim() !== '') {
-        const div = document.createElement('div');
-        advancedInject(div, ads.social);
-        document.body.appendChild(div);
-    }
-    if (ads.native) advancedInject(document.getElementById('ad-native'), ads.native);
 };
 
-// --- وظائف الواجهة ---
 const showToast = (msg: string) => {
     const t = document.getElementById('toast');
     const m = document.getElementById('toast-msg');
@@ -98,28 +64,6 @@ const applyTheme = () => {
     State.theme = State.theme === 'dark' ? 'light' : 'dark';
     localStorage.setItem('elite-theme', State.theme);
     applyTheme();
-};
-
-(window as any).share = (platform: string) => {
-    const url = encodeURIComponent(window.location.origin);
-    const text = encodeURIComponent("اكتشف Elite Image، أفضل أداة مجانية لمعالجة وتحويل الصور باحترافية وسهولة!");
-    
-    let shareUrl = '';
-    switch(platform) {
-        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
-        case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`; break;
-        case 'whatsapp': shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`; break;
-        case 'telegram': shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; break;
-        case 'pinterest': shareUrl = `https://pinterest.com/pin/create/button/?url=${url}&description=${text}`; break;
-        case 'copy':
-            navigator.clipboard.writeText(window.location.origin).then(() => {
-                showToast('تم نسخ الرابط بنجاح!');
-            });
-            return;
-    }
-    if (shareUrl) {
-        window.open(shareUrl, '_blank', 'width=600,height=400');
-    }
 };
 
 const updateUI = () => {
@@ -186,21 +130,12 @@ const processActive = async () => {
 };
 
 (window as any).openAdmin = () => {
-    const pass = prompt("الرجاء إدخال كلمة مرور الإدارة:");
+    const pass = prompt("كلمة المرور:");
     if (pass === AD_PASSWORD) {
         document.getElementById('app-container')?.classList.add('hidden');
         document.getElementById('admin-view')?.classList.remove('hidden');
-        const fields = {
-            'ad-smart': State.ads.smart,
-            'ad-pop': State.ads.pop,
-            'ad-direct': State.ads.direct,
-            'ad-social': State.ads.social
-        };
-        Object.entries(fields).forEach(([id, value]) => {
-            const el = document.getElementById(id) as HTMLTextAreaElement;
-            if (el) el.value = value || '';
-        });
-    } else if (pass !== null) alert("كلمة مرور خاطئة");
+        (document.getElementById('ad-smart') as HTMLTextAreaElement).value = State.ads.smart;
+    }
 };
 
 (window as any).closeAdmin = () => {
@@ -208,10 +143,9 @@ const processActive = async () => {
     document.getElementById('app-container')?.classList.remove('hidden');
 };
 
-// --- التهيئة ---
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    setTimeout(injectAds, 500);
+    injectAds();
 
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
     fileInput?.addEventListener('change', (e: any) => {
@@ -247,16 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('save-ads')?.addEventListener('click', () => {
-        const ads = {
-            smart: (document.getElementById('ad-smart') as HTMLTextAreaElement).value,
-            pop: (document.getElementById('ad-pop') as HTMLTextAreaElement).value,
-            direct: (document.getElementById('ad-direct') as HTMLInputElement).value,
-            social: (document.getElementById('ad-social') as HTMLTextAreaElement).value,
-            banner1: '', banner2: '', native: ''
-        };
-        State.ads = ads;
-        localStorage.setItem('elite-ads', JSON.stringify(ads));
-        showToast('تم الحفظ بنجاح!');
-        setTimeout(() => window.location.reload(), 800);
+        const smart = (document.getElementById('ad-smart') as HTMLTextAreaElement).value;
+        State.ads.smart = smart;
+        localStorage.setItem('elite-ads', JSON.stringify(State.ads));
+        showToast('تم الحفظ!');
+        setTimeout(() => window.location.reload(), 500);
     });
 });
