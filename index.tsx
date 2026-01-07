@@ -10,23 +10,10 @@ interface ImageFile {
     status: 'idle' | 'processing' | 'done';
 }
 
-interface AppSettings {
-    socialBar: string;
-    directLink: string;
-    bannerTop: string;
-    bannerSide: string;
-}
-
 const State = {
     files: [] as ImageFile[],
     activeId: null as string | null,
-    theme: localStorage.getItem('elite-theme') || 'dark',
-    settings: JSON.parse(localStorage.getItem('elite-config') || JSON.stringify({
-        socialBar: 'https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js',
-        directLink: 'https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js',
-        bannerTop: '0295263cf4ed8d9e3a97b6a2490864ee',
-        bannerSide: ''
-    })) as AppSettings
+    theme: localStorage.getItem('elite-theme') || 'dark'
 };
 
 const showToast = (msg: string) => {
@@ -52,59 +39,19 @@ const applyTheme = () => {
     applyTheme();
 };
 
-(window as any).toggleDashboard = () => {
-    const p = document.getElementById('admin-panel');
-    if (p) {
-        const isHidden = p.classList.contains('hidden');
-        if (isHidden) {
-            p.classList.remove('hidden');
-            p.classList.add('flex');
-            (document.getElementById('cfg-social') as HTMLInputElement).value = State.settings.socialBar;
-            (document.getElementById('cfg-direct') as HTMLInputElement).value = State.settings.directLink;
-            (document.getElementById('cfg-banner-top') as HTMLInputElement).value = State.settings.bannerTop;
-            (document.getElementById('cfg-banner-side') as HTMLInputElement).value = State.settings.bannerSide;
-        } else {
-            p.classList.add('hidden');
-            p.classList.remove('flex');
-        }
-    }
-};
+const setupShareLinks = () => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("جرب Elite Image: أسرع موقع لمعالجة وضغط الصور أونلاين مجاناً! 🔥");
+    
+    const whatsapp = document.getElementById('share-whatsapp') as HTMLAnchorElement;
+    const facebook = document.getElementById('share-facebook') as HTMLAnchorElement;
+    const twitter = document.getElementById('share-twitter') as HTMLAnchorElement;
+    const telegram = document.getElementById('share-telegram') as HTMLAnchorElement;
 
-(window as any).saveConfig = () => {
-    State.settings = {
-        socialBar: (document.getElementById('cfg-social') as HTMLInputElement).value,
-        directLink: (document.getElementById('cfg-direct') as HTMLInputElement).value,
-        bannerTop: (document.getElementById('cfg-banner-top') as HTMLInputElement).value,
-        bannerSide: (document.getElementById('cfg-banner-side') as HTMLInputElement).value
-    };
-    localStorage.setItem('elite-config', JSON.stringify(State.settings));
-    showToast('تم حفظ التغييرات بنجاح');
-    setTimeout(() => window.location.reload(), 800);
-};
-
-const injectAds = () => {
-    if (State.settings.socialBar) {
-        const s = document.createElement('script');
-        s.type = 'text/javascript';
-        s.src = State.settings.socialBar;
-        document.head.appendChild(s);
-    }
-
-    const dl = document.getElementById('adsterra-direct-link') as HTMLAnchorElement;
-    if (dl) dl.href = State.settings.directLink || '#';
-
-    const topSlot = document.getElementById('ad-top-banner');
-    if (topSlot && State.settings.bannerTop) {
-        topSlot.innerHTML = '';
-        const scriptConfig = document.createElement('script');
-        scriptConfig.type = 'text/javascript';
-        scriptConfig.text = `atOptions = { 'key' : '${State.settings.bannerTop}', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {} };`;
-        topSlot.appendChild(scriptConfig);
-        const scriptInvoke = document.createElement('script');
-        scriptInvoke.type = 'text/javascript';
-        scriptInvoke.src = `//www.topcreativeformat.com/${State.settings.bannerTop}/invoke.js`;
-        topSlot.appendChild(scriptInvoke);
-    }
+    if(whatsapp) whatsapp.href = `https://wa.me/?text=${text}%20${url}`;
+    if(facebook) facebook.href = `https://facebook.com/sharer/sharer.php?u=${url}`;
+    if(twitter) twitter.href = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+    if(telegram) telegram.href = `https://t.me/share/url?url=${url}&text=${text}`;
 };
 
 const updateUI = () => {
@@ -114,21 +61,12 @@ const updateUI = () => {
     const img = document.getElementById('main-preview') as HTMLImageElement;
     img.src = active.preview;
     
-    const nameEl = document.getElementById('active-filename');
-    const infoEl = document.getElementById('active-info');
-    if (nameEl) nameEl.innerText = active.name;
-    if (infoEl) infoEl.innerText = `حجم الملف: ${(active.size/1024).toFixed(1)} KB`;
-    
     const actions = document.getElementById('action-area');
     if (active.status === 'done') {
         actions?.classList.remove('hidden');
-        actions?.classList.add('flex');
-        // تأكد من أن رابط التحميل المباشر محدث
-        const dl = document.getElementById('adsterra-direct-link') as HTMLAnchorElement;
-        if (dl) dl.href = State.settings.directLink || '#';
+        setupShareLinks();
     } else {
         actions?.classList.add('hidden');
-        actions?.classList.remove('flex');
     }
 
     renderQueue();
@@ -141,7 +79,7 @@ const renderQueue = () => {
     list.innerHTML = State.files.map(f => `
         <div onclick="window.setActive('${f.id}')" class="shrink-0 cursor-pointer relative group">
             <img src="${f.preview}" class="w-20 h-20 object-cover rounded-xl border-4 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-110 shadow-lg' : 'border-transparent opacity-60 hover:opacity-100'}">
-            ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1 rounded-full shadow-md"><i data-lucide="check" class="w-3 h-3 text-white"></i></div>' : ''}
+            ${f.status === 'done' ? '<div class="absolute -top-2 -right-2 bg-brand-success text-white p-1 rounded-full shadow-md"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
 };
@@ -162,7 +100,7 @@ const processActive = async () => {
     const format = (document.getElementById('f-select') as HTMLSelectElement).value;
 
     try {
-        await new Promise(r => setTimeout(r, 1200));
+        await new Promise(r => setTimeout(r, 1500)); // محاكاة المعالجة
         const img = new Image();
         img.src = active.preview;
         await new Promise(r => img.onload = r);
@@ -178,10 +116,10 @@ const processActive = async () => {
             if (active.processedUrl) URL.revokeObjectURL(active.processedUrl);
             active.processedUrl = URL.createObjectURL(blob);
             active.status = 'done';
-            showToast('اكتملت المعالجة! يمكنك التحميل الآن.');
+            showToast('تمت المعالجة بنجاح!');
         }
     } catch (e) {
-        showToast('فشلت المعالجة، يرجى المحاولة مرة أخرى');
+        showToast('خطأ أثناء المعالجة');
     } finally {
         if (overlay) overlay.style.display = 'none';
         updateUI();
@@ -190,7 +128,6 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
-    injectAds();
 
     const input = document.getElementById('file-input') as HTMLInputElement;
     input?.addEventListener('change', (e: any) => {
@@ -226,9 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             a.href = active.processedUrl;
             a.download = `Elite_${active.name.split('.')[0]}.${(document.getElementById('f-select') as HTMLSelectElement).value.split('/')[1]}`;
             a.click();
-            showToast('جاري بدء التحميل...');
-        } else {
-            showToast('يرجى بدء المعالجة أولاً');
+            showToast('بدء التحميل...');
         }
     });
 });
