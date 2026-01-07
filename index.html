@@ -39,8 +39,10 @@
         .social-btn { transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease; }
         .social-btn:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
         
-        /* Ad Slots Placeholder */
-        .ad-slot { min-height: 90px; width: 100%; display: flex; align-items: center; justify-content: center; margin: 1rem 0; overflow: hidden; }
+        /* تحسين مساحات الإعلانات */
+        .ad-slot { width: 100%; display: flex; align-items: center; justify-content: center; margin: 1.5rem 0; overflow: hidden; min-height: 50px; }
+        #ad-top { max-width: 728px; margin-left: auto; margin-right: auto; }
+        #ad-sidebar { max-width: 300px; min-height: 250px; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -60,7 +62,7 @@
     </nav>
 
     <main class="pt-28 px-4 max-w-6xl mx-auto pb-20">
-        <!-- Banner Ad Top -->
+        <!-- الإعلان العلوي -->
         <div id="ad-top" class="ad-slot"></div>
 
         <!-- قسم الرفع -->
@@ -152,6 +154,7 @@
                     </div>
                 </div>
                 
+                <!-- الإعلان الجانبي -->
                 <div id="ad-sidebar" class="ad-slot"></div>
 
                 <div class="p-6 bg-brand-primary/5 rounded-3xl border border-brand-primary/10">
@@ -163,7 +166,7 @@
             </div>
         </section>
 
-        <!-- لوحة التحكم (مخفية) -->
+        <!-- لوحة التحكم -->
         <section id="admin-view" class="hidden py-12">
             <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
                 <div class="flex items-center justify-between mb-10">
@@ -177,22 +180,26 @@
                 </div>
 
                 <div class="grid grid-cols-1 gap-8">
+                    <div class="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-900/50 rounded-2xl text-amber-800 dark:text-amber-400 text-sm">
+                        <i data-lucide="alert-triangle" class="inline-block w-4 h-4 mr-2"></i>
+                        تأكد من وضع كود الإعلان كاملاً (بما في ذلك وسوم &lt;script&gt;). سيقوم النظام بتشغيلها تلقائياً للزوار.
+                    </div>
                     <div class="space-y-4">
                         <label class="block font-bold text-lg">كود Pop-under (Adsterra)</label>
-                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                        <textarea id="ad-pop" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-all" placeholder="<script ...>"></textarea>
                     </div>
                     <div class="space-y-4">
                         <label class="block font-bold text-lg">كود Social Bar</label>
-                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                        <textarea id="ad-social" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-all" placeholder="<script ...>"></textarea>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-4">
                             <label class="block font-bold text-lg">كود بنر علوي (Top)</label>
-                            <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                            <textarea id="ad-banner-1" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-all" placeholder="<script ...>"></textarea>
                         </div>
                         <div class="space-y-4">
                             <label class="block font-bold text-lg">كود بنر جانبي (Sidebar)</label>
-                            <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-sm outline-none focus:border-brand-primary transition-all" placeholder="ضع الكود هنا..."></textarea>
+                            <textarea id="ad-banner-2" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none focus:border-brand-primary transition-all" placeholder="<script ...>"></textarea>
                         </div>
                     </div>
                     <button id="save-ads" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">
