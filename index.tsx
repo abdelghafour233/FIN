@@ -43,13 +43,20 @@ const showToast = (msg: string) => {
 
 const applyTheme = () => {
     const html = document.documentElement;
+    const icon = document.getElementById('theme-icon');
+    
     if (State.theme === 'dark') {
         html.classList.add('dark');
+        if (icon) icon.setAttribute('data-lucide', 'sun');
     } else {
         html.classList.remove('dark');
+        if (icon) icon.setAttribute('data-lucide', 'moon');
     }
-    // Re-trigger icons refresh for theme changes
-    if ((window as any).lucide) (window as any).lucide.createIcons();
+    
+    // إعادة إنشاء الأيقونات للتأكد من التغيير
+    if ((window as any).lucide) {
+        (window as any).lucide.createIcons();
+    }
 };
 
 (window as any).socialShare = (platform: string) => {
