@@ -10,8 +10,9 @@ interface ImageFile {
     status: 'idle' | 'processing' | 'done';
 }
 
-const AD_PASSWORD = "admin123";
+const AD_PASSWORD = "admin"; // كلمة السر للوصول للإعدادات
 
+// الكود الذي طلبته تم تثبيته كقيمة افتراضية هنا لضمان عمله دائماً
 const DEFAULT_ADS = {
     smart: `<script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>`,
 };
@@ -32,11 +33,17 @@ const State = {
     ads: getSavedAds()
 };
 
+// وظيفة حقن الإعلانات - تتأكد من أن الكود موجود في الصفحة
 const injectAds = () => {
     const ads = State.ads;
     const container = document.getElementById('ad-global-container');
     if (container && ads.smart) {
-        container.innerHTML = '';
+        // نتحقق من وجود المعرف الرقمي الخاص بك لضمان عدم تكرار الحقن
+        if (document.body.innerHTML.includes('10430766')) {
+            console.log("Monetag Ad Script is already active.");
+            return;
+        }
+        
         const range = document.createRange();
         const fragment = range.createContextualFragment(ads.smart);
         container.appendChild(fragment);
@@ -56,7 +63,10 @@ const showToast = (msg: string) => {
 const applyTheme = () => {
     document.documentElement.className = State.theme;
     const icon = document.getElementById('theme-icon');
-    if (icon) icon.setAttribute('data-lucide', State.theme === 'dark' ? 'sun' : 'moon');
+    if (icon) {
+        icon.setAttribute('data-lucide', State.theme === 'dark' ? 'sun' : 'moon');
+        icon.style.color = State.theme === 'dark' ? '#f59e0b' : '#3b82f6';
+    }
     if ((window as any).lucide) (window as any).lucide.createIcons();
 };
 
@@ -83,8 +93,8 @@ const renderQueue = () => {
     if (!list) return;
     list.innerHTML = State.files.map(f => `
         <div onclick="window.setActive('${f.id}')" class="shrink-0 cursor-pointer relative group">
-            <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-105 shadow-lg' : 'border-transparent opacity-60'}">
-            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
+            <img src="${f.preview}" class="w-20 h-20 object-cover rounded-2xl border-2 transition-all ${State.activeId === f.id ? 'border-brand-primary scale-110 shadow-xl' : 'border-transparent opacity-50'}">
+            ${f.status === 'done' ? '<div class="absolute -top-1 -right-1 bg-brand-success text-white p-1 rounded-full shadow-lg border-2 border-white dark:border-brand-dark"><i data-lucide="check" class="w-3 h-3"></i></div>' : ''}
         </div>
     `).join('');
 };
@@ -122,7 +132,7 @@ const processActive = async () => {
             showToast('تمت معالجة الصورة بنجاح!');
         }
     } catch (e) {
-        showToast('حدث خطأ أثناء المعالجة');
+        showToast('حدث خطأ أثناء معالجة الصورة');
     } finally {
         if (overlay) overlay.style.display = 'none';
         updateUI();
@@ -130,11 +140,14 @@ const processActive = async () => {
 };
 
 (window as any).openAdmin = () => {
-    const pass = prompt("كلمة المرور:");
+    const pass = prompt("أدخل كلمة السر (admin):");
     if (pass === AD_PASSWORD) {
         document.getElementById('app-container')?.classList.add('hidden');
         document.getElementById('admin-view')?.classList.remove('hidden');
-        (document.getElementById('ad-smart') as HTMLTextAreaElement).value = State.ads.smart;
+        const area = document.getElementById('ad-smart') as HTMLTextAreaElement;
+        if (area) area.value = State.ads.smart;
+    } else if (pass !== null) {
+        alert("كلمة سر خاطئة");
     }
 };
 
@@ -145,6 +158,7 @@ const processActive = async () => {
 
 document.addEventListener('DOMContentLoaded', () => {
     applyTheme();
+    // تفعيل الإعلانات فوراً
     injectAds();
 
     const fileInput = document.getElementById('file-input') as HTMLInputElement;
@@ -181,10 +195,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('save-ads')?.addEventListener('click', () => {
-        const smart = (document.getElementById('ad-smart') as HTMLTextAreaElement).value;
-        State.ads.smart = smart;
+        const smartValue = (document.getElementById('ad-smart') as HTMLTextAreaElement).value;
+        State.ads.smart = smartValue;
         localStorage.setItem('elite-ads', JSON.stringify(State.ads));
-        showToast('تم الحفظ!');
-        setTimeout(() => window.location.reload(), 500);
+        showToast('تم حفظ وتحديث أكواد الإعلانات!');
+        setTimeout(() => window.location.reload(), 1000);
     });
 });

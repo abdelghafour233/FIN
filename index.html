@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>إيليت إيميج | معالجة الصور الاحترافية</title>
     
-    <!-- Monetag Script -->
+    <!-- كود MONETAG الأساسي - يعمل تلقائياً عند تحميل الصفحة -->
     <script src="https://3nbf4.com/act/files/tag.min.js?z=10430766" data-cfasync="false" async></script>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,6 +42,7 @@
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
 
+    <!-- حاوية حقن إعلانات Monetag برمجياً -->
     <div id="ad-global-container"></div>
 
     <nav class="fixed top-0 left-0 right-0 z-[100] glass px-6 py-4">
@@ -60,11 +61,11 @@
 
     <main id="main-content" class="pt-28 px-4 max-w-6xl mx-auto pb-20">
         <div id="app-container">
-            <!-- Upload View -->
+            <!-- عرض الرفع -->
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
-                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl">أداة معالجة الصور الاحترافية، الآن مع دعم Monetag.</p>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl">أداة معالجة الصور الاحترافية والآمنة.</p>
                 </div>
 
                 <div class="upload-zone rounded-[3rem] p-16 md:p-24 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5" onclick="document.getElementById('file-input').click()">
@@ -73,11 +74,11 @@
                         <i data-lucide="upload-cloud" class="w-12 h-12"></i>
                     </div>
                     <p class="text-3xl font-black mb-3">اسحب الصور هنا أو اضغط للرفع</p>
-                    <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">أداء سريع وتحويل ذكي</p>
+                    <p class="text-slate-500 font-bold uppercase tracking-widest text-sm">أداء سريع ودعم فوري لجميع الصيغ</p>
                 </div>
             </section>
 
-            <!-- Workspace View -->
+            <!-- عرض منطقة العمل -->
             <section id="workspace-view" class="hidden py-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
                 <div class="lg:col-span-8 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-6 border border-slate-200 dark:border-white/5 relative overflow-hidden shadow-2xl">
@@ -117,38 +118,42 @@
                             <button id="start-process" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">ابدأ المعالجة</button>
                         </div>
                     </div>
+                    <!-- مساحة إعلانية تحت الإعدادات -->
+                    <div id="ad-sidebar" class="ad-slot"></div>
                 </div>
             </section>
         </div>
 
-        <!-- Admin Section -->
+        <!-- قسم الإدارة - MONETAG SETTINGS -->
         <section id="admin-view" class="hidden py-12">
             <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
                 <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black">إعدادات Monetag</h2>
-                    <button onclick="window.closeAdmin()" class="text-slate-500"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
+                    <h2 class="text-3xl font-black text-brand-primary">لوحة تحكم MONETAG</h2>
+                    <button onclick="window.closeAdmin()" class="text-slate-500 hover:text-red-500 transition-colors"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
                 </div>
-                <div class="space-y-6">
-                    <div class="space-y-4">
-                        <label class="block font-bold text-sm">Monetag / Ad Script</label>
-                        <textarea id="ad-smart" class="w-full h-32 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-4 font-mono text-xs outline-none" placeholder="أدخل الكود هنا"></textarea>
+                <div class="space-y-8">
+                    <div class="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-200 dark:border-blue-800/20">
+                        <p class="text-sm font-bold text-blue-600 dark:text-blue-400">كود الـ Smart Tag الحالي مفعل ويتم تحميله تلقائياً. يمكنك تعديله أو إضافة أكواد أخرى أدناه.</p>
                     </div>
-                    <button id="save-ads" class="w-full bg-brand-primary text-white py-5 rounded-2xl font-black text-xl shadow-xl">حفظ التغييرات</button>
+                    <div class="space-y-4">
+                        <label class="block font-black text-lg">كود إعلانات Monetag</label>
+                        <textarea id="ad-smart" class="w-full h-48 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-6 font-mono text-sm outline-none focus:border-brand-primary transition-all shadow-inner" placeholder="ضع كود <script> هنا..."></textarea>
+                    </div>
+                    <button id="save-ads" class="w-full bg-brand-primary text-white py-6 rounded-2xl font-black text-xl shadow-2xl hover:scale-[1.01] active:scale-95 transition-all">حفظ وتفعيل الأكواد</button>
                 </div>
             </div>
         </section>
-        
-        <div id="ad-native" class="ad-slot"></div>
     </main>
 
-    <footer class="py-10 text-center">
-        <button onclick="window.openAdmin()" class="text-xs font-bold text-slate-500 opacity-20 hover:opacity-100 transition-opacity">
-            <i data-lucide="lock" class="inline w-3 h-3 ml-1"></i> الإدارة
+    <footer class="py-10 text-center border-t border-slate-200 dark:border-white/5">
+        <p class="text-slate-400 text-sm mb-4 font-bold">© 2024 إيليت إيميج - جميع الحقوق محفوظة</p>
+        <button onclick="window.openAdmin()" class="px-6 py-2 rounded-full border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 opacity-30 hover:opacity-100 transition-all">
+            <i data-lucide="settings" class="inline w-3 h-3 ml-1"></i> الإعدادات البرمجية
         </button>
     </footer>
 
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[300] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
-        <div class="bg-white dark:bg-brand-card px-8 py-4 rounded-2xl shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary" id="toast-msg"></div>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[400] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none text-center">
+        <div class="bg-white dark:bg-brand-card px-10 py-5 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 font-black text-brand-primary text-lg" id="toast-msg"></div>
     </div>
 
     <script src="index.tsx" type="module"></script>
