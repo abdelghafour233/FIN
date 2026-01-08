@@ -1,4 +1,4 @@
-// Added export {} to define this file as a module and avoid global scope variable collisions
+// Define as module
 export {};
 
 interface FileItem {
@@ -38,8 +38,9 @@ const setupTheme = () => {
 
 const setupShareLogic = () => {
   (window as any).shareSite = (platform: string) => {
+    // Ad trigger context: Clicking these buttons also helps initialize ads
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("جرب أداة إيليت إيميج الرهيبة لضغط وتحويل الصور مجاناً! 🔥🚀");
+    const text = encodeURIComponent("جرب أداة إيليت إيميج لضغط وتحويل الصور مجاناً! أداة احترافية وآمنة 🔥🚀");
     
     let shareUrl = "";
     switch(platform) {
@@ -76,16 +77,16 @@ const setupEventListeners = () => {
   
   dropZone?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('scale-105', 'border-brand-primary');
+    dropZone.classList.add('border-brand-primary', 'scale-[1.02]');
   });
 
   dropZone?.addEventListener('dragleave', () => {
-    dropZone.classList.remove('scale-105', 'border-brand-primary');
+    dropZone.classList.remove('border-brand-primary', 'scale-[1.02]');
   });
 
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('scale-105', 'border-brand-primary');
+    dropZone.classList.remove('border-brand-primary', 'scale-[1.02]');
     if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
   });
 
@@ -157,22 +158,22 @@ const processAllImages = async () => {
     renderQueue();
   }
   
-  showToast('تمت معالجة جميع الصور! 🎉');
+  showToast('اكتملت معالجة الصور! ✨');
 };
 
 const updateUI = () => {
   const dropZone = document.getElementById('drop-zone');
-  const sharingSection = document.getElementById('sharing-section');
+  const shareArea = document.getElementById('share-area');
   const editorSection = document.getElementById('editor-section');
   
   if (files.length > 0) {
     dropZone?.classList.add('hidden');
-    sharingSection?.classList.add('hidden');
+    shareArea?.classList.add('hidden');
     editorSection?.classList.remove('hidden');
     renderQueue();
   } else {
     dropZone?.classList.remove('hidden');
-    sharingSection?.classList.remove('hidden');
+    shareArea?.classList.remove('hidden');
     editorSection?.classList.add('hidden');
   }
 };
@@ -204,37 +205,37 @@ const renderQueue = () => {
   if (!container) return;
 
   container.innerHTML = files.map(item => `
-    <div class="bg-white dark:bg-brand-card p-6 rounded-[2.5rem] flex items-center gap-6 shadow-2xl border border-slate-100 dark:border-white/5 animate-up">
-      <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shrink-0 shadow-xl border-4 border-slate-100 dark:border-slate-800">
+    <div class="bg-white dark:bg-brand-card p-4 rounded-3xl flex items-center gap-4 shadow-xl border border-slate-100 dark:border-white/5 animate-up">
+      <div class="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg border-2 border-slate-100 dark:border-slate-800">
         <img src="${item.preview}" class="w-full h-full object-cover">
         ${item.status === 'done' ? `
           <div class="absolute inset-0 bg-brand-success/20 flex items-center justify-center backdrop-blur-[2px]">
-            <i data-lucide="check-circle" class="w-10 h-10 text-brand-success"></i>
+            <i data-lucide="check" class="w-8 h-8 text-brand-success"></i>
           </div>
         ` : ''}
       </div>
       <div class="flex-grow overflow-hidden text-right">
-        <h4 class="text-lg font-black truncate mb-2">${item.file.name}</h4>
-        <div class="flex items-center justify-end gap-3 text-xs font-bold">
-            ${item.resultSize ? `<span class="px-3 py-1 rounded-full bg-brand-success/10 text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
-            <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
+        <h4 class="text-sm font-black truncate mb-1">${item.file.name}</h4>
+        <div class="flex items-center justify-end gap-2 text-[9px] font-bold">
+            ${item.resultSize ? `<span class="px-2 py-0.5 rounded-full bg-brand-success/10 text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
+            <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
         </div>
       </div>
       <div class="flex gap-2">
         ${item.status === 'done' ? `
-          <button onclick="window.downloadOne('${item.id}')" class="w-12 h-12 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg">
-            <i data-lucide="download" class="w-6 h-6"></i>
+          <button onclick="window.downloadOne('${item.id}')" class="w-10 h-10 bg-brand-success text-brand-dark rounded-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md">
+            <i data-lucide="download" class="w-5 h-5"></i>
           </button>
         ` : item.status === 'processing' ? `
-          <div class="w-12 h-12 text-brand-primary animate-spin flex items-center justify-center">
-            <i data-lucide="loader" class="w-7 h-7"></i>
+          <div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center">
+            <i data-lucide="loader" class="w-6 h-6"></i>
           </div>
         ` : `
-          <div class="w-12 h-12 text-slate-300 dark:text-slate-700 flex items-center justify-center">
-            <i data-lucide="clock" class="w-6 h-6"></i>
+          <div class="w-10 h-10 text-slate-300 dark:text-slate-700 flex items-center justify-center">
+            <i data-lucide="clock" class="w-5 h-5"></i>
           </div>
         `}
-        <button onclick="window.removeFile('${item.id}')" class="w-12 h-12 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+        <button onclick="window.removeFile('${item.id}')" class="w-10 h-10 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
           <i data-lucide="trash-2" class="w-5 h-5"></i>
         </button>
       </div>
