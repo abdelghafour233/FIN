@@ -17,6 +17,7 @@ const init = () => {
   setupEventListeners();
   initLucide();
   setupTheme();
+  setupShareLogic();
 };
 
 const initLucide = () => {
@@ -32,6 +33,35 @@ const setupTheme = () => {
       icon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
     }
     initLucide();
+  };
+};
+
+const setupShareLogic = () => {
+  (window as any).shareSite = (platform: string) => {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("جرب أداة إيليت إيميج لضغط الصور وتحويلها بجودة خرافية! 🔥");
+    
+    let shareUrl = "";
+    switch(platform) {
+      case 'facebook':
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+        break;
+      case 'whatsapp':
+        shareUrl = `https://api.whatsapp.com/send?text=${text}%20${url}`;
+        break;
+      case 'telegram':
+        shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
+        break;
+      case 'twitter':
+        shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+        break;
+      case 'copy':
+        navigator.clipboard.writeText(window.location.href);
+        showToast("تم نسخ الرابط بنجاح! 📋");
+        return;
+    }
+    
+    if (shareUrl) window.open(shareUrl, '_blank', 'width=600,height=400');
   };
 };
 
@@ -130,17 +160,17 @@ const processAllImages = async () => {
 
 const updateUI = () => {
   const dropZone = document.getElementById('drop-zone');
-  const socialGrid = document.getElementById('social-grid');
+  const shareGrid = document.getElementById('share-grid')?.parentElement;
   const editorSection = document.getElementById('editor-section');
   
   if (files.length > 0) {
     dropZone?.classList.add('hidden');
-    socialGrid?.classList.add('hidden');
+    shareGrid?.classList.add('hidden');
     editorSection?.classList.remove('hidden');
     renderQueue();
   } else {
     dropZone?.classList.remove('hidden');
-    socialGrid?.classList.remove('hidden');
+    shareGrid?.classList.remove('hidden');
     editorSection?.classList.add('hidden');
   }
 };
@@ -182,10 +212,10 @@ const renderQueue = () => {
         ` : ''}
       </div>
       <div class="flex-grow overflow-hidden">
-        <h4 class="text-lg font-black truncate mb-2">${item.file.name}</h4>
-        <div class="flex items-center gap-4 text-xs font-bold">
-            <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
+        <h4 class="text-lg font-black truncate mb-2 text-right">${item.file.name}</h4>
+        <div class="flex items-center justify-end gap-4 text-xs font-bold">
             ${item.resultSize ? `<span class="px-3 py-1 rounded-full bg-brand-success/10 text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
+            <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
         </div>
       </div>
       <div class="flex gap-3">

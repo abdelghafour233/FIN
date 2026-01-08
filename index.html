@@ -50,19 +50,18 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-up { animation: slideUp 0.5s ease-out forwards; }
         
-        .social-card { 
+        .share-card { 
             transition: all 0.3s ease; 
             background: rgba(255,255,255,0.03); 
             border: 1px solid rgba(255,255,255,0.05);
         }
-        .social-card:hover { transform: translateY(-3px); background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; }
+        .share-card:hover { transform: translateY(-5px); scale: 1.05; background: rgba(255,255,255,0.08); border-color: currentColor; }
         
-        /* Branded Colors */
-        .fb:hover { color: #1877F2; }
-        .tw:hover { color: #1DA1F2; }
-        .ig:hover { color: #E4405F; }
-        .yt:hover { color: #FF0000; }
-        .tg:hover { color: #0088cc; }
+        .fb-share:hover { color: #1877F2; }
+        .wa-share:hover { color: #25D366; }
+        .tg-share:hover { color: #0088cc; }
+        .tw-share:hover { color: #1DA1F2; }
+        .cp-share:hover { color: #3b82f6; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -82,8 +81,8 @@
         </div>
     </nav>
 
-    <main class="pt-32 px-4 max-w-5xl mx-auto pb-24">
-        <header class="text-center mb-16 animate-up">
+    <main class="pt-32 px-4 max-w-5xl mx-auto pb-24 text-center">
+        <header class="mb-16 animate-up">
             <span class="inline-block px-4 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary text-xs font-black uppercase tracking-widest mb-6">أداة مجانية 100%</span>
             <h2 class="text-5xl md:text-6xl font-black mb-6 leading-[1.1]">حوّل صورك إلى <span class="text-brand-primary">تحف فنية</span> مضغوطة</h2>
             <p class="text-slate-500 dark:text-slate-400 font-bold text-lg max-w-2xl mx-auto">
@@ -93,7 +92,7 @@
 
         <div id="upload-container" class="animate-up" style="animation-delay: 0.1s">
             <!-- Drop Zone -->
-            <div id="drop-zone" class="upload-zone rounded-[3rem] p-20 text-center cursor-pointer bg-white dark:bg-brand-card shadow-2xl mb-10">
+            <div id="drop-zone" class="upload-zone rounded-[3rem] p-20 text-center cursor-pointer bg-white dark:bg-brand-card shadow-2xl mb-12">
                 <input type="file" id="file-input" class="hidden" multiple accept="image/*">
                 <div class="w-28 h-28 bg-brand-primary/10 text-brand-primary rounded-[2rem] flex items-center justify-center mx-auto mb-10 shadow-inner">
                     <i data-lucide="upload-cloud" class="w-14 h-14"></i>
@@ -102,28 +101,31 @@
                 <p class="text-slate-400 font-bold text-lg">ندعم جميع الصيغ الشهيرة (JPG, PNG, WebP)</p>
             </div>
 
-            <!-- Social Media Cards Underneath -->
-            <div id="social-grid" class="grid grid-cols-5 gap-4 mb-16">
-                <a href="#" class="social-card fb rounded-2xl p-4 flex flex-col items-center gap-2 group">
-                    <i data-lucide="facebook" class="w-6 h-6 text-slate-400 group-hover:text-blue-600 transition-colors"></i>
-                    <span class="text-[10px] font-black uppercase text-slate-500">فيسبوك</span>
-                </a>
-                <a href="#" class="social-card tw rounded-2xl p-4 flex flex-col items-center gap-2 group">
-                    <i data-lucide="twitter" class="w-6 h-6 text-slate-400 group-hover:text-sky-400 transition-colors"></i>
-                    <span class="text-[10px] font-black uppercase text-slate-500">تويتر</span>
-                </a>
-                <a href="#" class="social-card ig rounded-2xl p-4 flex flex-col items-center gap-2 group">
-                    <i data-lucide="instagram" class="w-6 h-6 text-slate-400 group-hover:text-pink-500 transition-colors"></i>
-                    <span class="text-[10px] font-black uppercase text-slate-500">إنستا</span>
-                </a>
-                <a href="#" class="social-card tg rounded-2xl p-4 flex flex-col items-center gap-2 group">
-                    <i data-lucide="send" class="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
-                    <span class="text-[10px] font-black uppercase text-slate-500">تليجرام</span>
-                </a>
-                <a href="#" class="social-card yt rounded-2xl p-4 flex flex-col items-center gap-2 group">
-                    <i data-lucide="youtube" class="w-6 h-6 text-slate-400 group-hover:text-red-600 transition-colors"></i>
-                    <span class="text-[10px] font-black uppercase text-slate-500">يوتيوب</span>
-                </a>
+            <!-- Enhanced Social Sharing Section -->
+            <div class="mb-16">
+                <h4 class="text-sm font-black uppercase tracking-[0.2em] text-slate-500 mb-8">شارك الموقع مع أصدقائك لدعمنا ❤️</h4>
+                <div id="share-grid" class="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                    <button onclick="window.shareSite('facebook')" class="share-card fb-share rounded-2xl p-5 flex flex-col items-center gap-3 group">
+                        <i data-lucide="facebook" class="w-7 h-7 text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">فيسبوك</span>
+                    </button>
+                    <button onclick="window.shareSite('whatsapp')" class="share-card wa-share rounded-2xl p-5 flex flex-col items-center gap-3 group">
+                        <i data-lucide="message-circle" class="w-7 h-7 text-slate-400 group-hover:text-green-500 transition-colors"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">واتساب</span>
+                    </button>
+                    <button onclick="window.shareSite('telegram')" class="share-card tg-share rounded-2xl p-5 flex flex-col items-center gap-3 group">
+                        <i data-lucide="send" class="w-7 h-7 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">تليجرام</span>
+                    </button>
+                    <button onclick="window.shareSite('twitter')" class="share-card tw-share rounded-2xl p-5 flex flex-col items-center gap-3 group">
+                        <i data-lucide="twitter" class="w-7 h-7 text-slate-400 group-hover:text-sky-400 transition-colors"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">تويتر</span>
+                    </button>
+                    <button onclick="window.shareSite('copy')" class="share-card cp-share rounded-2xl p-5 flex flex-col items-center gap-3 group">
+                        <i data-lucide="copy" class="w-7 h-7 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+                        <span class="text-[11px] font-black uppercase tracking-wider">نسخ الرابط</span>
+                    </button>
+                </div>
             </div>
 
             <!-- Editor Section -->
@@ -183,9 +185,9 @@
                 </div>
             </div>
             
-            <div class="flex gap-10 text-sm font-black text-slate-400 uppercase tracking-widest">
-                <a href="#" class="hover:text-brand-primary transition-colors">سياسة الخصوصية</a>
-                <a href="#" class="hover:text-brand-primary transition-colors">شروط الخدمة</a>
+            <div class="flex gap-10 text-sm font-black text-slate-400 uppercase tracking-widest text-center">
+                <a href="#" class="hover:text-brand-primary transition-colors">الخصوصية</a>
+                <a href="#" class="hover:text-brand-primary transition-colors">الشروط</a>
                 <a href="#" class="hover:text-brand-primary transition-colors">اتصل بنا</a>
             </div>
 
@@ -194,7 +196,7 @@
     </footer>
 
     <!-- Success Toast -->
-    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[500] transition-all duration-700 translate-y-32 opacity-0 pointer-events-none">
+    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[500] transition-all duration-700 translate-y-32 opacity-0 pointer-events-none text-center">
         <div class="bg-brand-success text-brand-dark px-12 py-5 rounded-[2rem] shadow-[0_20px_50px_rgba(16,185,129,0.3)] font-black flex items-center gap-4">
             <div class="w-8 h-8 bg-brand-dark/10 rounded-full flex items-center justify-center">
                 <i data-lucide="check" class="w-5 h-5"></i>
