@@ -5,38 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>إيليت إيميج | معالجة الصور الاحترافية</title>
     
-    <!-- Adsterra Scripts -->
-    <!-- Zone 1 & 2 -->
-    <script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>
-    <script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>
-
-    <!-- Zone 3 (Banner 300x250) -->
-    <script type="text/javascript">
-      atOptions = {
-        'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-        'format' : 'iframe',
-        'height' : 250,
-        'width' : 300,
-        'params' : {}
-      };
-    </script>
-    <script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
-
-    <!-- Zone 4 -->
-    <script async="async" data-cfasync="false" src="https://bouncingbuzz.com/5391a99b621f7fabc01edf3b98c1b6e5/invoke.js"></script>
-
-    <!-- Zone 5 (Vertical 160x300) -->
-    <script type="text/javascript">
-      atOptions = {
-        'key' : 'deb441a26b7385b9111cbb19d72d8513',
-        'format' : 'iframe',
-        'height' : 300,
-        'width' : 160,
-        'params' : {}
-      };
-    </script>
-    <script type="text/javascript" src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -67,20 +35,11 @@
         .hidden { display: none !important; }
         .processing-loader { position: absolute; inset: 0; background: rgba(15, 23, 42, 0.95); z-index: 50; display: none; flex-direction: column; align-items: center; justify-content: center; }
         .btn-glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
-        .ad-link-btn { background: linear-gradient(90deg, #f59e0b, #ef4444); animation: pulse-ad 2s infinite; }
         .share-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .share-btn:hover { transform: translateY(-5px) scale(1.1); }
-        @keyframes pulse-ad {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
-
-    <!-- Global Ad Area -->
-    <div id="ad-global-container" class="flex justify-center py-4"></div>
 
     <nav class="fixed top-0 left-0 right-0 z-[100] glass px-6 py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
@@ -104,17 +63,8 @@
             <!-- Upload View -->
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
-                    <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary animate-pulse">باحترافية</span></h2>
-                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl font-bold">أداة معالجة الصور الاحترافية، سريعة، مجانية، ومدعومة بإعلانات آمنة.</p>
-                </div>
-
-                <!-- Ad Zone 4 & 6 -->
-                <div class="mb-12 flex flex-col items-center gap-6">
-                    <div id="container-5391a99b621f7fabc01edf3b98c1b6e5"></div>
-                    <a href="https://bouncingbuzz.com/x93g7iqhij?key=7f6751f640538f788a6e6fa2e10591a8" target="_blank" class="ad-link-btn px-12 py-5 rounded-2xl text-white font-black text-xl shadow-2xl flex items-center gap-3">
-                        <i data-lucide="sparkles"></i>
-                        عرض خاص: اكتشف المزيد الآن
-                    </a>
+                    <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl font-bold">أداة معالجة الصور الاحترافية، سريعة، مجانية، وبدون إعلانات مزعجة.</p>
                 </div>
 
                 <div class="upload-zone rounded-[3rem] p-16 md:p-24 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5" onclick="document.getElementById('file-input').click()">
@@ -123,6 +73,7 @@
                         <i data-lucide="upload-cloud" class="w-12 h-12"></i>
                     </div>
                     <p class="text-3xl font-black mb-3">اسحب الصور هنا أو اضغط للرفع</p>
+                    <p class="text-slate-400 font-bold italic">يدعم JPG, PNG, WebP</p>
                 </div>
             </section>
 
@@ -137,6 +88,7 @@
                         <div class="aspect-video relative rounded-2xl overflow-hidden bg-slate-100 dark:bg-brand-dark flex items-center justify-center mb-6">
                             <img id="main-preview" class="max-w-full max-h-full object-contain">
                         </div>
+                        
                         <div id="action-area" class="hidden">
                             <button id="download-btn" class="w-full bg-brand-success text-white py-6 rounded-2xl font-black flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-xl text-xl btn-glow mb-8">
                                 <i data-lucide="download" class="w-6 h-6"></i>
@@ -185,44 +137,13 @@
                             <button id="start-process" class="w-full bg-brand-primary text-white py-6 rounded-2xl font-black text-xl shadow-xl hover:scale-[1.02] transition-all">بدء المعالجة</button>
                         </div>
                     </div>
-                    <!-- Sidebar Ads -->
-                    <div class="flex flex-col items-center gap-6">
-                        <div id="sidebar-banner-container" class="flex justify-center"></div>
-                        
-                        <a href="https://bouncingbuzz.com/x93g7iqhij?key=7f6751f640538f788a6e6fa2e10591a8" target="_blank" class="ad-link-btn w-full py-4 rounded-xl text-white font-black text-center shadow-lg flex items-center justify-center gap-2">
-                            <i data-lucide="zap" class="w-5 h-5"></i>
-                            عرض خاص للمحترفين
-                        </a>
-
-                        <div id="vertical-ad-placeholder" class="flex justify-center"></div>
-                    </div>
                 </div>
             </section>
         </div>
-
-        <!-- Admin View -->
-        <section id="admin-view" class="hidden py-12">
-            <div class="bg-white dark:bg-brand-card rounded-[3rem] p-10 border border-slate-200 dark:border-white/10 shadow-2xl max-w-4xl mx-auto">
-                <div class="flex items-center justify-between mb-10">
-                    <h2 class="text-3xl font-black text-brand-primary">إدارة الإعلانات (6 مناطق)</h2>
-                    <button onclick="window.closeAdmin()" class="text-slate-500"><i data-lucide="x-circle" class="w-8 h-8"></i></button>
-                </div>
-                <div class="space-y-6">
-                    <div>
-                        <label class="block font-black text-lg mb-4">أكواد Adsterra النشطة</label>
-                        <textarea id="ad-smart" class="w-full h-80 bg-slate-50 dark:bg-brand-dark border border-slate-200 dark:border-white/10 rounded-2xl p-6 font-mono text-xs outline-none"></textarea>
-                    </div>
-                    <button id="save-ads" class="w-full bg-brand-primary text-white py-6 rounded-2xl font-black text-xl shadow-xl">حفظ كافة الإعلانات</button>
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer class="py-10 text-center border-t border-slate-200 dark:border-white/5">
-        <button onclick="window.openAdmin()" class="px-4 py-1 rounded-full border border-slate-200 dark:border-white/10 text-[10px] font-bold text-slate-500 hover:text-brand-primary transition-all">
-            <i data-lucide="settings" class="inline w-3 h-3 ml-1"></i> الإعدادات
-        </button>
-        <p class="mt-4 text-slate-500 text-[10px] font-bold">© 2024 إيليت إيميج. جميع الحقوق محفوظة</p>
+        <p class="text-slate-500 text-[12px] font-bold">© 2024 إيليت إيميج. جميع الحقوق محفوظة</p>
     </footer>
 
     <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[400] transition-all duration-500 translate-y-20 opacity-0 pointer-events-none">
