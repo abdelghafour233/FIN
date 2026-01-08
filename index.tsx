@@ -38,9 +38,8 @@ const setupTheme = () => {
 
 const setupShareLogic = () => {
   (window as any).shareSite = (platform: string) => {
-    // Ad trigger context: Clicking these buttons also helps initialize ads
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("جرب أداة إيليت إيميج لضغط وتحويل الصور مجاناً! أداة احترافية وآمنة 🔥🚀");
+    const text = encodeURIComponent("جرب أداة إيليت إيميج لضغط وتحويل الصور مجاناً وبأمان تام! 🚀");
     
     let shareUrl = "";
     switch(platform) {
