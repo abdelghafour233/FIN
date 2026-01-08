@@ -68,7 +68,6 @@ const setupEventListeners = () => {
   });
 
   processBtn?.addEventListener('click', () => {
-    // تفعيل إعلانات Monetag عند الضغط
     processAllImages();
   });
 };
@@ -126,19 +125,22 @@ const processAllImages = async () => {
     renderQueue();
   }
   
-  showToast('اكتملت معالجة الصور بنجاح!');
+  showToast('تمت معالجة الصور بنجاح!');
 };
 
 const updateUI = () => {
   const dropZone = document.getElementById('drop-zone');
+  const socialGrid = document.getElementById('social-grid');
   const editorSection = document.getElementById('editor-section');
   
   if (files.length > 0) {
     dropZone?.classList.add('hidden');
+    socialGrid?.classList.add('hidden');
     editorSection?.classList.remove('hidden');
     renderQueue();
   } else {
     dropZone?.classList.remove('hidden');
+    socialGrid?.classList.remove('hidden');
     editorSection?.classList.add('hidden');
   }
 };
@@ -156,10 +158,10 @@ const showToast = (msg: string) => {
   const m = document.getElementById('toast-msg');
   if (t && m) {
     m.innerText = msg;
-    t.classList.remove('translate-y-20', 'opacity-0');
+    t.classList.remove('translate-y-32', 'opacity-0');
     t.classList.add('translate-y-0', 'opacity-100');
     setTimeout(() => {
-      t.classList.add('translate-y-20', 'opacity-0');
+      t.classList.add('translate-y-32', 'opacity-0');
       t.classList.remove('translate-y-0', 'opacity-100');
     }, 3000);
   }
@@ -170,29 +172,38 @@ const renderQueue = () => {
   if (!container) return;
 
   container.innerHTML = files.map(item => `
-    <div class="bg-white dark:bg-brand-card p-4 rounded-3xl flex items-center gap-4 shadow-lg border border-slate-100 dark:border-white/5">
-      <div class="w-16 h-16 rounded-xl overflow-hidden shrink-0">
+    <div class="bg-white dark:bg-brand-card p-6 rounded-[2.5rem] flex items-center gap-6 shadow-2xl border border-slate-100 dark:border-white/5 animate-up">
+      <div class="relative w-24 h-24 rounded-3xl overflow-hidden shrink-0 shadow-xl border-4 border-slate-100 dark:border-slate-800">
         <img src="${item.preview}" class="w-full h-full object-cover">
-      </div>
-      <div class="flex-grow overflow-hidden">
-        <h4 class="text-sm font-black truncate">${item.file.name}</h4>
-        <div class="flex gap-3 text-[10px] font-bold mt-1">
-            <span class="text-slate-400">الأصل: ${formatSize(item.originalSize)}</span>
-            ${item.resultSize ? `<span class="text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
-        </div>
-      </div>
-      <div class="flex gap-2">
         ${item.status === 'done' ? `
-          <button onclick="window.downloadOne('${item.id}')" class="w-10 h-10 bg-brand-success text-white rounded-xl flex items-center justify-center hover:scale-110 transition-all shadow-lg">
-            <i data-lucide="download" class="w-5 h-5"></i>
-          </button>
-        ` : item.status === 'processing' ? `
-          <div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center">
-            <i data-lucide="loader" class="w-5 h-5"></i>
+          <div class="absolute inset-0 bg-brand-success/20 flex items-center justify-center backdrop-blur-[2px]">
+            <i data-lucide="check-circle" class="w-10 h-10 text-brand-success drop-shadow-lg"></i>
           </div>
         ` : ''}
-        <button onclick="window.removeFile('${item.id}')" class="w-10 h-10 text-slate-400 hover:text-red-500 transition-colors">
-          <i data-lucide="trash-2" class="w-5 h-5"></i>
+      </div>
+      <div class="flex-grow overflow-hidden">
+        <h4 class="text-lg font-black truncate mb-2">${item.file.name}</h4>
+        <div class="flex items-center gap-4 text-xs font-bold">
+            <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
+            ${item.resultSize ? `<span class="px-3 py-1 rounded-full bg-brand-success/10 text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
+        </div>
+      </div>
+      <div class="flex gap-3">
+        ${item.status === 'done' ? `
+          <button onclick="window.downloadOne('${item.id}')" class="w-14 h-14 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg">
+            <i data-lucide="download" class="w-7 h-7"></i>
+          </button>
+        ` : item.status === 'processing' ? `
+          <div class="w-14 h-14 text-brand-primary animate-spin flex items-center justify-center">
+            <i data-lucide="loader" class="w-8 h-8"></i>
+          </div>
+        ` : `
+          <div class="w-14 h-14 text-slate-300 dark:text-slate-700 flex items-center justify-center">
+            <i data-lucide="clock" class="w-7 h-7"></i>
+          </div>
+        `}
+        <button onclick="window.removeFile('${item.id}')" class="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+          <i data-lucide="trash-2" class="w-6 h-6"></i>
         </button>
       </div>
     </div>
@@ -207,7 +218,7 @@ const renderQueue = () => {
   const a = document.createElement('a');
   const ext = (document.getElementById('format-select') as HTMLSelectElement).value.split('/')[1];
   a.href = url;
-  a.download = `elite_${item.id}.${ext}`;
+  a.download = `elite_compressed_${item.id}.${ext}`;
   a.click();
   URL.revokeObjectURL(url);
 };
