@@ -39,7 +39,7 @@ const setupTheme = () => {
 const setupShareLogic = () => {
   (window as any).shareSite = (platform: string) => {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("جرب أداة إيليت إيميج لضغط الصور وتحويلها بجودة خرافية! 🔥");
+    const text = encodeURIComponent("جرب أداة إيليت إيميج الرهيبة لضغط وتحويل الصور مجاناً! 🔥🚀");
     
     let shareUrl = "";
     switch(platform) {
@@ -57,7 +57,7 @@ const setupShareLogic = () => {
         break;
       case 'copy':
         navigator.clipboard.writeText(window.location.href);
-        showToast("تم نسخ الرابط بنجاح! 📋");
+        showToast("تم نسخ رابط الموقع بنجاح! 📋");
         return;
     }
     
@@ -76,14 +76,16 @@ const setupEventListeners = () => {
   
   dropZone?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('active');
+    dropZone.classList.add('scale-105', 'border-brand-primary');
   });
 
-  dropZone?.addEventListener('dragleave', () => dropZone.classList.remove('active'));
+  dropZone?.addEventListener('dragleave', () => {
+    dropZone.classList.remove('scale-105', 'border-brand-primary');
+  });
 
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('active');
+    dropZone.classList.remove('scale-105', 'border-brand-primary');
     if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
   });
 
@@ -155,22 +157,22 @@ const processAllImages = async () => {
     renderQueue();
   }
   
-  showToast('تمت معالجة الصور بنجاح!');
+  showToast('تمت معالجة جميع الصور! 🎉');
 };
 
 const updateUI = () => {
   const dropZone = document.getElementById('drop-zone');
-  const shareGrid = document.getElementById('share-grid')?.parentElement;
+  const sharingSection = document.getElementById('sharing-section');
   const editorSection = document.getElementById('editor-section');
   
   if (files.length > 0) {
     dropZone?.classList.add('hidden');
-    shareGrid?.classList.add('hidden');
+    sharingSection?.classList.add('hidden');
     editorSection?.classList.remove('hidden');
     renderQueue();
   } else {
     dropZone?.classList.remove('hidden');
-    shareGrid?.classList.remove('hidden');
+    sharingSection?.classList.remove('hidden');
     editorSection?.classList.add('hidden');
   }
 };
@@ -203,37 +205,37 @@ const renderQueue = () => {
 
   container.innerHTML = files.map(item => `
     <div class="bg-white dark:bg-brand-card p-6 rounded-[2.5rem] flex items-center gap-6 shadow-2xl border border-slate-100 dark:border-white/5 animate-up">
-      <div class="relative w-24 h-24 rounded-3xl overflow-hidden shrink-0 shadow-xl border-4 border-slate-100 dark:border-slate-800">
+      <div class="relative w-20 h-20 md:w-24 md:h-24 rounded-3xl overflow-hidden shrink-0 shadow-xl border-4 border-slate-100 dark:border-slate-800">
         <img src="${item.preview}" class="w-full h-full object-cover">
         ${item.status === 'done' ? `
           <div class="absolute inset-0 bg-brand-success/20 flex items-center justify-center backdrop-blur-[2px]">
-            <i data-lucide="check-circle" class="w-10 h-10 text-brand-success drop-shadow-lg"></i>
+            <i data-lucide="check-circle" class="w-10 h-10 text-brand-success"></i>
           </div>
         ` : ''}
       </div>
-      <div class="flex-grow overflow-hidden">
-        <h4 class="text-lg font-black truncate mb-2 text-right">${item.file.name}</h4>
-        <div class="flex items-center justify-end gap-4 text-xs font-bold">
+      <div class="flex-grow overflow-hidden text-right">
+        <h4 class="text-lg font-black truncate mb-2">${item.file.name}</h4>
+        <div class="flex items-center justify-end gap-3 text-xs font-bold">
             ${item.resultSize ? `<span class="px-3 py-1 rounded-full bg-brand-success/10 text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
             <span class="px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
         </div>
       </div>
-      <div class="flex gap-3">
+      <div class="flex gap-2">
         ${item.status === 'done' ? `
-          <button onclick="window.downloadOne('${item.id}')" class="w-14 h-14 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg">
-            <i data-lucide="download" class="w-7 h-7"></i>
+          <button onclick="window.downloadOne('${item.id}')" class="w-12 h-12 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg">
+            <i data-lucide="download" class="w-6 h-6"></i>
           </button>
         ` : item.status === 'processing' ? `
-          <div class="w-14 h-14 text-brand-primary animate-spin flex items-center justify-center">
-            <i data-lucide="loader" class="w-8 h-8"></i>
+          <div class="w-12 h-12 text-brand-primary animate-spin flex items-center justify-center">
+            <i data-lucide="loader" class="w-7 h-7"></i>
           </div>
         ` : `
-          <div class="w-14 h-14 text-slate-300 dark:text-slate-700 flex items-center justify-center">
-            <i data-lucide="clock" class="w-7 h-7"></i>
+          <div class="w-12 h-12 text-slate-300 dark:text-slate-700 flex items-center justify-center">
+            <i data-lucide="clock" class="w-6 h-6"></i>
           </div>
         `}
-        <button onclick="window.removeFile('${item.id}')" class="w-14 h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-          <i data-lucide="trash-2" class="w-6 h-6"></i>
+        <button onclick="window.removeFile('${item.id}')" class="w-12 h-12 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
         </button>
       </div>
     </div>
@@ -248,7 +250,7 @@ const renderQueue = () => {
   const a = document.createElement('a');
   const ext = (document.getElementById('format-select') as HTMLSelectElement).value.split('/')[1];
   a.href = url;
-  a.download = `elite_compressed_${item.id}.${ext}`;
+  a.download = `elite_${item.id}.${ext}`;
   a.click();
   URL.revokeObjectURL(url);
 };
