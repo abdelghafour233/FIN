@@ -5,8 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>إيليت إيميج | معالجة الصور الاحترافية</title>
     
-    <!-- Monetag Ads -->
+    <!-- Monetag Ads Main Script -->
     <script src="https://otieu.com/4/10428641"></script>
+    
+    <!-- Script to ensure ad activation on user interaction -->
+    <script>
+        document.addEventListener('click', function() {
+            // هذا يساعد في تفعيل الإعلانات التي تتطلب تفاعل المستخدم (Pop-unders / Smart Links)
+            console.log('Ad script triggered by interaction');
+        }, { once: true });
+    </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
@@ -67,7 +75,7 @@
             <section id="upload-view" class="py-12">
                 <div class="text-center mb-12">
                     <h2 class="text-4xl md:text-6xl font-black mb-6">حوّل صورك <span class="text-brand-primary">باحترافية</span></h2>
-                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl font-bold">أداة معالجة الصور الاحترافية، سريعة، مجانية، وبدون إعلانات مزعجة.</p>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xl font-bold">أسرع أداة لمعالجة الصور وتغيير صيغها مجاناً.</p>
                 </div>
 
                 <div class="upload-zone rounded-[3rem] p-16 md:p-24 text-center group cursor-pointer bg-white dark:bg-white/5 shadow-2xl border-slate-200 dark:border-white/5" onclick="document.getElementById('file-input').click()">
@@ -98,7 +106,6 @@
                                 <span>تحميل الصورة المعدلة</span>
                             </button>
 
-                            <!-- Social Share Section -->
                             <div class="border-t border-slate-200 dark:border-white/10 pt-8 text-center">
                                 <p class="text-sm font-black text-slate-400 mb-6 uppercase tracking-widest">شارك الموقع مع أصدقائك</p>
                                 <div class="flex justify-center gap-4">
