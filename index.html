@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>إيليت إيميج | أداة ضغط الصور الاحترافية</title>
     
+    <!-- Monetag Global Zones Initialization -->
+    <script src="https://quge5.com/88/tag.min.js" data-zone="199698" async data-cfasync="false"></script>
+    <script src="https://quge5.com/88/tag.min.js" data-zone="199687" async data-cfasync="false"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -137,7 +141,7 @@
 
                         <div>
                             <label class="block text-sm font-black mb-4 text-slate-400 uppercase tracking-widest">صيغة الملف النهائي</label>
-                            <select id="format-select" class="w-full bg-slate-100 dark:bg-brand-dark rounded-2xl p-5 font-black border-none outline-none focus:ring-2 focus:ring-brand-primary transition-all">
+                            <select id="format-select" class="w-full bg-slate-100 dark:bg-brand-dark rounded-2xl p-5 font-black border-none occupancy-none focus:ring-2 focus:ring-brand-primary transition-all">
                                 <option value="image/webp">WebP (أفضل ضغط)</option>
                                 <option value="image/jpeg">JPEG (جودة عالية)</option>
                                 <option value="image/png">PNG (خلفية شفافة)</option>
@@ -182,11 +186,24 @@
         </div>
     </div>
 
-    <!-- Monetag Ads (Bottom Placement) -->
+    <!-- Monetag Ads Integration (Bottom Placement) -->
     <script data-cfasync="false" src="https://otieu.com/4/10428864"></script>
     <script data-cfasync="false" src="https://otieu.com/4/10430934"></script>
     <script data-cfasync="false" src="https://otieu.com/4/10428459"></script>
     <script data-cfasync="false" src="https://otieu.com/4/10428641"></script>
+
+    <!-- Ad Trigger Script: Ensures Monetag zones are activated on user interaction -->
+    <script>
+        (function() {
+            const triggerMonetag = () => {
+                // Dispatch a click event to ensure popunders/vignettes are permitted by the browser
+                window.dispatchEvent(new Event('click'));
+                console.log('Monetag: Ad Engine Activated');
+            };
+            document.addEventListener('click', triggerMonetag, { once: true });
+            document.addEventListener('touchstart', triggerMonetag, { once: true });
+        })();
+    </script>
 
     <script src="index.tsx" type="module"></script>
 </body>
