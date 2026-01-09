@@ -132,31 +132,32 @@
                 <p class="text-slate-400 font-bold text-sm md:text-lg">اضغط لرفع الملفات إلى storimage</p>
             </div>
 
-            <!-- Share Area -->
-            <div id="share-area" class="mb-12 md:mb-16 overflow-x-auto no-scrollbar">
+            <!-- Share Area Fix -->
+            <div id="share-area" class="mb-12 md:mb-16">
                 <div class="flex items-center justify-center gap-3 mb-6">
                     <div class="h-[1px] w-8 md:w-12 bg-slate-200 dark:bg-slate-800"></div>
                     <span class="text-[9px] md:text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] whitespace-nowrap">شارك storimage مع المطورين</span>
                     <div class="h-[1px] w-8 md:w-12 bg-slate-200 dark:bg-slate-800"></div>
                 </div>
-                <div class="flex md:grid md:grid-cols-5 gap-3 md:gap-4 max-w-3xl mx-auto px-2 justify-center">
-                    <button onclick="window.shareSite('facebook')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                <!-- Changed to Grid with responsive columns to ensure all buttons show -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 md:gap-4 max-w-3xl mx-auto px-2">
+                    <button onclick="window.shareSite('facebook')" class="share-btn rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
                         <i data-lucide="facebook" class="w-6 h-6 text-slate-400 group-hover:text-blue-600 transition-colors"></i>
                         <span class="text-[9px] font-black text-slate-500 uppercase">فيسبوك</span>
                     </button>
-                    <button onclick="window.shareSite('whatsapp')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                    <button onclick="window.shareSite('whatsapp')" class="share-btn rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
                         <i data-lucide="message-circle" class="w-6 h-6 text-slate-400 group-hover:text-green-500 transition-colors"></i>
                         <span class="text-[9px] font-black text-slate-500 uppercase">واتساب</span>
                     </button>
-                    <button onclick="window.shareSite('telegram')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                    <button onclick="window.shareSite('telegram')" class="share-btn rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
                         <i data-lucide="send" class="w-6 h-6 text-slate-400 group-hover:text-sky-400 transition-colors"></i>
                         <span class="text-[9px] font-black text-slate-500 uppercase">تليجرام</span>
                     </button>
-                    <button onclick="window.shareSite('twitter')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                    <button onclick="window.shareSite('twitter')" class="share-btn rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
                         <i data-lucide="twitter" class="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
                         <span class="text-[9px] font-black text-slate-500 uppercase">تويتر</span>
                     </button>
-                    <button onclick="window.shareSite('copy')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                    <button onclick="window.shareSite('copy')" class="share-btn rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
                         <i data-lucide="copy" class="w-6 h-6 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
                         <span class="text-[9px] font-black text-slate-500 uppercase">نسخ الرابط</span>
                     </button>
