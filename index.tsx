@@ -203,44 +203,74 @@ const renderQueue = () => {
   const container = document.getElementById('image-queue');
   if (!container) return;
 
-  container.innerHTML = files.map(item => `
-    <div class="bg-white dark:bg-brand-card p-4 rounded-3xl flex items-center gap-4 shadow-xl border border-slate-100 dark:border-white/5 animate-up">
-      <div class="relative w-16 h-16 md:w-20 md:h-20 rounded-2xl overflow-hidden shrink-0 shadow-lg border-2 border-slate-100 dark:border-slate-800">
-        <img src="${item.preview}" class="w-full h-full object-cover">
-        ${item.status === 'done' ? `
-          <div class="absolute inset-0 bg-brand-success/20 flex items-center justify-center backdrop-blur-[2px]">
-            <i data-lucide="check" class="w-8 h-8 text-brand-success"></i>
+  container.innerHTML = files.map(item => {
+    const savings = item.resultSize ? Math.round((1 - (item.resultSize / item.originalSize)) * 100) : 0;
+    
+    return `
+      <div class="bg-white dark:bg-brand-card p-5 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 shadow-xl border border-slate-100 dark:border-white/5 animate-up">
+        <!-- Image Preview (Larger) -->
+        <div class="relative w-full md:w-32 h-40 md:h-32 rounded-3xl overflow-hidden shrink-0 shadow-lg border border-slate-100 dark:border-slate-800">
+          <img src="${item.preview}" class="w-full h-full object-cover">
+          ${item.status === 'done' ? `
+            <div class="absolute inset-0 bg-brand-success/30 flex items-center justify-center backdrop-blur-[2px]">
+              <i data-lucide="check" class="w-10 h-10 text-white drop-shadow-lg"></i>
+            </div>
+          ` : ''}
+          ${item.status === 'processing' ? `
+            <div class="absolute inset-0 bg-brand-primary/20 flex items-center justify-center backdrop-blur-[2px]">
+              <div class="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Info Section -->
+        <div class="flex-grow text-center md:text-right w-full">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
+             <h4 class="text-lg font-black truncate max-w-[250px]">${item.file.name}</h4>
+             ${item.status === 'done' ? `
+               <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-success/10 text-brand-success text-[10px] font-black rounded-full self-center md:self-auto">
+                 <i data-lucide="trending-down" class="w-3 h-3"></i>
+                 تم توفير ${savings}%
+               </span>
+             ` : ''}
           </div>
-        ` : ''}
-      </div>
-      <div class="flex-grow overflow-hidden text-right">
-        <h4 class="text-sm font-black truncate mb-1">${item.file.name}</h4>
-        <div class="flex items-center justify-end gap-2 text-[9px] font-bold">
-            ${item.resultSize ? `<span class="px-2 py-0.5 rounded-full bg-brand-success/10 text-brand-success">الجديد: ${formatSize(item.resultSize)}</span>` : ''}
-            <span class="px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500">الأصلي: ${formatSize(item.originalSize)}</span>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-slate-50 dark:bg-brand-dark/50 p-3 rounded-2xl border border-slate-100 dark:border-white/5">
+              <span class="block text-[10px] text-slate-400 font-black mb-1">الحجم الأصلي</span>
+              <span class="text-sm font-bold text-slate-600 dark:text-slate-300">${formatSize(item.originalSize)}</span>
+            </div>
+            <div class="bg-slate-50 dark:bg-brand-dark/50 p-3 rounded-2xl border border-slate-100 dark:border-white/5">
+              <span class="block text-[10px] text-slate-400 font-black mb-1">الحجم الحالي</span>
+              <span class="text-sm font-bold ${item.resultSize ? 'text-brand-primary' : 'text-slate-400'}">${item.resultSize ? formatSize(item.resultSize) : '--'}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-row md:flex-col gap-3 shrink-0">
+          ${item.status === 'done' ? `
+            <button onclick="window.downloadOne('${item.id}')" class="w-14 h-14 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg group">
+              <i data-lucide="download" class="w-7 h-7 group-hover:animate-bounce"></i>
+            </button>
+          ` : `
+            <button onclick="window.processOne('${item.id}')" ${item.status === 'processing' ? 'disabled' : ''} class="w-14 h-14 ${item.status === 'processing' ? 'bg-slate-100 text-slate-300' : 'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white'} rounded-2xl flex items-center justify-center transition-all">
+              <i data-lucide="play" class="w-6 h-6"></i>
+            </button>
+          `}
+          <button onclick="window.removeFile('${item.id}')" class="w-14 h-14 bg-red-500/5 text-red-400 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
+            <i data-lucide="trash-2" class="w-6 h-6"></i>
+          </button>
         </div>
       </div>
-      <div class="flex gap-2">
-        ${item.status === 'done' ? `
-          <button onclick="window.downloadOne('${item.id}')" class="w-10 h-10 bg-brand-success text-brand-dark rounded-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-md">
-            <i data-lucide="download" class="w-5 h-5"></i>
-          </button>
-        ` : item.status === 'processing' ? `
-          <div class="w-10 h-10 text-brand-primary animate-spin flex items-center justify-center">
-            <i data-lucide="loader" class="w-6 h-6"></i>
-          </div>
-        ` : `
-          <div class="w-10 h-10 text-slate-300 dark:text-slate-700 flex items-center justify-center">
-            <i data-lucide="clock" class="w-5 h-5"></i>
-          </div>
-        `}
-        <button onclick="window.removeFile('${item.id}')" class="w-10 h-10 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-          <i data-lucide="trash-2" class="w-5 h-5"></i>
-        </button>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
   initLucide();
+};
+
+(window as any).processOne = (id: string) => {
+    const item = files.find(f => f.id === id);
+    if(item) processImage(item);
 };
 
 (window as any).downloadOne = (id: string) => {
@@ -248,7 +278,8 @@ const renderQueue = () => {
   if (!item || !item.resultBlob) return;
   const url = URL.createObjectURL(item.resultBlob);
   const a = document.createElement('a');
-  const ext = (document.getElementById('format-select') as HTMLSelectElement).value.split('/')[1];
+  const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
+  const ext = formatSelect.value.split('/')[1];
   a.href = url;
   a.download = `elite_${item.id}.${ext}`;
   a.click();
