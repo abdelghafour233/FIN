@@ -27,7 +27,7 @@
         }
     </script>
     <style>
-        body { font-family: 'Cairo', sans-serif; transition: background 0.4s; overflow-x: hidden; }
+        body { font-family: 'Cairo', sans-serif; transition: background 0.4s; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.05); }
         .upload-zone { border: 2px dashed rgba(59, 130, 246, 0.3); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); background: rgba(255,255,255,0.02); }
         .upload-zone:hover { border-color: #3b82f6; transform: translateY(-5px); box-shadow: 0 25px 50px -12px rgba(59, 130, 246, 0.25); background: rgba(255,255,255,0.04); }
@@ -40,120 +40,125 @@
         }
         .share-btn:hover { transform: translateY(-3px); background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; }
         
-        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-up { animation: slideUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-up { animation: slideUp 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 20px;
-            width: 20px;
+            height: 24px;
+            width: 24px;
             border-radius: 50%;
             background: #3b82f6;
             cursor: pointer;
             box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-            margin-top: -6px;
+            border: 3px solid #020617;
+        }
+        
+        /* Mobile scroll behavior */
+        @media (max-width: 1024px) {
+            .sticky-settings { position: relative; top: 0 !important; }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
+<body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen selection:bg-brand-primary/30">
 
-    <nav class="fixed top-0 left-0 right-0 z-[100] glass px-6 py-4">
+    <nav class="fixed top-0 left-0 right-0 z-[100] glass px-4 py-3 md:px-6 md:py-4">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.reload()">
-                <div class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-2xl rotate-3">
-                    <i data-lucide="image" class="w-6 h-6"></i>
+            <div class="flex items-center gap-2 md:gap-3 cursor-pointer" onclick="window.location.reload()">
+                <div class="w-8 h-8 md:w-10 md:h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-lg rotate-3">
+                    <i data-lucide="image" class="w-5 h-5 md:w-6 md:h-6"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-tighter">إيليت<span class="text-brand-primary">إيميج</span></h1>
+                <h1 class="text-xl md:text-2xl font-black tracking-tighter">إيليت<span class="text-brand-primary">إيميج</span></h1>
             </div>
             
-            <button onclick="window.toggleTheme()" class="w-11 h-11 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 transition-all border border-white/5">
+            <button onclick="window.toggleTheme()" class="w-10 h-10 md:w-11 md:h-11 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 transition-all border border-white/5 active:scale-90">
                 <i id="theme-icon" data-lucide="sun" class="w-5 h-5 text-amber-500"></i>
             </button>
         </div>
     </nav>
 
-    <main class="pt-32 px-4 max-w-6xl mx-auto pb-24 text-center">
-        <header class="mb-12 animate-up">
-            <span class="inline-block px-4 py-1.5 rounded-full bg-brand-primary/10 text-brand-primary text-[10px] font-black uppercase tracking-widest mb-6 border border-brand-primary/20">خصوصية تامة ومعالجة سريعة</span>
-            <h2 class="text-4xl md:text-5xl font-black mb-4 leading-tight">معالج الصور <span class="text-brand-primary">الاحترافي</span></h2>
-            <p class="text-slate-500 dark:text-slate-400 font-bold text-lg max-w-2xl mx-auto">
+    <main class="pt-24 md:pt-32 px-4 max-w-6xl mx-auto pb-20 text-center">
+        <header class="mb-8 md:mb-12 animate-up">
+            <span class="inline-block px-3 py-1 rounded-full bg-brand-primary/10 text-brand-primary text-[9px] md:text-[10px] font-black uppercase tracking-widest mb-4 border border-brand-primary/20">خصوصية تامة ومعالجة سريعة</span>
+            <h2 class="text-3xl md:text-5xl font-black mb-4 leading-tight">معالج الصور <span class="text-brand-primary">الاحترافي</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 font-bold text-base md:text-lg max-w-xl mx-auto px-4">
                 قم بضغط وتحويل صورك في ثوانٍ بأمان 100% داخل متصفحك.
             </p>
         </header>
 
         <div id="app-container" class="animate-up" style="animation-delay: 0.1s">
             <!-- Drop Zone -->
-            <div id="drop-zone" class="upload-zone rounded-[3rem] p-14 md:p-24 text-center cursor-pointer bg-white dark:bg-brand-card shadow-2xl mb-10 border border-slate-200 dark:border-white/5">
+            <div id="drop-zone" class="upload-zone rounded-[2.5rem] md:rounded-[3rem] p-10 md:p-24 text-center cursor-pointer bg-white dark:bg-brand-card shadow-2xl mb-8 border border-slate-200 dark:border-white/5">
                 <input type="file" id="file-input" class="hidden" multiple accept="image/*">
-                <div class="w-24 h-24 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-8 shadow-inner">
-                    <i data-lucide="upload-cloud" class="w-12 h-12"></i>
+                <div class="w-20 h-20 md:w-24 md:h-24 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-6 md:mb-8 shadow-inner">
+                    <i data-lucide="upload-cloud" class="w-10 h-10 md:w-12 md:h-12"></i>
                 </div>
-                <h3 class="text-3xl md:text-4xl font-black mb-4">اضغط هنا لرفع الصور</h3>
-                <p class="text-slate-400 font-bold text-lg">أو قم بسحب الصور وإفلاتها مباشرة</p>
+                <h3 class="text-2xl md:text-4xl font-black mb-3">ارفع صورك هنا</h3>
+                <p class="text-slate-400 font-bold text-sm md:text-lg">اضغط للاختيار أو اسحب الملفات مباشرة</p>
             </div>
 
             <!-- Share Area -->
-            <div id="share-area" class="mb-16">
-                <div class="flex items-center justify-center gap-3 mb-8">
-                    <div class="h-[1px] w-12 bg-slate-200 dark:bg-slate-800"></div>
-                    <span class="text-[11px] font-black text-slate-500 uppercase tracking-[0.3em]">شارك الأداة مع أصدقائك</span>
-                    <div class="h-[1px] w-12 bg-slate-200 dark:bg-slate-800"></div>
+            <div id="share-area" class="mb-12 md:mb-16 overflow-x-auto no-scrollbar">
+                <div class="flex items-center justify-center gap-3 mb-6">
+                    <div class="h-[1px] w-8 md:w-12 bg-slate-200 dark:bg-slate-800"></div>
+                    <span class="text-[9px] md:text-[11px] font-black text-slate-500 uppercase tracking-[0.2em] whitespace-nowrap">شارك الأداة مع أصدقائك</span>
+                    <div class="h-[1px] w-8 md:w-12 bg-slate-200 dark:bg-slate-800"></div>
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 max-w-3xl mx-auto">
-                    <button onclick="window.shareSite('facebook')" class="share-btn rounded-2xl p-5 flex flex-col items-center gap-3 group">
-                        <i data-lucide="facebook" class="w-7 h-7 text-slate-400 group-hover:text-blue-600 transition-colors"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">فيسبوك</span>
+                <div class="flex md:grid md:grid-cols-5 gap-3 md:gap-4 max-w-3xl mx-auto px-2 justify-center">
+                    <button onclick="window.shareSite('facebook')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                        <i data-lucide="facebook" class="w-6 h-6 text-slate-400 group-hover:text-blue-600 transition-colors"></i>
+                        <span class="text-[9px] font-black text-slate-500 uppercase">فيسبوك</span>
                     </button>
-                    <button onclick="window.shareSite('whatsapp')" class="share-btn rounded-2xl p-5 flex flex-col items-center gap-3 group">
-                        <i data-lucide="message-circle" class="w-7 h-7 text-slate-400 group-hover:text-green-500 transition-colors"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">واتساب</span>
+                    <button onclick="window.shareSite('whatsapp')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                        <i data-lucide="message-circle" class="w-6 h-6 text-slate-400 group-hover:text-green-500 transition-colors"></i>
+                        <span class="text-[9px] font-black text-slate-500 uppercase">واتساب</span>
                     </button>
-                    <button onclick="window.shareSite('telegram')" class="share-btn rounded-2xl p-5 flex flex-col items-center gap-3 group">
-                        <i data-lucide="send" class="w-7 h-7 text-slate-400 group-hover:text-sky-400 transition-colors"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">تليجرام</span>
+                    <button onclick="window.shareSite('telegram')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                        <i data-lucide="send" class="w-6 h-6 text-slate-400 group-hover:text-sky-400 transition-colors"></i>
+                        <span class="text-[9px] font-black text-slate-500 uppercase">تليجرام</span>
                     </button>
-                    <button onclick="window.shareSite('twitter')" class="share-btn rounded-2xl p-5 flex flex-col items-center gap-3 group">
-                        <i data-lucide="twitter" class="w-7 h-7 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">تويتر</span>
+                    <button onclick="window.shareSite('twitter')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                        <i data-lucide="twitter" class="w-6 h-6 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+                        <span class="text-[9px] font-black text-slate-500 uppercase">تويتر</span>
                     </button>
-                    <button onclick="window.shareSite('copy')" class="share-btn rounded-2xl p-5 flex flex-col items-center gap-3 group">
-                        <i data-lucide="copy" class="w-7 h-7 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
-                        <span class="text-[10px] font-black text-slate-500 uppercase">نسخ الرابط</span>
+                    <button onclick="window.shareSite('copy')" class="share-btn min-w-[100px] md:min-w-0 rounded-2xl p-4 md:p-5 flex flex-col items-center gap-2 group active:scale-95">
+                        <i data-lucide="copy" class="w-6 h-6 text-slate-400 group-hover:text-brand-primary transition-colors"></i>
+                        <span class="text-[9px] font-black text-slate-500 uppercase">نسخ الرابط</span>
                     </button>
                 </div>
             </div>
 
             <!-- Image Queue Section -->
-            <div id="editor-section" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12 text-right">
+            <div id="editor-section" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 mt-8 text-right">
                 <!-- Queue Items -->
                 <div class="lg:col-span-8 space-y-4">
                     <div id="image-queue" class="grid grid-cols-1 gap-4">
-                        <!-- Dynamic items rendered via index.tsx -->
+                        <!-- Dynamic items -->
                     </div>
                 </div>
 
                 <!-- Settings Sidebar -->
                 <div class="lg:col-span-4">
-                    <div class="sticky top-32 bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl space-y-8">
+                    <div class="sticky-settings top-28 bg-white dark:bg-brand-card rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-8 border border-slate-200 dark:border-white/5 shadow-2xl space-y-6 md:space-y-8">
                         <div>
-                            <h3 class="text-xl font-black flex items-center gap-3 mb-6">
-                                <i data-lucide="settings-2" class="w-6 h-6 text-brand-primary"></i>
+                            <h3 class="text-lg md:text-xl font-black flex items-center gap-3 mb-6">
+                                <i data-lucide="settings-2" class="w-5 h-5 md:w-6 md:h-6 text-brand-primary"></i>
                                 خيارات الضغط
                             </h3>
                             
-                            <div class="space-y-6">
-                                <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-slate-100 dark:border-white/5">
+                            <div class="space-y-4 md:space-y-6">
+                                <div class="bg-slate-50 dark:bg-brand-dark/50 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-slate-100 dark:border-white/5">
                                     <div class="flex justify-between items-center mb-4 font-black">
-                                        <span class="text-sm text-slate-400 uppercase tracking-wider">الجودة المطلوبة</span>
-                                        <span id="quality-val" class="text-brand-primary text-lg">85%</span>
+                                        <span class="text-xs text-slate-400 uppercase tracking-wider">الجودة المطلوبة</span>
+                                        <span id="quality-val" class="text-brand-primary text-base md:text-lg">85%</span>
                                     </div>
                                     <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer">
                                 </div>
 
-                                <div class="bg-slate-50 dark:bg-brand-dark/50 p-6 rounded-3xl border border-slate-100 dark:border-white/5">
-                                    <label class="block text-xs font-black mb-3 text-slate-400 uppercase tracking-widest">صيغة التصدير</label>
-                                    <select id="format-select" class="w-full bg-white dark:bg-brand-card rounded-2xl p-4 font-black text-sm border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-brand-primary transition-all">
-                                        <option value="image/webp">WebP (أفضل حجم)</option>
+                                <div class="bg-slate-50 dark:bg-brand-dark/50 p-5 md:p-6 rounded-2xl md:rounded-3xl border border-slate-100 dark:border-white/5">
+                                    <label class="block text-[10px] md:text-xs font-black mb-3 text-slate-400 uppercase tracking-widest">صيغة التصدير</label>
+                                    <select id="format-select" class="w-full bg-white dark:bg-brand-card rounded-xl p-3 md:p-4 font-black text-sm border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-brand-primary transition-all">
+                                        <option value="image/webp">WebP (أصغر حجم)</option>
                                         <option value="image/jpeg">JPEG (صور فوتوغرافية)</option>
                                         <option value="image/png">PNG (رسوميات)</option>
                                     </select>
@@ -161,12 +166,12 @@
                             </div>
                         </div>
 
-                        <div class="pt-4 space-y-3">
-                            <button id="process-all" class="w-full bg-brand-primary text-white py-5 rounded-[2rem] font-black text-lg shadow-xl hover:shadow-brand-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
-                                <i data-lucide="zap" class="w-6 h-6"></i>
+                        <div class="pt-2 space-y-3">
+                            <button id="process-all" class="w-full bg-brand-primary text-white py-4 md:py-5 rounded-2xl md:rounded-[2rem] font-black text-base md:text-lg shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3">
+                                <i data-lucide="zap" class="w-5 h-5 md:w-6 md:h-6"></i>
                                 معالجة الكل
                             </button>
-                            <button onclick="window.location.reload()" class="w-full text-slate-400 hover:text-red-500 font-bold text-sm transition-colors py-2">مسح القائمة</button>
+                            <button onclick="window.location.reload()" class="w-full text-slate-400 hover:text-red-500 font-bold text-xs transition-colors py-2">مسح القائمة</button>
                         </div>
                     </div>
                 </div>
@@ -174,27 +179,27 @@
         </div>
     </main>
 
-    <footer class="py-20 border-t border-slate-200 dark:border-white/5 bg-white dark:bg-brand-dark/50">
+    <footer class="py-12 md:py-20 border-t border-slate-200 dark:border-white/5 bg-white dark:bg-brand-dark/50">
         <div class="max-w-6xl mx-auto px-6 text-center">
-            <h4 class="text-2xl font-black mb-6 flex items-center justify-center gap-3">
-                <i data-lucide="shield-check" class="text-brand-primary"></i>
+            <h4 class="text-xl md:text-2xl font-black mb-4 flex items-center justify-center gap-3">
+                <i data-lucide="shield-check" class="text-brand-primary w-6 h-6"></i>
                 إيليت<span class="text-brand-primary">إيميج</span>
             </h4>
-            <p class="text-slate-500 font-bold mb-10 text-lg">أداة آمنة، سريعة، ومجانية تماماً - بياناتك ملك لك فقط.</p>
-            <div class="flex justify-center flex-wrap gap-8 text-xs font-black text-slate-400 uppercase tracking-widest mb-10">
-                <a href="#" class="hover:text-brand-primary transition-colors">الشروط</a>
-                <a href="#" class="hover:text-brand-primary transition-colors">الخصوصية</a>
-                <a href="#" class="hover:text-brand-primary transition-colors">عن الأداة</a>
+            <p class="text-slate-500 font-bold mb-8 text-sm md:text-lg">بياناتك آمنة ومعالجتها تتم في جهازك فقط.</p>
+            <div class="flex justify-center flex-wrap gap-4 md:gap-8 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-8">
+                <a href="#" class="hover:text-brand-primary">الشروط</a>
+                <a href="#" class="hover:text-brand-primary">الخصوصية</a>
+                <a href="#" class="hover:text-brand-primary">عن الموقع</a>
             </div>
-            <p class="text-slate-500 font-bold text-xs">© 2024 جميع الحقوق محفوظة لـ Elite Image</p>
+            <p class="text-slate-500 font-bold text-[9px] md:text-xs tracking-wider">© 2024 ELITE IMAGE - ALL RIGHTS RESERVED</p>
         </div>
     </footer>
 
-    <!-- Toast Component -->
-    <div id="toast" class="fixed bottom-12 left-1/2 -translate-x-1/2 z-[500] transition-all duration-500 translate-y-32 opacity-0 pointer-events-none">
-        <div class="bg-brand-success text-brand-dark px-10 py-4 rounded-full shadow-2xl font-black flex items-center gap-4 border border-brand-success/20">
-            <i data-lucide="check-circle" class="w-6 h-6"></i>
-            <span id="toast-msg">تمت المهمة بنجاح!</span>
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[500] transition-all duration-500 translate-y-32 opacity-0 pointer-events-none w-[90%] md:w-auto">
+        <div class="bg-brand-success text-brand-dark px-6 md:px-10 py-3 md:py-4 rounded-full shadow-2xl font-black flex items-center justify-center gap-3 border border-brand-success/20">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span id="toast-msg" class="text-xs md:text-sm">تمت المهمة بنجاح!</span>
         </div>
     </div>
 

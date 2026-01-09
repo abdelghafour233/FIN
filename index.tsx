@@ -76,16 +76,16 @@ const setupEventListeners = () => {
   
   dropZone?.addEventListener('dragover', (e) => {
     e.preventDefault();
-    dropZone.classList.add('border-brand-primary', 'scale-[1.02]');
+    dropZone.classList.add('border-brand-primary', 'scale-[1.01]');
   });
 
   dropZone?.addEventListener('dragleave', () => {
-    dropZone.classList.remove('border-brand-primary', 'scale-[1.02]');
+    dropZone.classList.remove('border-brand-primary', 'scale-[1.01]');
   });
 
   dropZone?.addEventListener('drop', (e) => {
     e.preventDefault();
-    dropZone.classList.remove('border-brand-primary', 'scale-[1.02]');
+    dropZone.classList.remove('border-brand-primary', 'scale-[1.01]');
     if (e.dataTransfer?.files) handleFiles(e.dataTransfer.files);
   });
 
@@ -157,7 +157,7 @@ const processAllImages = async () => {
     renderQueue();
   }
   
-  showToast('اكتملت معالجة الصور! ✨');
+  showToast('تمت معالجة جميع الصور! ✨');
 };
 
 const updateUI = () => {
@@ -207,9 +207,9 @@ const renderQueue = () => {
     const savings = item.resultSize ? Math.round((1 - (item.resultSize / item.originalSize)) * 100) : 0;
     
     return `
-      <div class="bg-white dark:bg-brand-card p-5 rounded-[2.5rem] flex flex-col md:flex-row items-center gap-6 shadow-xl border border-slate-100 dark:border-white/5 animate-up">
-        <!-- Image Preview (Larger) -->
-        <div class="relative w-full md:w-32 h-40 md:h-32 rounded-3xl overflow-hidden shrink-0 shadow-lg border border-slate-100 dark:border-slate-800">
+      <div class="bg-white dark:bg-brand-card p-4 md:p-5 rounded-[2rem] md:rounded-[2.5rem] flex flex-col sm:flex-row items-center gap-4 md:gap-6 shadow-xl border border-slate-100 dark:border-white/5 animate-up">
+        <!-- Image Preview -->
+        <div class="relative w-full sm:w-28 md:w-32 h-44 sm:h-28 md:h-32 rounded-2xl md:rounded-3xl overflow-hidden shrink-0 shadow-lg border border-slate-100 dark:border-slate-800">
           <img src="${item.preview}" class="w-full h-full object-cover">
           ${item.status === 'done' ? `
             <div class="absolute inset-0 bg-brand-success/30 flex items-center justify-center backdrop-blur-[2px]">
@@ -224,42 +224,42 @@ const renderQueue = () => {
         </div>
 
         <!-- Info Section -->
-        <div class="flex-grow text-center md:text-right w-full">
-          <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-4">
-             <h4 class="text-lg font-black truncate max-w-[250px]">${item.file.name}</h4>
+        <div class="flex-grow text-center sm:text-right w-full">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+             <h4 class="text-base md:text-lg font-black truncate max-w-full sm:max-w-[200px]">${item.file.name}</h4>
              ${item.status === 'done' ? `
-               <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-success/10 text-brand-success text-[10px] font-black rounded-full self-center md:self-auto">
+               <span class="inline-flex items-center gap-1 px-3 py-1 bg-brand-success/10 text-brand-success text-[9px] font-black rounded-full self-center sm:self-auto">
                  <i data-lucide="trending-down" class="w-3 h-3"></i>
-                 تم توفير ${savings}%
+                 وفرت ${savings}%
                </span>
              ` : ''}
           </div>
           
-          <div class="grid grid-cols-2 gap-4">
-            <div class="bg-slate-50 dark:bg-brand-dark/50 p-3 rounded-2xl border border-slate-100 dark:border-white/5">
-              <span class="block text-[10px] text-slate-400 font-black mb-1">الحجم الأصلي</span>
-              <span class="text-sm font-bold text-slate-600 dark:text-slate-300">${formatSize(item.originalSize)}</span>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-slate-50 dark:bg-brand-dark/50 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+              <span class="block text-[9px] text-slate-400 font-black mb-0.5">الحجم الأصلي</span>
+              <span class="text-xs md:text-sm font-bold text-slate-600 dark:text-slate-300">${formatSize(item.originalSize)}</span>
             </div>
-            <div class="bg-slate-50 dark:bg-brand-dark/50 p-3 rounded-2xl border border-slate-100 dark:border-white/5">
-              <span class="block text-[10px] text-slate-400 font-black mb-1">الحجم الحالي</span>
-              <span class="text-sm font-bold ${item.resultSize ? 'text-brand-primary' : 'text-slate-400'}">${item.resultSize ? formatSize(item.resultSize) : '--'}</span>
+            <div class="bg-slate-50 dark:bg-brand-dark/50 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
+              <span class="block text-[9px] text-slate-400 font-black mb-0.5">الحجم الحالي</span>
+              <span class="text-xs md:text-sm font-bold ${item.resultSize ? 'text-brand-primary' : 'text-slate-400'}">${item.resultSize ? formatSize(item.resultSize) : '--'}</span>
             </div>
           </div>
         </div>
 
         <!-- Actions -->
-        <div class="flex flex-row md:flex-col gap-3 shrink-0">
+        <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
           ${item.status === 'done' ? `
-            <button onclick="window.downloadOne('${item.id}')" class="w-14 h-14 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg group">
-              <i data-lucide="download" class="w-7 h-7 group-hover:animate-bounce"></i>
+            <button onclick="window.downloadOne('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-success text-brand-dark rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg group">
+              <i data-lucide="download" class="w-6 h-6 sm:w-7 sm:h-7"></i>
             </button>
           ` : `
-            <button onclick="window.processOne('${item.id}')" ${item.status === 'processing' ? 'disabled' : ''} class="w-14 h-14 ${item.status === 'processing' ? 'bg-slate-100 text-slate-300' : 'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white'} rounded-2xl flex items-center justify-center transition-all">
-              <i data-lucide="play" class="w-6 h-6"></i>
+            <button onclick="window.processOne('${item.id}')" ${item.status === 'processing' ? 'disabled' : ''} class="flex-1 sm:w-14 sm:h-14 ${item.status === 'processing' ? 'bg-slate-100 text-slate-300' : 'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white'} rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center transition-all">
+              <i data-lucide="play" class="w-5 h-5 md:w-6 md:h-6"></i>
             </button>
           `}
-          <button onclick="window.removeFile('${item.id}')" class="w-14 h-14 bg-red-500/5 text-red-400 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
-            <i data-lucide="trash-2" class="w-6 h-6"></i>
+          <button onclick="window.removeFile('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-red-500/5 text-red-400 rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-sm">
+            <i data-lucide="trash-2" class="w-5 h-5 md:w-6 md:h-6"></i>
           </button>
         </div>
       </div>
@@ -281,7 +281,7 @@ const renderQueue = () => {
   const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
   const ext = formatSelect.value.split('/')[1];
   a.href = url;
-  a.download = `elite_${item.id}.${ext}`;
+  a.download = `elite_compressed_${item.id}.${ext}`;
   a.click();
   URL.revokeObjectURL(url);
 };
