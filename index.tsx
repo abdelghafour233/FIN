@@ -39,7 +39,7 @@ const setupTheme = () => {
 const setupShareLogic = () => {
   (window as any).shareSite = (platform: string) => {
     const url = encodeURIComponent(window.location.href);
-    const text = encodeURIComponent("جرب أداة إيليت إيميج لضغط وتحويل الصور مجاناً وبأمان تام! 🚀");
+    const text = encodeURIComponent("جرب أداة storimage لضغط وتحسين الصور للسيو مجاناً وبأمان! 🚀");
     
     let shareUrl = "";
     switch(platform) {
@@ -57,7 +57,7 @@ const setupShareLogic = () => {
         break;
       case 'copy':
         navigator.clipboard.writeText(window.location.href);
-        showToast("تم نسخ رابط الموقع بنجاح! 📋");
+        showToast("تم نسخ رابط storimage بنجاح! 📋");
         return;
     }
     
@@ -157,7 +157,7 @@ const processAllImages = async () => {
     renderQueue();
   }
   
-  showToast('تمت معالجة جميع الصور! ✨');
+  showToast('تم تحسين الصور بنجاح عبر storimage! ✨');
 };
 
 const updateUI = () => {
@@ -208,9 +208,8 @@ const renderQueue = () => {
     
     return `
       <div class="bg-white dark:bg-brand-card p-4 md:p-5 rounded-[2rem] md:rounded-[2.5rem] flex flex-col sm:flex-row items-center gap-4 md:gap-6 shadow-xl border border-slate-100 dark:border-white/5 animate-up">
-        <!-- Image Preview -->
         <div class="relative w-full sm:w-28 md:w-32 h-44 sm:h-28 md:h-32 rounded-2xl md:rounded-3xl overflow-hidden shrink-0 shadow-lg border border-slate-100 dark:border-slate-800">
-          <img src="${item.preview}" class="w-full h-full object-cover">
+          <img src="${item.preview}" class="w-full h-full object-cover" alt="معاينة الصورة في storimage">
           ${item.status === 'done' ? `
             <div class="absolute inset-0 bg-brand-success/30 flex items-center justify-center backdrop-blur-[2px]">
               <i data-lucide="check" class="w-10 h-10 text-white drop-shadow-lg"></i>
@@ -223,31 +222,29 @@ const renderQueue = () => {
           ` : ''}
         </div>
 
-        <!-- Info Section -->
         <div class="flex-grow text-center sm:text-right w-full">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
              <h4 class="text-base md:text-lg font-black truncate max-w-full sm:max-w-[200px]">${item.file.name}</h4>
              ${item.status === 'done' ? `
                <span class="inline-flex items-center gap-1 px-3 py-1 bg-brand-success/10 text-brand-success text-[9px] font-black rounded-full self-center sm:self-auto">
                  <i data-lucide="trending-down" class="w-3 h-3"></i>
-                 وفرت ${savings}%
+                 تم التحسين بنسبة ${savings}%
                </span>
              ` : ''}
           </div>
           
           <div class="grid grid-cols-2 gap-3">
             <div class="bg-slate-50 dark:bg-brand-dark/50 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
-              <span class="block text-[9px] text-slate-400 font-black mb-0.5">الحجم الأصلي</span>
+              <span class="block text-[9px] text-slate-400 font-black mb-0.5">قبل التحسين</span>
               <span class="text-xs md:text-sm font-bold text-slate-600 dark:text-slate-300">${formatSize(item.originalSize)}</span>
             </div>
             <div class="bg-slate-50 dark:bg-brand-dark/50 p-2.5 rounded-xl border border-slate-100 dark:border-white/5">
-              <span class="block text-[9px] text-slate-400 font-black mb-0.5">الحجم الحالي</span>
+              <span class="block text-[9px] text-slate-400 font-black mb-0.5">بعد التحسين</span>
               <span class="text-xs md:text-sm font-bold ${item.resultSize ? 'text-brand-primary' : 'text-slate-400'}">${item.resultSize ? formatSize(item.resultSize) : '--'}</span>
             </div>
           </div>
         </div>
 
-        <!-- Actions -->
         <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
           ${item.status === 'done' ? `
             <button onclick="window.downloadOne('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-success text-brand-dark rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg group">
@@ -281,7 +278,7 @@ const renderQueue = () => {
   const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
   const ext = formatSelect.value.split('/')[1];
   a.href = url;
-  a.download = `elite_compressed_${item.id}.${ext}`;
+  a.download = `storimage_optimized_${item.id}.${ext}`;
   a.click();
   URL.revokeObjectURL(url);
 };
