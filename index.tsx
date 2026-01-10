@@ -1,3 +1,4 @@
+
 // Define as module
 export {};
 
@@ -136,14 +137,53 @@ const processImage = async (item: FileItem): Promise<void> => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0);
 
-      canvas.toBlob((blob) => {
-        if (blob) {
-          item.status = 'done';
-          item.resultBlob = blob;
-          item.resultSize = blob.size;
-          resolve();
-        }
-      }, format, quality);
+      // logic for HTML (HTM) conversion
+      if (format === 'text/html') {
+          // Compress as WebP first to embed it
+          canvas.toBlob(async (imgBlob) => {
+              if (imgBlob) {
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                      const base64data = reader.result as string;
+                      const htmlContent = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>storimage - ${item.file.name}</title>
+    <style>
+        body { margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #020617; font-family: sans-serif; }
+        .container { max-width: 90%; text-align: center; }
+        img { max-width: 100%; height: auto; border-radius: 12px; shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1); border: 1px solid rgba(255,255,255,0.1); }
+        p { color: #64748b; margin-top: 1rem; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="${base64data}" alt="${item.file.name}">
+        <p>تم الإنشاء بواسطة storimage | أداة سيو احترافية</p>
+    </div>
+</body>
+</html>`;
+                      const htmBlob = new Blob([htmlContent], { type: 'text/html' });
+                      item.status = 'done';
+                      item.resultBlob = htmBlob;
+                      item.resultSize = htmBlob.size;
+                      resolve();
+                  };
+                  reader.readAsDataURL(imgBlob);
+              }
+          }, 'image/webp', quality);
+      } else {
+          canvas.toBlob((blob) => {
+            if (blob) {
+              item.status = 'done';
+              item.resultBlob = blob;
+              item.resultSize = blob.size;
+              resolve();
+            }
+          }, format, quality);
+      }
     };
   });
 };
@@ -276,7 +316,13 @@ const renderQueue = () => {
   const url = URL.createObjectURL(item.resultBlob);
   const a = document.createElement('a');
   const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
-  const ext = formatSelect.value.split('/')[1];
+  let ext = formatSelect.value.split('/')[1];
+  
+  // Custom extension handling for HTML
+  if (formatSelect.value === 'text/html') {
+      ext = 'htm';
+  }
+
   a.href = url;
   a.download = `storimage_optimized_${item.id}.${ext}`;
   a.click();
