@@ -137,9 +137,7 @@ const processImage = async (item: FileItem): Promise<void> => {
       const ctx = canvas.getContext('2d');
       ctx?.drawImage(img, 0, 0);
 
-      // logic for HTML (HTM) conversion
       if (format === 'text/html') {
-          // Compress as WebP first to embed it
           canvas.toBlob(async (imgBlob) => {
               if (imgBlob) {
                   const reader = new FileReader();
@@ -287,9 +285,14 @@ const renderQueue = () => {
 
         <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto shrink-0 mt-2 sm:mt-0">
           ${item.status === 'done' ? `
-            <button onclick="window.downloadOne('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-success text-brand-dark rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg group">
-              <i data-lucide="download" class="w-6 h-6 sm:w-7 sm:h-7"></i>
-            </button>
+            <div class="flex flex-row sm:flex-col gap-2 flex-1">
+              <button onclick="window.downloadOne('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-success text-brand-dark rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg group" title="تحميل الملف">
+                <i data-lucide="download" class="w-6 h-6 sm:w-7 sm:h-7"></i>
+              </button>
+              <button onclick="window.copyLink('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-primary/10 text-brand-primary rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all shadow-sm" title="نسخ رابط الصورة للسيو">
+                <i data-lucide="link" class="w-5 h-5"></i>
+              </button>
+            </div>
           ` : `
             <button onclick="window.processOne('${item.id}')" ${item.status === 'processing' ? 'disabled' : ''} class="flex-1 sm:w-14 sm:h-14 ${item.status === 'processing' ? 'bg-slate-100 text-slate-300' : 'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white'} rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center transition-all">
               <i data-lucide="play" class="w-5 h-5 md:w-6 md:h-6"></i>
@@ -305,6 +308,23 @@ const renderQueue = () => {
   initLucide();
 };
 
+(window as any).copyLink = async (id: string) => {
+  const item = files.find(f => f.id === id);
+  if (!item || !item.resultBlob) return;
+
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const base64data = reader.result as string;
+    navigator.clipboard.writeText(base64data).then(() => {
+      showToast("تم نسخ رابط الصورة (Data URI) بنجاح! 🔗");
+    }).catch(err => {
+      console.error('فشل النسخ:', err);
+      showToast("خطأ في نسخ الرابط.");
+    });
+  };
+  reader.readAsDataURL(item.resultBlob);
+};
+
 (window as any).processOne = (id: string) => {
     const item = files.find(f => f.id === id);
     if(item) processImage(item);
@@ -318,7 +338,6 @@ const renderQueue = () => {
   const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
   let ext = formatSelect.value.split('/')[1];
   
-  // Custom extension handling for HTML
   if (formatSelect.value === 'text/html') {
       ext = 'htm';
   }
