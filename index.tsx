@@ -10,6 +10,8 @@ interface FileItem {
   resultBlob?: Blob;
   originalSize: number;
   resultSize?: number;
+  shortLink?: string;
+  isUploading?: boolean;
 }
 
 let files: FileItem[] = [];
@@ -253,7 +255,7 @@ const renderQueue = () => {
               <i data-lucide="check" class="w-10 h-10 text-white drop-shadow-lg"></i>
             </div>
           ` : ''}
-          ${item.status === 'processing' ? `
+          ${item.status === 'processing' || item.isUploading ? `
             <div class="absolute inset-0 bg-brand-primary/20 flex items-center justify-center backdrop-blur-[2px]">
               <div class="w-8 h-8 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
             </div>
@@ -289,8 +291,11 @@ const renderQueue = () => {
               <button onclick="window.downloadOne('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-success text-brand-dark rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg group" title="تحميل الملف">
                 <i data-lucide="download" class="w-6 h-6 sm:w-7 sm:h-7"></i>
               </button>
-              <button onclick="window.copyLink('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-primary/10 text-brand-primary rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all shadow-sm" title="نسخ رابط الصورة للسيو">
-                <i data-lucide="link" class="w-5 h-5"></i>
+              <button onclick="window.getShortLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-14 sm:h-14 ${item.isUploading ? 'bg-slate-100' : 'bg-brand-primary/10 text-brand-primary hover:bg-brand-primary hover:text-white'} rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center transition-all shadow-sm" title="الحصول على رابط قصير (PNG/JPEG)">
+                ${item.isUploading ? '<div class="w-5 h-5 border-2 border-brand-primary border-t-transparent rounded-full animate-spin"></div>' : '<i data-lucide="globe" class="w-5 h-5"></i>'}
+              </button>
+              <button onclick="window.copyLink('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-xl md:rounded-2xl py-3 sm:py-0 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-all shadow-sm" title="نسخ كود الصورة">
+                <i data-lucide="code" class="w-5 h-5"></i>
               </button>
             </div>
           ` : `
@@ -308,6 +313,56 @@ const renderQueue = () => {
   initLucide();
 };
 
+(window as any).getShortLink = async (id: string) => {
+  const item = files.find(f => f.id === id);
+  if (!item || !item.resultBlob) return;
+
+  if (item.shortLink) {
+    navigator.clipboard.writeText(item.shortLink);
+    showToast("تم نسخ الرابط القصير مسبقاً! 🔗");
+    return;
+  }
+
+  item.isUploading = true;
+  renderQueue();
+
+  try {
+    const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
+    let ext = formatSelect.value.split('/')[1] || 'png';
+    if (formatSelect.value === 'text/html') ext = 'htm';
+    
+    const formData = new FormData();
+    // Rename blob to have the correct extension so the host returns a link ending in it
+    const fileName = `storimage_${item.id}.${ext}`;
+    formData.append('file', item.resultBlob, fileName);
+
+    const response = await fetch('https://tmpfiles.org/api/v1/upload', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    if (result.status === 'success') {
+      // tmpfiles.org returns a view URL, we need to modify it to be a direct download URL which ends in ext
+      // Standard: https://tmpfiles.org/12345/file.png -> https://tmpfiles.org/dl/12345/file.png
+      let rawUrl = result.data.url;
+      const directLink = rawUrl.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+      
+      item.shortLink = directLink;
+      navigator.clipboard.writeText(directLink);
+      showToast(`تم توليد ونسخ الرابط القصير (ينتهي بـ ${ext.toUpperCase()})! 🚀`);
+    } else {
+      throw new Error('Upload failed');
+    }
+  } catch (error) {
+    console.error(error);
+    showToast("عذراً، فشل توليد الرابط القصير. حاول مرة أخرى.");
+  } finally {
+    item.isUploading = false;
+    renderQueue();
+  }
+};
+
 (window as any).copyLink = async (id: string) => {
   const item = files.find(f => f.id === id);
   if (!item || !item.resultBlob) return;
@@ -316,10 +371,10 @@ const renderQueue = () => {
   reader.onloadend = () => {
     const base64data = reader.result as string;
     navigator.clipboard.writeText(base64data).then(() => {
-      showToast("تم نسخ رابط الصورة (Data URI) بنجاح! 🔗");
+      showToast("تم نسخ كود الصورة (Data URI) بنجاح! 📋");
     }).catch(err => {
       console.error('فشل النسخ:', err);
-      showToast("خطأ في نسخ الرابط.");
+      showToast("خطأ في نسخ الكود.");
     });
   };
   reader.readAsDataURL(item.resultBlob);
