@@ -38,6 +38,7 @@
             -webkit-appearance: none; height: 18px; width: 18px; border-radius: 50%;
             background: #3b82f6; cursor: pointer; border: 3px solid #020617;
         }
+        .modal-bg { background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(8px); }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -52,8 +53,8 @@
                 <h1 class="text-2xl font-black uppercase">stor<span class="text-brand-primary">image</span></h1>
             </div>
             <div class="flex items-center gap-3 md:gap-4">
-                <!-- زر لوحة التحكم المخفي -->
-                <button onclick="window.switchView('admin')" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/5 hover:bg-brand-primary/10 transition-all group" title="الإدارة">
+                <!-- زر لوحة التحكم -->
+                <button onclick="window.requestAdminAccess()" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/5 hover:bg-brand-primary/10 transition-all group" title="الإدارة">
                     <i data-lucide="shield-lock" class="w-5 h-5 text-slate-500 group-hover:text-brand-primary"></i>
                 </button>
                 <button onclick="window.toggleTheme()" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 border border-white/5 active:scale-90 transition-all">
@@ -70,7 +71,6 @@
             <p class="text-slate-400 font-bold text-lg max-w-2xl mx-auto">أداة احترافية لتحسين حجم الصور وتوليد روابط مباشرة (Direct Links) بجودة عالية.</p>
         </header>
 
-        <!-- Drop Zone -->
         <div id="drop-zone" class="upload-zone rounded-[3rem] p-16 md:p-32 text-center cursor-pointer bg-white dark:bg-brand-card shadow-2xl mb-8">
             <input type="file" id="file-input" class="hidden" multiple accept="image/*">
             <div class="w-20 h-20 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-8">
@@ -80,20 +80,14 @@
             <p class="text-slate-400 font-bold">اسحب الصور أو اضغط للاختيار</p>
         </div>
 
-        <!-- Editor Content -->
         <div id="editor-section" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-8 text-right">
             <div class="lg:col-span-8 space-y-4">
                 <div id="image-queue" class="grid grid-cols-1 gap-4"></div>
             </div>
-
             <div class="lg:col-span-4">
                 <div class="sticky top-28 space-y-6">
                     <div class="bg-white dark:bg-brand-card rounded-[2.5rem] p-8 border border-slate-200 dark:border-white/5 shadow-2xl space-y-6">
-                        <h3 class="text-xl font-black flex items-center gap-3">
-                            <i data-lucide="sliders" class="text-brand-primary"></i>
-                            إعدادات المعالجة
-                        </h3>
-                        
+                        <h3 class="text-xl font-black flex items-center gap-3"><i data-lucide="sliders" class="text-brand-primary"></i> إعدادات المعالجة</h3>
                         <div class="space-y-4">
                             <div class="bg-slate-50 dark:bg-brand-dark/50 p-5 rounded-2xl border border-slate-100 dark:border-white/5">
                                 <div class="flex justify-between items-center mb-4 font-black">
@@ -102,7 +96,6 @@
                                 </div>
                                 <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full appearance-none cursor-pointer">
                             </div>
-
                             <div class="bg-slate-50 dark:bg-brand-dark/50 p-5 rounded-2xl border border-slate-100 dark:border-white/5">
                                 <label class="block text-xs font-black mb-2 text-slate-400">تنسيق الصورة</label>
                                 <select id="format-select" class="w-full bg-white dark:bg-brand-card rounded-xl p-3 font-bold border border-slate-200 dark:border-white/10 outline-none">
@@ -112,10 +105,8 @@
                                 </select>
                             </div>
                         </div>
-
                         <button id="process-all" class="w-full bg-brand-primary text-white py-5 rounded-[2rem] font-black text-lg shadow-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
-                            <i data-lucide="zap" class="w-6 h-6"></i>
-                            تحسين جميع الصور
+                            <i data-lucide="zap" class="w-6 h-6"></i> تحسين جميع الصور
                         </button>
                     </div>
                 </div>
@@ -128,32 +119,50 @@
         <div class="bg-white dark:bg-brand-card rounded-[3rem] p-8 md:p-12 shadow-2xl border border-slate-200 dark:border-white/5">
             <div class="flex items-center justify-between mb-8">
                 <h2 class="text-3xl font-black flex items-center gap-4">
-                    <i data-lucide="settings-2" class="text-brand-primary w-8 h-8"></i>
-                    إعدادات الإدارة والأرباح
+                    <i data-lucide="settings-2" class="text-brand-primary w-8 h-8"></i> إعدادات الإدارة والأرباح
                 </h2>
                 <button onclick="window.switchView('app')" class="bg-slate-100 dark:bg-white/5 px-4 py-2 rounded-xl text-xs font-black flex items-center gap-2">
-                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                    العودة
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> العودة
                 </button>
             </div>
-
             <div class="bg-slate-50 dark:bg-brand-dark/50 p-8 rounded-[2.5rem] border border-slate-100 dark:border-white/5">
-                <h3 class="text-xl font-black mb-6 flex items-center gap-3">
-                    <i data-lucide="dollar-sign" class="text-brand-success"></i>
-                    تكوين Monetag
-                </h3>
-                
+                <h3 class="text-xl font-black mb-6 flex items-center gap-3"><i data-lucide="dollar-sign" class="text-brand-success"></i> تكوين Monetag</h3>
                 <div class="space-y-6">
                     <div>
                         <label class="block text-xs font-black mb-3 text-slate-500 uppercase tracking-widest">Monetag Tag ID</label>
                         <input type="text" id="monetag-id" placeholder="أدخل المعرف هنا (مثال: 10428864)" class="w-full bg-white dark:bg-brand-card rounded-2xl p-4 text-sm font-bold border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-brand-primary shadow-inner">
-                        <p class="mt-3 text-[10px] text-slate-500 font-bold">بمجرد الحفظ، سيتم حقن كود الإعلانات تلقائياً في جميع صفحات الموقع للزوار.</p>
                     </div>
-                    <button id="save-monetag" class="w-full py-4 bg-brand-primary text-white rounded-2xl font-black shadow-lg hover:scale-[1.01] active:scale-95 transition-all">حفظ وتفعيل المعرف</button>
+                    <button id="save-monetag" class="w-full py-4 bg-brand-primary text-white rounded-2xl font-black shadow-lg hover:scale-[1.01] transition-all">حفظ وتفعيل المعرف</button>
                 </div>
             </div>
         </div>
     </main>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="fixed inset-0 z-[1000] modal-bg flex items-center justify-center p-6 hidden">
+        <div class="bg-white dark:bg-brand-card w-full max-w-md rounded-[2.5rem] p-8 shadow-2xl border border-white/5 animate-up">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-2xl font-black">تحقق الهوية</h3>
+                <p class="text-slate-400 font-bold text-sm">أدخل كلمة المرور للوصول للإدارة</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="relative">
+                    <input type="password" id="admin-pass-input" placeholder="كلمة المرور..." class="w-full bg-slate-50 dark:bg-brand-dark/50 rounded-2xl p-4 pr-12 text-sm font-bold border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-brand-primary">
+                    <button onclick="window.togglePasswordVisibility()" class="absolute inset-y-0 left-4 flex items-center text-slate-400 hover:text-brand-primary transition-colors">
+                        <i id="eye-icon" data-lucide="eye"></i>
+                    </button>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="window.verifyAdminPassword()" class="flex-[2] bg-brand-primary text-white py-4 rounded-2xl font-black shadow-lg hover:opacity-90 transition-all">دخول</button>
+                    <button onclick="window.closeAdminModal()" class="flex-1 bg-slate-100 dark:bg-white/5 py-4 rounded-2xl font-black text-slate-400 transition-all">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <footer class="py-12 border-t border-slate-200 dark:border-white/5 text-center text-slate-500 font-bold text-xs">
         <p>© 2024 storimage | مدعوم بتقنيات الضغط الحديثة</p>
