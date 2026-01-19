@@ -21,6 +21,7 @@ const init = () => {
   initLucide();
   setupTheme();
   loadMonetag();
+  setupViewSwitcher();
 };
 
 const initLucide = () => {
@@ -37,6 +38,20 @@ const setupTheme = () => {
   };
 };
 
+const setupViewSwitcher = () => {
+  (window as any).switchView = (view: 'app' | 'admin') => {
+    const views = ['app', 'admin'];
+    views.forEach(v => {
+      document.getElementById(`view-${v}`)?.classList.add('hidden');
+    });
+    document.getElementById(`view-${view}`)?.classList.remove('hidden');
+    
+    if (view === 'app') updateUI();
+    initLucide();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+};
+
 const loadMonetag = () => {
   const id = localStorage.getItem('storimage-monetag-id');
   if (id) {
@@ -48,7 +63,7 @@ const loadMonetag = () => {
 
 const injectMonetagScript = (id: string) => {
   if (!id) return;
-  const scriptId = 'monetag-script';
+  const scriptId = 'monetag-script-loader';
   document.getElementById(scriptId)?.remove();
   const script = document.createElement('script');
   script.id = scriptId;
@@ -56,7 +71,7 @@ const injectMonetagScript = (id: string) => {
   script.async = true;
   script.setAttribute('data-cfasync', 'false');
   document.head.appendChild(script);
-  console.log(`[storimage] Monetag active: ${id}`);
+  console.log(`[storimage] Monetag Injected: ${id}`);
 };
 
 const setupEventListeners = () => {
@@ -81,21 +96,28 @@ const setupEventListeners = () => {
   processBtn?.addEventListener('click', () => processAllImages());
 
   saveMonetagBtn?.addEventListener('click', () => {
-    const id = (document.getElementById('monetag-id') as HTMLInputElement).value;
+    const id = (document.getElementById('monetag-id') as HTMLInputElement).value.trim();
+    if (!id) return showToast("يرجى إدخال معرف صالح");
+    
     localStorage.setItem('storimage-monetag-id', id);
-    if (id) injectMonetagScript(id);
-    showToast("تم تفعيل إعلانات Monetag بنجاح! 💰");
+    injectMonetagScript(id);
+    showToast("تم حفظ إعدادات Monetag وتفعيلها! 💰");
   });
 };
 
 const handleFiles = (incoming: FileList) => {
-  const newFiles = Array.from(incoming).map(f => ({
-    id: Math.random().toString(36).substr(2, 9),
-    file: f,
-    preview: URL.createObjectURL(f),
-    status: 'idle' as const,
-    originalSize: f.size
-  }));
+  const newFiles = Array.from(incoming)
+    .filter(f => f.type.startsWith('image/'))
+    .map(f => ({
+      id: Math.random().toString(36).substr(2, 9),
+      file: f,
+      preview: URL.createObjectURL(f),
+      status: 'idle' as const,
+      originalSize: f.size
+    }));
+  
+  if (newFiles.length === 0) return;
+  
   files = [...files, ...newFiles];
   updateUI();
 };
@@ -131,16 +153,19 @@ const processImage = async (item: FileItem) => {
 
 const processAllImages = async () => {
   const idle = files.filter(f => f.status === 'idle');
+  if (idle.length === 0) return;
+  
   for (const item of idle) {
     await processImage(item);
     renderQueue();
   }
-  showToast("اكتملت معالجة جميع الصور! ✨");
+  showToast("تم تحسين جميع الصور بنجاح! ✨");
 };
 
 const updateUI = () => {
   const dropZone = document.getElementById('drop-zone');
   const editor = document.getElementById('editor-section');
+  
   if (files.length > 0) {
     dropZone?.classList.add('hidden');
     editor?.classList.remove('hidden');
@@ -163,7 +188,7 @@ const renderQueue = () => {
 
   container.innerHTML = files.map(item => `
     <div class="bg-white dark:bg-brand-card p-5 rounded-[2.5rem] flex flex-col sm:flex-row items-center gap-6 shadow-xl border border-slate-100 dark:border-white/5">
-      <div class="relative w-full sm:w-32 h-44 sm:h-32 rounded-3xl overflow-hidden shadow-lg">
+      <div class="relative w-full sm:w-28 h-32 sm:h-28 rounded-3xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
         <img src="${item.preview}" class="w-full h-full object-cover">
         ${item.status === 'processing' || item.isUploading ? `
           <div class="absolute inset-0 bg-brand-primary/20 backdrop-blur-[2px] flex items-center justify-center">
@@ -173,34 +198,32 @@ const renderQueue = () => {
       </div>
 
       <div class="flex-grow text-center sm:text-right w-full">
-        <h4 class="text-lg font-black truncate mb-3">${item.file.name}</h4>
-        <div class="grid grid-cols-2 gap-3">
-          <div class="bg-slate-50 dark:bg-brand-dark/50 p-3 rounded-xl border border-slate-100 dark:border-white/5">
-            <span class="block text-[10px] text-slate-400 font-bold mb-1 uppercase">الأصل</span>
-            <span class="text-sm font-bold">${formatSize(item.originalSize)}</span>
-          </div>
-          <div class="bg-slate-50 dark:bg-brand-dark/50 p-3 rounded-xl border border-slate-100 dark:border-white/5">
-            <span class="block text-[10px] text-slate-400 font-bold mb-1 uppercase">النتيجة</span>
-            <span class="text-sm font-bold text-brand-primary">${item.resultSize ? formatSize(item.resultSize) : '--'}</span>
-          </div>
+        <h4 class="text-base font-black truncate mb-2">${item.file.name}</h4>
+        <div class="flex gap-2 justify-center sm:justify-start">
+            <span class="bg-slate-50 dark:bg-brand-dark/50 px-3 py-1.5 rounded-xl text-[10px] font-bold border border-slate-100 dark:border-white/5">
+                الأصل: ${formatSize(item.originalSize)}
+            </span>
+            <span class="bg-brand-primary/10 text-brand-primary px-3 py-1.5 rounded-xl text-[10px] font-bold border border-brand-primary/5">
+                الآن: ${item.resultSize ? formatSize(item.resultSize) : '--'}
+            </span>
         </div>
       </div>
 
       <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
         ${item.status === 'done' ? `
-          <button onclick="window.downloadItem('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-success text-brand-dark rounded-2xl flex items-center justify-center hover:scale-105 transition-all">
-            <i data-lucide="download"></i>
+          <button onclick="window.downloadItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-success text-brand-dark rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg">
+            <i data-lucide="download" class="w-5 h-5"></i>
           </button>
-          <button onclick="window.generateDirectLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-14 sm:h-14 bg-brand-primary text-white rounded-2xl flex items-center justify-center hover:scale-105 transition-all">
-            <i data-lucide="globe"></i>
+          <button onclick="window.generateDirectLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-12 sm:h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-lg">
+            <i data-lucide="globe" class="w-5 h-5"></i>
           </button>
         ` : `
-          <button onclick="window.processItem('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-brand-primary/10 text-brand-primary rounded-2xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
-            <i data-lucide="play"></i>
+          <button onclick="window.processItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all">
+            <i data-lucide="play" class="w-5 h-5"></i>
           </button>
         `}
-        <button onclick="window.removeItem('${item.id}')" class="flex-1 sm:w-14 sm:h-14 bg-red-500/10 text-red-500 rounded-2xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
-          <i data-lucide="trash-2"></i>
+        <button onclick="window.removeItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+          <i data-lucide="trash-2" class="w-5 h-5"></i>
         </button>
       </div>
     </div>
@@ -236,7 +259,7 @@ const renderQueue = () => {
 
   if (item.shortLink) {
     navigator.clipboard.writeText(item.shortLink);
-    showToast("تم نسخ الرابط المباشر مسبقاً! 🔗");
+    showToast("تم نسخ الرابط المباشر! 🔗");
     return;
   }
 
@@ -258,12 +281,12 @@ const renderQueue = () => {
       const directUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
       item.shortLink = directUrl;
       navigator.clipboard.writeText(directUrl);
-      showToast(`تم نسخ الرابط المباشر (ينتهي بـ .${format.toUpperCase()})! 🚀`);
+      showToast("تم رفع الصورة ونسخ الرابط المباشر! 🚀");
     } else {
       throw new Error('Upload failed');
     }
   } catch (err) {
-    showToast("عذراً، فشل رفع الصورة. حاول مرة أخرى.");
+    showToast("فشل الرفع، يرجى المحاولة لاحقاً.");
   } finally {
     item.isUploading = false;
     renderQueue();
