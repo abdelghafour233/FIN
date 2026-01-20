@@ -1,4 +1,3 @@
-
 // StorImage Core Logic
 export {};
 
@@ -14,10 +13,11 @@ interface FileItem {
   isUploading?: boolean;
 }
 
-// الروابط الافتراضية المزودة من المستخدم
+// جميع الروابط المزودة من المستخدم بما فيها الرابط الجديد
 const DEFAULT_ADSTERRA_LINKS = [
   "https://bouncingbuzz.com/zj3mgnqb3?key=06741e12c87b4f0448ad3a2ef3183b49",
-  "https://bouncingbuzz.com/ctpynfts0?key=a6c7eb53025d8d39c467b947581bb153"
+  "https://bouncingbuzz.com/ctpynfts0?key=a6c7eb53025d8d39c467b947581bb153",
+  "https://bouncingbuzz.com/x93g7iqhij?key=7f6751f640538f788a6e6fa2e10591a8"
 ];
 
 let files: FileItem[] = [];
@@ -93,7 +93,6 @@ const setupAdminLogic = () => {
 };
 
 const loadAllAds = () => {
-  // تحميل Monetag
   const mValue = localStorage.getItem('storimage-monetag-ids');
   if (mValue) {
     (document.getElementById('monetag-ids') as HTMLTextAreaElement).value = mValue;
@@ -106,7 +105,6 @@ const loadAllAds = () => {
     });
   }
 
-  // تحميل Adsterra
   const aValue = localStorage.getItem('storimage-adsterra-links');
   if (aValue) {
     (document.getElementById('adsterra-links') as HTMLTextAreaElement).value = aValue;
@@ -117,31 +115,30 @@ const loadAllAds = () => {
   }
 };
 
-const setupGlobalClickTracker = () => {
-  let hasPopped = false;
-  const triggerAd = () => {
-    if (hasPopped || adsterraLinks.length === 0) return;
-    
-    // اختيار رابط عشوائي من القائمة
+const triggerAdDirect = () => {
+    if (adsterraLinks.length === 0) return;
     const link = adsterraLinks[Math.floor(Math.random() * adsterraLinks.length)];
-    
-    // محاولة فتح النافذة
-    const win = window.open(link, '_blank');
-    
-    if (win) {
-      hasPopped = true;
-      // محاولة جعل النافذة في الخلفية (Popunder)
-      win.blur(); 
-      window.focus();
-      // السماح بفتح إعلان آخر بعد 3 دقائق
-      setTimeout(() => { hasPopped = false; }, 180000);
-      console.log("Ad Triggered Successfully");
+    // محاولة فتح الرابط المباشر
+    window.open(link, '_blank');
+};
+(window as any).triggerAdDirect = triggerAdDirect;
+
+const setupGlobalClickTracker = () => {
+  let hasFirstClick = false;
+  const triggerAd = () => {
+    // فتح إعلان عند أول نقرة في الموقع إجبارياً
+    if (!hasFirstClick) {
+        triggerAdDirect();
+        hasFirstClick = true;
+        return;
+    }
+    // فتح إعلان بشكل عشوائي بنسبة 20% عند كل نقرة أخرى
+    if (Math.random() < 0.2) {
+        triggerAdDirect();
     }
   };
 
-  // ربط الحدث بأي تفاعل في الصفحة لضمان تخطي حواجز المتصفح
-  document.addEventListener('mousedown', triggerAd, { once: false });
-  document.addEventListener('touchstart', triggerAd, { once: false });
+  document.addEventListener('click', triggerAd, { capture: true });
 };
 
 const setupEventListeners = () => {
@@ -157,14 +154,17 @@ const setupEventListeners = () => {
     if (qualityVal) qualityVal.innerText = `${(e.target as HTMLInputElement).value}%`;
   });
 
-  document.getElementById('process-all')?.addEventListener('click', () => processAllImages());
+  document.getElementById('process-all')?.addEventListener('click', () => {
+      triggerAdDirect(); 
+      processAllImages();
+  });
   
   document.getElementById('save-all-ads')?.addEventListener('click', () => {
     const m = (document.getElementById('monetag-ids') as HTMLTextAreaElement).value.trim();
     const a = (document.getElementById('adsterra-links') as HTMLTextAreaElement).value.trim();
     localStorage.setItem('storimage-monetag-ids', m);
     localStorage.setItem('storimage-adsterra-links', a);
-    showToast("تم الحفظ بنجاح! الإعلانات الآن نشطة 💰");
+    showToast("تم الحفظ! 💰");
     setTimeout(() => window.location.reload(), 1000);
   });
 };
@@ -254,23 +254,39 @@ const renderQueue = () => {
             <span class="bg-brand-primary/10 text-brand-primary px-3 py-1.5 rounded-xl text-[10px] font-bold">${item.resultSize ? 'بعد: ' + formatSize(item.resultSize) : 'بانتظار الضغط'}</span>
         </div>
       </div>
-      <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+      <div class="flex flex-col gap-2 items-center sm:items-end w-full sm:w-auto">
+        <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
+          ${item.status === 'done' ? `
+            <button onclick="window.downloadItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-success text-brand-dark rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg shadow-brand-success/20"><i data-lucide="download" class="w-5 h-5"></i></button>
+            <button onclick="window.generateDirectLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-12 sm:h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg shadow-brand-primary/20"><i data-lucide="globe" class="w-5 h-5"></i></button>
+          ` : `
+            <button onclick="window.processItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-5 h-5"></i></button>
+          `}
+          <button onclick="window.removeItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+        </div>
+        
         ${item.status === 'done' ? `
-          <button onclick="window.downloadItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-success text-brand-dark rounded-xl flex items-center justify-center hover:scale-105 transition-all"><i data-lucide="download" class="w-5 h-5"></i></button>
-          <button onclick="window.generateDirectLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-12 sm:h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all"><i data-lucide="globe" class="w-5 h-5"></i></button>
-        ` : `
-          <button onclick="window.processItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-5 h-5"></i></button>
-        `}
-        <button onclick="window.removeItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-red-500/10 text-red-500 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-5 h-5"></i></button>
+        <div class="flex items-center gap-3 mt-1 px-2 py-1 rounded-lg bg-white/5 border border-white/5">
+            <button onclick="window.shareItem('${item.id}', 'facebook')" class="text-blue-500 hover:scale-125 transition-transform" title="مشاركة على فيسبوك"><i data-lucide="facebook" class="w-4 h-4"></i></button>
+            <button onclick="window.shareItem('${item.id}', 'whatsapp')" class="text-green-500 hover:scale-125 transition-transform" title="مشاركة على واتساب"><i data-lucide="message-circle" class="w-4 h-4"></i></button>
+            <button onclick="window.shareItem('${item.id}', 'twitter')" class="text-sky-400 hover:scale-125 transition-transform" title="مشاركة على X"><i data-lucide="twitter" class="w-4 h-4"></i></button>
+            <button onclick="window.shareItem('${item.id}', 'telegram')" class="text-blue-400 hover:scale-125 transition-transform" title="مشاركة على تليجرام"><i data-lucide="send" class="w-4 h-4"></i></button>
+        </div>
+        ` : ''}
       </div>
     </div>
   `).join('');
   initLucide();
 };
 
-(window as any).processItem = (id: string) => { const item = files.find(f => f.id === id); if (item) processImage(item); };
+(window as any).processItem = (id: string) => { 
+    triggerAdDirect();
+    const item = files.find(f => f.id === id); 
+    if (item) processImage(item); 
+};
 (window as any).removeItem = (id: string) => { files = files.filter(f => f.id !== id); updateUI(); };
 (window as any).downloadItem = (id: string) => {
+  triggerAdDirect(); 
   const item = files.find(f => f.id === id);
   if (!item || !item.resultBlob) return;
   const url = URL.createObjectURL(item.resultBlob);
@@ -280,9 +296,10 @@ const renderQueue = () => {
 };
 
 (window as any).generateDirectLink = async (id: string) => {
+  triggerAdDirect(); 
   const item = files.find(f => f.id === id);
   if (!item || !item.resultBlob) return;
-  if (item.shortLink) { navigator.clipboard.writeText(item.shortLink); showToast("تم نسخ الرابط المباشر! 🔗"); return; }
+  if (item.shortLink) { navigator.clipboard.writeText(item.shortLink); showToast("تم النسخ! 🔗"); return; }
   item.isUploading = true; renderQueue();
   try {
     const formData = new FormData();
@@ -291,9 +308,34 @@ const renderQueue = () => {
     const data = await res.json();
     if (data.status === 'success') {
       const directUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-      item.shortLink = directUrl; navigator.clipboard.writeText(directUrl); showToast("تم الرفع ونسخ الرابط بنجاح! 🚀");
+      item.shortLink = directUrl; navigator.clipboard.writeText(directUrl); showToast("تم الرفع ونسخ الرابط! 🚀");
     } else { throw new Error('Upload failed'); }
-  } catch (err) { showToast("فشل الرفع، جرب لاحقاً."); } finally { item.isUploading = false; renderQueue(); }
+  } catch (err) { showToast("فشل الرفع."); } finally { item.isUploading = false; renderQueue(); }
+};
+
+(window as any).shareItem = async (id: string, platform: string) => {
+    const item = files.find(f => f.id === id);
+    if (!item) return;
+
+    if (!item.shortLink) {
+        showToast("جاري إنشاء رابط للمشاركة...");
+        await (window as any).generateDirectLink(id);
+    }
+
+    const url = item.shortLink;
+    if (!url) return;
+
+    const text = "لقد قمت بتحويل وصورة عبر StorImage! شاهدها هنا:";
+    let shareUrl = "";
+
+    switch(platform) {
+        case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`; break;
+        case 'whatsapp': shareUrl = `https://wa.me/?text=${encodeURIComponent(text + " " + url)}`; break;
+        case 'twitter': shareUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`; break;
+        case 'telegram': shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`; break;
+    }
+
+    if (shareUrl) window.open(shareUrl, '_blank');
 };
 
 const showToast = (msg: string) => {

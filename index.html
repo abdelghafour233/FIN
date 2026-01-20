@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>StorImage | تحويل وضغط الصور باحترافية</title>
     
+    <!-- Adsterra Scripts -->
+    <script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>
+    <script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -30,14 +34,30 @@
         body { font-family: 'Cairo', sans-serif; transition: background 0.4s; }
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         .drop-area.active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); transform: scale(1.01); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .animate-up { animation: slideUp 0.4s ease-out forwards; }
         .status-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+        .ad-slot { min-height: 100px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(59, 130, 246, 0.2); border-radius: 1rem; margin: 1rem 0; overflow: hidden; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen pb-10">
+
+    <!-- Top Banner Ad (300x250) -->
+    <div class="max-w-4xl mx-auto px-6 pt-4">
+        <div class="ad-slot">
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+                    'format' : 'iframe',
+                    'height' : 250,
+                    'width' : 300,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+        </div>
+    </div>
 
     <!-- Header -->
     <nav class="sticky top-0 z-50 glass px-6 py-4 mb-8">
@@ -60,15 +80,27 @@
         </div>
     </nav>
 
+    <!-- Sidebar Ad (160x300) - Floating on Desktop -->
+    <div class="fixed left-4 top-1/2 -translate-y-1/2 hidden xl:block z-40">
+        <script type="text/javascript">
+            atOptions = {
+                'key' : 'deb441a26b7385b9111cbb19d72d8513',
+                'format' : 'iframe',
+                'height' : 300,
+                'width' : 160,
+                'params' : {}
+            };
+        </script>
+        <script type="text/javascript" src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>
+    </div>
+
     <!-- App View -->
     <main id="view-app" class="max-w-4xl mx-auto px-6">
-        <!-- Hero -->
         <div class="text-center mb-12 animate-up">
-            <h2 class="text-4xl md:text-5xl font-black mb-4">حول صورك بضغطة واحدة</h2>
+            <h2 class="text-4xl md:text-5xl font-black mb-4 text-slate-900 dark:text-white">حول صورك بضغطة واحدة</h2>
             <p class="text-slate-500 dark:text-slate-400 font-bold">أداة مجانية وسريعة لضغط الصور، تحويل الصيغ، والحصول على روابط مباشرة.</p>
         </div>
 
-        <!-- Drop Zone -->
         <div id="drop-zone" class="drop-area relative group border-4 border-dashed border-slate-200 dark:border-white/5 rounded-[3rem] p-12 text-center cursor-pointer transition-all hover:border-brand-primary mb-10 animate-up">
             <input type="file" id="file-input" multiple accept="image/*" class="hidden">
             <div class="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
@@ -78,7 +110,6 @@
             <p class="text-slate-400 font-bold text-sm">يدعم JPG, PNG, WebP وغيرها</p>
         </div>
 
-        <!-- Editor Section -->
         <section id="editor-section" class="hidden animate-up">
             <div class="glass rounded-[2.5rem] p-8 mb-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -104,12 +135,32 @@
                 </button>
             </div>
 
-            <!-- Queue -->
-            <div id="image-queue" class="space-y-4">
-                <!-- Dynamic Content -->
-            </div>
+            <div id="image-queue" class="space-y-4"></div>
         </section>
+
+        <!-- Bottom Ad Slot -->
+        <div class="mt-12 text-center">
+             <p class="text-[10px] font-bold text-slate-500 uppercase mb-4">إعلان ممول</p>
+             <div class="ad-slot">
+                 <script type="text/javascript">
+                    atOptions = {
+                        'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
+                        'format' : 'iframe',
+                        'height' : 250,
+                        'width' : 300,
+                        'params' : {}
+                    };
+                </script>
+                <script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
+             </div>
+        </div>
     </main>
+
+    <!-- Floating Ad Trigger -->
+    <div onclick="window.triggerAdDirect()" class="fixed bottom-6 right-6 z-[60] bg-brand-success text-brand-dark px-6 py-4 rounded-2xl font-black shadow-2xl flex items-center gap-3 cursor-pointer hover:scale-110 transition-all status-pulse">
+        <i data-lucide="award" class="w-6 h-6"></i>
+        <span>هدية لمستخدمينا!</span>
+    </div>
 
     <!-- Admin View -->
     <main id="view-admin" class="hidden max-w-2xl mx-auto px-6 pt-10">
@@ -119,7 +170,7 @@
                     <h2 class="text-3xl font-black">إعدادات الإعلانات</h2>
                     <div class="flex items-center gap-2 mt-2">
                         <span class="w-3 h-3 bg-brand-success rounded-full status-pulse"></span>
-                        <span class="text-brand-success text-xs font-bold">نظام الأرباح نشط حالياً</span>
+                        <span class="text-brand-success text-xs font-bold">النظام مفعل بأقصى قوة 💰</span>
                     </div>
                 </div>
                 <button onclick="window.switchView('app')" class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
@@ -129,33 +180,31 @@
             
             <div class="space-y-6">
                 <div>
-                    <label class="block text-sm font-bold mb-3">معرفات Monetag (ID فقط):</label>
-                    <textarea id="monetag-ids" placeholder="أدخل المعرفات هنا، واحد في كل سطر..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-sm font-mono min-h-[100px] outline-none focus:ring-2 focus:ring-brand-primary"></textarea>
+                    <label class="block text-sm font-bold mb-3">معرفات Monetag:</label>
+                    <textarea id="monetag-ids" placeholder="ID..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-sm font-mono min-h-[80px] outline-none"></textarea>
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-3">روابط Adsterra المباشرة:</label>
-                    <textarea id="adsterra-links" placeholder="https://..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-sm font-mono min-h-[100px] outline-none focus:ring-2 focus:ring-brand-primary"></textarea>
-                    <p class="text-[10px] text-slate-500 mt-2 font-bold leading-relaxed">ملاحظة: الروابط التي أرسلتها مفعلة افتراضياً، يمكنك إضافة روابط أخرى هنا إذا أردت.</p>
+                    <textarea id="adsterra-links" placeholder="https://..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-sm font-mono min-h-[80px] outline-none"></textarea>
                 </div>
-                <button id="save-all-ads" class="w-full bg-brand-success text-brand-dark py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-success/20">حفظ الإعدادات وتنشيط الأرباح</button>
+                <button id="save-all-ads" class="w-full bg-brand-success text-brand-dark py-5 rounded-2xl font-black text-lg">حفظ التغييرات</button>
             </div>
         </div>
     </main>
 
-    <!-- Password Modal -->
+    <!-- Admin Modal -->
     <div id="password-modal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
         <div class="glass w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl animate-up text-center">
-            <h3 class="text-2xl font-black mb-6">تحقق المدير</h3>
+            <h3 class="text-2xl font-black mb-6 text-white">تحقق المدير</h3>
             <input type="password" id="admin-pass-input" placeholder="كلمة المرور..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-center text-lg font-black outline-none mb-6">
             <div class="flex gap-3">
                 <button onclick="window.verifyAdminPassword()" class="flex-grow bg-brand-primary text-white py-4 rounded-xl font-black">دخول</button>
-                <button onclick="window.closeAdminModal()" class="px-6 bg-white/5 rounded-xl font-black">إلغاء</button>
+                <button onclick="window.closeAdminModal()" class="px-6 bg-white/5 rounded-xl font-black text-white">إلغاء</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
-    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-32 opacity-0">
+    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-32 opacity-0">
         <div class="bg-brand-primary text-white px-8 py-4 rounded-full shadow-2xl font-black flex items-center gap-3">
             <i data-lucide="info" class="w-5 h-5"></i>
             <span id="toast-msg">تمت العملية بنجاح!</span>
