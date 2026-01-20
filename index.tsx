@@ -1,3 +1,4 @@
+
 // Define as module
 export {};
 
@@ -21,7 +22,7 @@ const init = () => {
   setupEventListeners();
   initLucide();
   setupTheme();
-  loadMonetag();
+  loadAllAds();
   setupViewSwitcher();
   setupAdminLogic();
 };
@@ -46,12 +47,13 @@ const setupViewSwitcher = () => {
       (window as any).requestAdminAccess();
       return;
     }
-
     const views = ['app', 'admin'];
     views.forEach(v => {
-      document.getElementById(`view-${v}`)?.classList.add('hidden');
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.classList.add('hidden');
     });
-    document.getElementById(`view-${view}`)?.classList.remove('hidden');
+    const target = document.getElementById(`view-${view}`);
+    if (target) target.classList.remove('hidden');
     
     if (view === 'app') updateUI();
     initLucide();
@@ -64,17 +66,18 @@ const setupAdminLogic = () => {
     if (isAdminAuthenticated) {
       (window as any).switchView('admin');
     } else {
-      document.getElementById('password-modal')?.classList.remove('hidden');
-      document.getElementById('admin-pass-input')?.focus();
+      const modal = document.getElementById('password-modal');
+      if (modal) modal.classList.remove('hidden');
+      const input = document.getElementById('admin-pass-input');
+      if (input) input.focus();
     }
   };
-
   (window as any).closeAdminModal = () => {
-    document.getElementById('password-modal')?.classList.add('hidden');
+    const modal = document.getElementById('password-modal');
+    if (modal) modal.classList.add('hidden');
     const input = document.getElementById('admin-pass-input') as HTMLInputElement;
     if (input) input.value = '';
   };
-
   (window as any).verifyAdminPassword = () => {
     const input = document.getElementById('admin-pass-input') as HTMLInputElement;
     if (input.value === ADMIN_PASSWORD) {
@@ -88,47 +91,44 @@ const setupAdminLogic = () => {
       setTimeout(() => input.classList.remove('border-red-500'), 1000);
     }
   };
-
   (window as any).togglePasswordVisibility = () => {
     const input = document.getElementById('admin-pass-input') as HTMLInputElement;
     const icon = document.getElementById('eye-icon');
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon?.setAttribute('data-lucide', 'eye-off');
-    } else {
-      input.type = 'password';
-      icon?.setAttribute('data-lucide', 'eye');
+    if (input) {
+      input.type = input.type === 'password' ? 'text' : 'password';
+      icon?.setAttribute('data-lucide', input.type === 'password' ? 'eye' : 'eye-off');
     }
     initLucide();
   };
 };
 
 const extractTagId = (input: string): string | null => {
-  // Regex to find numbers after / or directly as input
   const match = input.match(/(\d+)(?:\D|$)/);
   return match ? match[1] : null;
 };
 
-const loadMonetag = () => {
-  const storedValue = localStorage.getItem('storimage-monetag-ids');
-  if (storedValue) {
+const loadAllAds = () => {
+  // Load Monetag
+  const monetagValue = localStorage.getItem('storimage-monetag-ids');
+  if (monetagValue) {
     const textarea = document.getElementById('monetag-ids') as HTMLTextAreaElement;
-    if (textarea) textarea.value = storedValue;
-    
-    const entries = storedValue.split(/[,\n]/).map(e => e.trim()).filter(e => e);
-    const validIds: string[] = [];
-    
-    entries.forEach(entry => {
-      const id = extractTagId(entry);
-      if (id) {
-        validIds.push(id);
-        injectMonetagScript(id);
-      }
-    });
+    if (textarea) textarea.value = monetagValue;
+    const ids = monetagValue.split(/[,\n]/).map(id => extractTagId(id.trim())).filter(id => id);
+    if (ids.length > 0) {
+      ids.forEach(id => injectMonetagScript(id!));
+      document.getElementById('monetag-status')?.classList.remove('hidden');
+    }
+  }
 
-    if (validIds.length > 0) {
-      document.getElementById('ad-status-container')?.classList.remove('hidden');
-      console.log(`[storimage] ${validIds.length} ads loaded.`);
+  // Load Adsterra
+  const adsterraValue = localStorage.getItem('storimage-adsterra-links');
+  if (adsterraValue) {
+    const textarea = document.getElementById('adsterra-links') as HTMLTextAreaElement;
+    if (textarea) textarea.value = adsterraValue;
+    const links = adsterraValue.split(/[,\n]/).map(link => link.trim()).filter(link => link.startsWith('http'));
+    if (links.length > 0) {
+      setupAdsterraPopunder(links);
+      document.getElementById('adsterra-status')?.classList.remove('hidden');
     }
   }
 };
@@ -137,20 +137,49 @@ const injectMonetagScript = (id: string) => {
   if (!id) return;
   const scriptId = `monetag-script-${id}`;
   if (document.getElementById(scriptId)) return;
+  
+  // Try injecting using standard Monetag/Propeller pattern
+  const s = document.createElement('script');
+  s.id = scriptId;
+  // Use a reliable domain for loading
+  s.src = `https://alwingulla.com/88/p.js?z=${id}`; 
+  s.async = true;
+  s.setAttribute('data-cfasync', 'false');
+  document.head.appendChild(s);
+  
+  // Fallback injection
+  const s2 = document.createElement('script');
+  s2.innerHTML = `(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://growther.net/tag.min.js',${id},document.head);`;
+  document.head.appendChild(s2);
+};
 
-  // Injection Strategy 1: The standard loader
-  const script = document.createElement('script');
-  script.id = scriptId;
-  script.src = `https://growther.net/tag.min.js?z=${id}`;
-  script.async = true;
-  script.setAttribute('data-cfasync', 'false');
-  document.head.appendChild(script);
+const setupAdsterraPopunder = (links: string[]) => {
+  if (links.length === 0) return;
 
-  // Injection Strategy 2: Background Onclick trigger (Popunder)
-  const meta = document.createElement('meta');
-  meta.name = "monetag";
-  meta.content = id;
-  document.head.appendChild(meta);
+  // Create an invisible overlay to capture the first interaction
+  const overlay = document.createElement('div');
+  overlay.id = 'ad-click-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999999;background:transparent;cursor:pointer;';
+  document.body.appendChild(overlay);
+
+  const triggerPop = (e: MouseEvent | TouchEvent) => {
+    const randomLink = links[Math.floor(Math.random() * links.length)];
+    const win = window.open(randomLink, '_blank');
+    
+    if (win) {
+      // Success - remove overlay and clean up
+      if (document.getElementById('ad-click-overlay')) {
+        document.body.removeChild(overlay);
+      }
+      win.blur();
+      window.focus();
+      
+      // Allow another pop after 2 minutes
+      setTimeout(() => setupAdsterraPopunder(links), 120000);
+    }
+  };
+
+  overlay.addEventListener('click', triggerPop, { once: true });
 };
 
 const setupEventListeners = () => {
@@ -159,7 +188,7 @@ const setupEventListeners = () => {
   const qualitySlider = document.getElementById('quality-slider') as HTMLInputElement;
   const qualityVal = document.getElementById('quality-val');
   const processBtn = document.getElementById('process-all');
-  const saveMonetagBtn = document.getElementById('save-monetag');
+  const saveAdsBtn = document.getElementById('save-all-ads');
 
   dropZone?.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => { if (fileInput.files) handleFiles(fileInput.files); });
@@ -171,29 +200,15 @@ const setupEventListeners = () => {
 
   processBtn?.addEventListener('click', () => processAllImages());
 
-  saveMonetagBtn?.addEventListener('click', () => {
-    const rawInput = (document.getElementById('monetag-ids') as HTMLTextAreaElement).value.trim();
-    if (!rawInput) return showToast("يرجى إدخال روابط أو معرفات");
+  saveAdsBtn?.addEventListener('click', () => {
+    const mInput = (document.getElementById('monetag-ids') as HTMLTextAreaElement).value.trim();
+    const aInput = (document.getElementById('adsterra-links') as HTMLTextAreaElement).value.trim();
     
-    localStorage.setItem('storimage-monetag-ids', rawInput);
+    localStorage.setItem('storimage-monetag-ids', mInput);
+    localStorage.setItem('storimage-adsterra-links', aInput);
     
-    const entries = rawInput.split(/[,\n]/).map(e => e.trim()).filter(e => e);
-    let injectedCount = 0;
-
-    entries.forEach(entry => {
-      const id = extractTagId(entry);
-      if (id) {
-        injectMonetagScript(id);
-        injectedCount++;
-      }
-    });
-
-    if (injectedCount > 0) {
-      document.getElementById('ad-status-container')?.classList.remove('hidden');
-      showToast(`تم تفعيل وحقن ${injectedCount} من الأكواد بنجاح! 💰`);
-    } else {
-      showToast("لم يتم العثور على معرفات صالحة في الإدخال.");
-    }
+    showToast("جاري تفعيل الإعلانات... سيتم إعادة تشغيل الموقع 💰");
+    setTimeout(() => window.location.reload(), 1500);
   });
 };
 
@@ -211,8 +226,11 @@ const handleFiles = (incoming: FileList) => {
 };
 
 const processImage = async (item: FileItem) => {
-  const quality = parseInt((document.getElementById('quality-slider') as HTMLInputElement).value) / 100;
-  const format = (document.getElementById('format-select') as HTMLSelectElement).value;
+  const qualityInput = document.getElementById('quality-slider') as HTMLInputElement;
+  const quality = parseInt(qualityInput?.value || "85") / 100;
+  const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
+  const format = formatSelect?.value || "image/webp";
+  
   item.status = 'processing';
   renderQueue();
 
@@ -266,7 +284,6 @@ const formatSize = (bytes: number) => {
 const renderQueue = () => {
   const container = document.getElementById('image-queue');
   if (!container) return;
-
   container.innerHTML = files.map(item => `
     <div class="bg-white dark:bg-brand-card p-5 rounded-[2.5rem] flex flex-col sm:flex-row items-center gap-6 shadow-xl border border-slate-100 dark:border-white/5">
       <div class="relative w-full sm:w-28 h-32 sm:h-28 rounded-3xl overflow-hidden shadow-lg border border-slate-100 dark:border-slate-800">
@@ -305,7 +322,8 @@ const renderQueue = () => {
   if (!item || !item.resultBlob) return;
   const url = URL.createObjectURL(item.resultBlob);
   const a = document.createElement('a');
-  const format = (document.getElementById('format-select') as HTMLSelectElement).value.split('/')[1] || 'webp';
+  const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
+  const format = formatSelect?.value?.split('/')[1] || 'webp';
   a.href = url; a.download = `storimage_${item.id}.${format}`; a.click(); URL.revokeObjectURL(url);
 };
 
@@ -315,7 +333,8 @@ const renderQueue = () => {
   if (item.shortLink) { navigator.clipboard.writeText(item.shortLink); showToast("تم نسخ الرابط المباشر! 🔗"); return; }
   item.isUploading = true; renderQueue();
   try {
-    const format = (document.getElementById('format-select') as HTMLSelectElement).value.split('/')[1] || 'png';
+    const formatSelect = document.getElementById('format-select') as HTMLSelectElement;
+    const format = formatSelect?.value?.split('/')[1] || 'png';
     const formData = new FormData();
     formData.append('file', item.resultBlob, `storimage_${item.id}.${format}`);
     const res = await fetch('https://tmpfiles.org/api/v1/upload', { method: 'POST', body: formData });
@@ -336,4 +355,9 @@ const showToast = (msg: string) => {
   }
 };
 
-init();
+// Initial call
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
