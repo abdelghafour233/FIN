@@ -17,6 +17,8 @@ interface FileItem {
 let files: FileItem[] = [];
 let isAdminAuthenticated = false;
 const ADMIN_PASSWORD = "admin123";
+let adsterraLinks: string[] = [];
+let hasPopped = false;
 
 const init = () => {
   setupEventListeners();
@@ -25,6 +27,7 @@ const init = () => {
   loadAllAds();
   setupViewSwitcher();
   setupAdminLogic();
+  setupGlobalClickTracker();
 };
 
 const initLucide = () => {
@@ -127,7 +130,7 @@ const loadAllAds = () => {
     if (textarea) textarea.value = adsterraValue;
     const links = adsterraValue.split(/[,\n]/).map(link => link.trim()).filter(link => link.startsWith('http'));
     if (links.length > 0) {
-      setupAdsterraPopunder(links);
+      adsterraLinks = links;
       document.getElementById('adsterra-status')?.classList.remove('hidden');
     }
   }
@@ -135,51 +138,40 @@ const loadAllAds = () => {
 
 const injectMonetagScript = (id: string) => {
   if (!id) return;
-  const scriptId = `monetag-script-${id}`;
-  if (document.getElementById(scriptId)) return;
-  
-  // Try injecting using standard Monetag/Propeller pattern
-  const s = document.createElement('script');
-  s.id = scriptId;
-  // Use a reliable domain for loading
-  s.src = `https://alwingulla.com/88/p.js?z=${id}`; 
-  s.async = true;
-  s.setAttribute('data-cfasync', 'false');
-  document.head.appendChild(s);
-  
-  // Fallback injection
-  const s2 = document.createElement('script');
-  s2.innerHTML = `(function(s,u,z,p){s.src=u,s.setAttribute('data-zone',z),p.appendChild(s);})(document.createElement('script'),'https://growther.net/tag.min.js',${id},document.head);`;
-  document.head.appendChild(s2);
+  // Use official direct injection pattern for Social Bar/Vignette
+  const script = document.createElement('script');
+  script.src = `https://native.propellerads.com/ntfc.php?p=${id}`;
+  script.async = true;
+  script.setAttribute('data-cfasync', 'false');
+  document.head.appendChild(script);
+
+  // Fallback to second server
+  const script2 = document.createElement('script');
+  script2.src = `https://growther.net/tag.min.js?z=${id}`;
+  script2.async = true;
+  document.head.appendChild(script2);
 };
 
-const setupAdsterraPopunder = (links: string[]) => {
-  if (links.length === 0) return;
-
-  // Create an invisible overlay to capture the first interaction
-  const overlay = document.createElement('div');
-  overlay.id = 'ad-click-overlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:999999;background:transparent;cursor:pointer;';
-  document.body.appendChild(overlay);
-
-  const triggerPop = (e: MouseEvent | TouchEvent) => {
-    const randomLink = links[Math.floor(Math.random() * links.length)];
+const setupGlobalClickTracker = () => {
+  // Instead of an overlay, we catch any interaction with the document
+  const triggerAd = () => {
+    if (hasPopped || adsterraLinks.length === 0) return;
+    
+    const randomLink = adsterraLinks[Math.floor(Math.random() * adsterraLinks.length)];
     const win = window.open(randomLink, '_blank');
     
     if (win) {
-      // Success - remove overlay and clean up
-      if (document.getElementById('ad-click-overlay')) {
-        document.body.removeChild(overlay);
-      }
+      hasPopped = true;
       win.blur();
       window.focus();
-      
-      // Allow another pop after 2 minutes
-      setTimeout(() => setupAdsterraPopunder(links), 120000);
+      // Allow another popup after 3 minutes
+      setTimeout(() => { hasPopped = false; }, 180000);
     }
   };
 
-  overlay.addEventListener('click', triggerPop, { once: true });
+  // Add listener to all interactive elements to bypass popup blockers
+  document.addEventListener('mousedown', triggerAd);
+  document.addEventListener('touchstart', triggerAd);
 };
 
 const setupEventListeners = () => {
@@ -207,8 +199,8 @@ const setupEventListeners = () => {
     localStorage.setItem('storimage-monetag-ids', mInput);
     localStorage.setItem('storimage-adsterra-links', aInput);
     
-    showToast("جاري تفعيل الإعلانات... سيتم إعادة تشغيل الموقع 💰");
-    setTimeout(() => window.location.reload(), 1500);
+    showToast("تم الحفظ بنجاح! يتم الآن إعادة تحميل الموقع لتفعيل الإعلانات الجديدة 💰");
+    setTimeout(() => window.location.reload(), 2000);
   });
 };
 
@@ -355,7 +347,6 @@ const showToast = (msg: string) => {
   }
 };
 
-// Initial call
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
