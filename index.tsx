@@ -1,4 +1,3 @@
-
 // Define as module
 export {};
 
@@ -16,7 +15,7 @@ interface FileItem {
 
 let files: FileItem[] = [];
 let isAdminAuthenticated = false;
-const ADMIN_PASSWORD = "admin123"; // يمكنك تغيير كلمة المرور هنا
+const ADMIN_PASSWORD = "admin123"; // كلمة المرور الافتراضية
 
 const init = () => {
   setupEventListeners();
@@ -43,7 +42,6 @@ const setupTheme = () => {
 
 const setupViewSwitcher = () => {
   (window as any).switchView = (view: 'app' | 'admin') => {
-    // Check if view is admin and user is not authenticated
     if (view === 'admin' && !isAdminAuthenticated) {
       (window as any).requestAdminAccess();
       return;
@@ -104,25 +102,27 @@ const setupAdminLogic = () => {
     initLucide();
   };
 
-  // Allow enter key to submit password
   document.getElementById('admin-pass-input')?.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') (window as any).verifyAdminPassword();
   });
 };
 
 const loadMonetag = () => {
-  const id = localStorage.getItem('storimage-monetag-id');
-  if (id) {
-    const input = document.getElementById('monetag-id') as HTMLInputElement;
-    if (input) input.value = id;
-    injectMonetagScript(id);
+  const idsString = localStorage.getItem('storimage-monetag-ids');
+  if (idsString) {
+    const textarea = document.getElementById('monetag-ids') as HTMLTextAreaElement;
+    if (textarea) textarea.value = idsString;
+    
+    const ids = idsString.split(',').map(id => id.trim()).filter(id => id);
+    ids.forEach(id => injectMonetagScript(id));
   }
 };
 
 const injectMonetagScript = (id: string) => {
   if (!id) return;
-  const scriptId = 'monetag-script-loader';
-  document.getElementById(scriptId)?.remove();
+  const scriptId = `monetag-script-${id}`;
+  if (document.getElementById(scriptId)) return;
+
   const script = document.createElement('script');
   script.id = scriptId;
   script.src = `https://growther.net/tag.min.js?z=${id}`;
@@ -141,17 +141,25 @@ const setupEventListeners = () => {
 
   dropZone?.addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => { if (fileInput.files) handleFiles(fileInput.files); });
+  
   qualitySlider?.addEventListener('input', (e) => {
     const val = (e.target as HTMLInputElement).value;
     if (qualityVal) qualityVal.innerText = `${val}%`;
   });
+
   processBtn?.addEventListener('click', () => processAllImages());
+
   saveMonetagBtn?.addEventListener('click', () => {
-    const id = (document.getElementById('monetag-id') as HTMLInputElement).value.trim();
-    if (!id) return showToast("يرجى إدخال معرف صالح");
-    localStorage.setItem('storimage-monetag-id', id);
-    injectMonetagScript(id);
-    showToast("تم حفظ إعدادات Monetag وتفعيلها! 💰");
+    const idsString = (document.getElementById('monetag-ids') as HTMLTextAreaElement).value.trim();
+    if (!idsString) return showToast("يرجى إدخال معرف واحد على الأقل");
+    
+    localStorage.setItem('storimage-monetag-ids', idsString);
+    const ids = idsString.split(',').map(id => id.trim()).filter(id => id);
+    
+    // Clear old scripts if they are not in the new list (simple approach: refresh injection)
+    ids.forEach(id => injectMonetagScript(id));
+    
+    showToast(`تم تفعيل ${ids.length} من أكواد الإعلانات! 💰`);
   });
 };
 
