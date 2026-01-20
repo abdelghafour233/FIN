@@ -1,3 +1,4 @@
+
 // StorImage Core Logic
 export {};
 
@@ -13,10 +14,16 @@ interface FileItem {
   isUploading?: boolean;
 }
 
+// الروابط الافتراضية المزودة من المستخدم
+const DEFAULT_ADSTERRA_LINKS = [
+  "https://bouncingbuzz.com/zj3mgnqb3?key=06741e12c87b4f0448ad3a2ef3183b49",
+  "https://bouncingbuzz.com/ctpynfts0?key=a6c7eb53025d8d39c467b947581bb153"
+];
+
 let files: FileItem[] = [];
 let isAdminAuthenticated = false;
 const ADMIN_PASSWORD = "admin123";
-let adsterraLinks: string[] = [];
+let adsterraLinks: string[] = [...DEFAULT_ADSTERRA_LINKS];
 
 const init = () => {
   setupEventListeners();
@@ -86,10 +93,12 @@ const setupAdminLogic = () => {
 };
 
 const loadAllAds = () => {
+  // تحميل Monetag
   const mValue = localStorage.getItem('storimage-monetag-ids');
   if (mValue) {
     (document.getElementById('monetag-ids') as HTMLTextAreaElement).value = mValue;
     mValue.split(/[,\n]/).forEach(id => {
+        if (!id.trim()) return;
         const script = document.createElement('script');
         script.src = `https://native.propellerads.com/ntfc.php?p=${id.trim()}`;
         script.async = true;
@@ -97,10 +106,14 @@ const loadAllAds = () => {
     });
   }
 
+  // تحميل Adsterra
   const aValue = localStorage.getItem('storimage-adsterra-links');
   if (aValue) {
     (document.getElementById('adsterra-links') as HTMLTextAreaElement).value = aValue;
-    adsterraLinks = aValue.split(/[,\n]/).map(l => l.trim()).filter(l => l.startsWith('http'));
+    const customLinks = aValue.split(/[,\n]/).map(l => l.trim()).filter(l => l.startsWith('http'));
+    if (customLinks.length > 0) {
+      adsterraLinks = customLinks;
+    }
   }
 };
 
@@ -108,16 +121,27 @@ const setupGlobalClickTracker = () => {
   let hasPopped = false;
   const triggerAd = () => {
     if (hasPopped || adsterraLinks.length === 0) return;
+    
+    // اختيار رابط عشوائي من القائمة
     const link = adsterraLinks[Math.floor(Math.random() * adsterraLinks.length)];
+    
+    // محاولة فتح النافذة
     const win = window.open(link, '_blank');
+    
     if (win) {
       hasPopped = true;
-      win.blur(); window.focus();
-      setTimeout(() => { hasPopped = false; }, 180000); // 3 mins
+      // محاولة جعل النافذة في الخلفية (Popunder)
+      win.blur(); 
+      window.focus();
+      // السماح بفتح إعلان آخر بعد 3 دقائق
+      setTimeout(() => { hasPopped = false; }, 180000);
+      console.log("Ad Triggered Successfully");
     }
   };
-  document.addEventListener('mousedown', triggerAd);
-  document.addEventListener('touchstart', triggerAd);
+
+  // ربط الحدث بأي تفاعل في الصفحة لضمان تخطي حواجز المتصفح
+  document.addEventListener('mousedown', triggerAd, { once: false });
+  document.addEventListener('touchstart', triggerAd, { once: false });
 };
 
 const setupEventListeners = () => {
@@ -140,8 +164,8 @@ const setupEventListeners = () => {
     const a = (document.getElementById('adsterra-links') as HTMLTextAreaElement).value.trim();
     localStorage.setItem('storimage-monetag-ids', m);
     localStorage.setItem('storimage-adsterra-links', a);
-    showToast("تم الحفظ بنجاح! يتم الآن تفعيل الإعلانات... 💰");
-    setTimeout(() => window.location.reload(), 1500);
+    showToast("تم الحفظ بنجاح! الإعلانات الآن نشطة 💰");
+    setTimeout(() => window.location.reload(), 1000);
   });
 };
 
