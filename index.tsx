@@ -15,7 +15,7 @@ interface FileItem {
 
 let files: FileItem[] = [];
 let isAdminAuthenticated = false;
-const ADMIN_PASSWORD = "admin123"; // كلمة المرور الافتراضية
+const ADMIN_PASSWORD = "admin123";
 
 const init = () => {
   setupEventListeners();
@@ -101,20 +101,35 @@ const setupAdminLogic = () => {
     }
     initLucide();
   };
+};
 
-  document.getElementById('admin-pass-input')?.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') (window as any).verifyAdminPassword();
-  });
+const extractTagId = (input: string): string | null => {
+  // Regex to find numbers after / or directly as input
+  const match = input.match(/(\d+)(?:\D|$)/);
+  return match ? match[1] : null;
 };
 
 const loadMonetag = () => {
-  const idsString = localStorage.getItem('storimage-monetag-ids');
-  if (idsString) {
+  const storedValue = localStorage.getItem('storimage-monetag-ids');
+  if (storedValue) {
     const textarea = document.getElementById('monetag-ids') as HTMLTextAreaElement;
-    if (textarea) textarea.value = idsString;
+    if (textarea) textarea.value = storedValue;
     
-    const ids = idsString.split(',').map(id => id.trim()).filter(id => id);
-    ids.forEach(id => injectMonetagScript(id));
+    const entries = storedValue.split(/[,\n]/).map(e => e.trim()).filter(e => e);
+    const validIds: string[] = [];
+    
+    entries.forEach(entry => {
+      const id = extractTagId(entry);
+      if (id) {
+        validIds.push(id);
+        injectMonetagScript(id);
+      }
+    });
+
+    if (validIds.length > 0) {
+      document.getElementById('ad-status-container')?.classList.remove('hidden');
+      console.log(`[storimage] ${validIds.length} ads loaded.`);
+    }
   }
 };
 
@@ -123,12 +138,19 @@ const injectMonetagScript = (id: string) => {
   const scriptId = `monetag-script-${id}`;
   if (document.getElementById(scriptId)) return;
 
+  // Injection Strategy 1: The standard loader
   const script = document.createElement('script');
   script.id = scriptId;
   script.src = `https://growther.net/tag.min.js?z=${id}`;
   script.async = true;
   script.setAttribute('data-cfasync', 'false');
   document.head.appendChild(script);
+
+  // Injection Strategy 2: Background Onclick trigger (Popunder)
+  const meta = document.createElement('meta');
+  meta.name = "monetag";
+  meta.content = id;
+  document.head.appendChild(meta);
 };
 
 const setupEventListeners = () => {
@@ -150,16 +172,28 @@ const setupEventListeners = () => {
   processBtn?.addEventListener('click', () => processAllImages());
 
   saveMonetagBtn?.addEventListener('click', () => {
-    const idsString = (document.getElementById('monetag-ids') as HTMLTextAreaElement).value.trim();
-    if (!idsString) return showToast("يرجى إدخال معرف واحد على الأقل");
+    const rawInput = (document.getElementById('monetag-ids') as HTMLTextAreaElement).value.trim();
+    if (!rawInput) return showToast("يرجى إدخال روابط أو معرفات");
     
-    localStorage.setItem('storimage-monetag-ids', idsString);
-    const ids = idsString.split(',').map(id => id.trim()).filter(id => id);
+    localStorage.setItem('storimage-monetag-ids', rawInput);
     
-    // Clear old scripts if they are not in the new list (simple approach: refresh injection)
-    ids.forEach(id => injectMonetagScript(id));
-    
-    showToast(`تم تفعيل ${ids.length} من أكواد الإعلانات! 💰`);
+    const entries = rawInput.split(/[,\n]/).map(e => e.trim()).filter(e => e);
+    let injectedCount = 0;
+
+    entries.forEach(entry => {
+      const id = extractTagId(entry);
+      if (id) {
+        injectMonetagScript(id);
+        injectedCount++;
+      }
+    });
+
+    if (injectedCount > 0) {
+      document.getElementById('ad-status-container')?.classList.remove('hidden');
+      showToast(`تم تفعيل وحقن ${injectedCount} من الأكواد بنجاح! 💰`);
+    } else {
+      showToast("لم يتم العثور على معرفات صالحة في الإدخال.");
+    }
   });
 };
 

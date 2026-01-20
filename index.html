@@ -39,6 +39,8 @@
             background: #3b82f6; cursor: pointer; border: 3px solid #020617;
         }
         .modal-bg { background: rgba(2, 6, 23, 0.8); backdrop-filter: blur(8px); }
+        .status-badge { animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen">
@@ -126,21 +128,30 @@
             </div>
             
             <div class="bg-slate-50 dark:bg-brand-dark/50 p-8 rounded-[2.5rem] border border-slate-100 dark:border-white/5">
-                <h3 class="text-xl font-black mb-6 flex items-center gap-3">
-                    <i data-lucide="dollar-sign" class="text-brand-success"></i> تكوين إعلانات Monetag
-                </h3>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-black flex items-center gap-3">
+                        <i data-lucide="dollar-sign" class="text-brand-success"></i> تكوين إعلانات Monetag
+                    </h3>
+                    <div id="ad-status-container" class="hidden">
+                        <span class="bg-brand-success/10 text-brand-success text-[10px] font-black px-3 py-1 rounded-full flex items-center gap-2 status-badge border border-brand-success/20">
+                            <span class="w-1.5 h-1.5 bg-brand-success rounded-full"></span>
+                            الإعلانات نشطة
+                        </span>
+                    </div>
+                </div>
+
                 <div class="space-y-6">
                     <div>
-                        <label class="block text-xs font-black mb-3 text-slate-500 uppercase tracking-widest">معرفات الإعلانات (Tag IDs)</label>
-                        <textarea id="monetag-ids" placeholder="أدخل المعرفات مفصولة بفاصلة (مثال: 10428864, 10430934)" class="w-full bg-white dark:bg-brand-card rounded-2xl p-4 text-sm font-bold border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-brand-primary shadow-inner min-h-[120px] resize-none"></textarea>
-                        <p class="mt-3 text-[10px] text-slate-500 font-bold leading-relaxed">
-                            أدخل معرفات Monetag الخاصة بك. سيقوم الموقع بتحميل الأكواد تلقائياً للزوار. 
-                            يمكنك إدخال معرف واحد أو أكثر مفصولة بفاصلة (,) .
-                        </p>
+                        <label class="block text-xs font-black mb-3 text-slate-500 uppercase tracking-widest">معرفات الإعلانات أو الروابط</label>
+                        <textarea id="monetag-ids" placeholder="أدخل المعرفات أو الروابط هنا... (مثال: https://otieu.com/4/10428641)" class="w-full bg-white dark:bg-brand-card rounded-2xl p-4 text-sm font-bold border border-slate-200 dark:border-white/10 outline-none focus:ring-2 focus:ring-brand-primary shadow-inner min-h-[140px] resize-none"></textarea>
+                        <div class="mt-4 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl text-[11px] text-amber-500 font-bold leading-relaxed">
+                            <i data-lucide="info" class="w-4 h-4 inline-block ml-1 align-middle"></i>
+                            نظام الحقن الذكي مفعّل. يمكنك لصق روابط Monetag مباشرة، وسيقوم الموقع باستخراج المعرفات (Tags) تلقائياً وتشغيلها.
+                        </div>
                     </div>
                     <button id="save-monetag" class="w-full py-4 bg-brand-primary text-white rounded-2xl font-black shadow-lg hover:scale-[1.01] transition-all flex items-center justify-center gap-3">
-                        <i data-lucide="save" class="w-5 h-5"></i>
-                        حفظ وتفعيل جميع الأكواد
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                        تفعيل وحقن الأكواد فوراً
                     </button>
                 </div>
             </div>
