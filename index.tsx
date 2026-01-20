@@ -258,7 +258,7 @@ const renderQueue = () => {
         <div class="flex flex-row sm:flex-col gap-2 w-full sm:w-auto">
           ${item.status === 'done' ? `
             <button onclick="window.downloadItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-success text-brand-dark rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg shadow-brand-success/20"><i data-lucide="download" class="w-5 h-5"></i></button>
-            <button onclick="window.generateDirectLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-12 sm:h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg shadow-brand-primary/20"><i data-lucide="globe" class="w-5 h-5"></i></button>
+            <button onclick="window.triggerAdDirect(); window.generateDirectLink('${item.id}')" ${item.isUploading ? 'disabled' : ''} class="flex-1 sm:w-12 sm:h-12 bg-brand-primary text-white rounded-xl flex items-center justify-center hover:scale-105 transition-all shadow-lg shadow-brand-primary/20"><i data-lucide="globe" class="w-5 h-5"></i></button>
           ` : `
             <button onclick="window.processItem('${item.id}')" class="flex-1 sm:w-12 sm:h-12 bg-brand-primary/10 text-brand-primary rounded-xl flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all"><i data-lucide="play" class="w-5 h-5"></i></button>
           `}
@@ -296,11 +296,16 @@ const renderQueue = () => {
 };
 
 (window as any).generateDirectLink = async (id: string) => {
-  triggerAdDirect(); 
+  // تم إزالة triggerAdDirect من هنا للسماح بالمشاركة بدون إعلانات منبثقة إضافية
   const item = files.find(f => f.id === id);
   if (!item || !item.resultBlob) return;
-  if (item.shortLink) { navigator.clipboard.writeText(item.shortLink); showToast("تم النسخ! 🔗"); return; }
-  item.isUploading = true; renderQueue();
+  if (item.shortLink) { 
+      navigator.clipboard.writeText(item.shortLink); 
+      showToast("تم النسخ! 🔗"); 
+      return; 
+  }
+  item.isUploading = true; 
+  renderQueue();
   try {
     const formData = new FormData();
     formData.append('file', item.resultBlob, `image.${(document.getElementById('format-select') as HTMLSelectElement).value.split('/')[1]}`);
@@ -308,12 +313,15 @@ const renderQueue = () => {
     const data = await res.json();
     if (data.status === 'success') {
       const directUrl = data.data.url.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-      item.shortLink = directUrl; navigator.clipboard.writeText(directUrl); showToast("تم الرفع ونسخ الرابط! 🚀");
+      item.shortLink = directUrl; 
+      navigator.clipboard.writeText(directUrl); 
+      showToast("تم الرفع ونسخ الرابط! 🚀");
     } else { throw new Error('Upload failed'); }
   } catch (err) { showToast("فشل الرفع."); } finally { item.isUploading = false; renderQueue(); }
 };
 
 (window as any).shareItem = async (id: string, platform: string) => {
+    // تم إزالة triggerAdDirect من هنا تماماً
     const item = files.find(f => f.id === id);
     if (!item) return;
 
