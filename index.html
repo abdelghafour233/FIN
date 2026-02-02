@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>StorImage | تحويل وضغط الصور باحترافية</title>
+    <title>StorAI | سحر الذكاء الاصطناعي</title>
     
-    <!-- Adsterra Scripts -->
-    <script src="https://bouncingbuzz.com/29/98/27/29982794e86cad0441c5d56daad519bd.js"></script>
-    <script src="https://bouncingbuzz.com/15/38/5b/15385b7c751e6c7d59d59fb7f34e2934.js"></script>
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -20,7 +16,8 @@
                     fontFamily: { sans: ['Cairo', 'sans-serif'] },
                     colors: { 
                         brand: { 
-                            primary: '#3b82f6', 
+                            primary: '#8b5cf6', // Purple for AI
+                            secondary: '#ec4899', // Pink
                             dark: '#0f172a',
                             card: '#1e293b',
                             success: '#22c55e'
@@ -32,47 +29,36 @@
     </script>
     <style>
         body { font-family: 'Cairo', sans-serif; transition: background 0.4s; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
-        .drop-area.active { border-color: #3b82f6; background: rgba(59, 130, 246, 0.05); transform: scale(1.01); }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .drop-area.active { border-color: #8b5cf6; background: rgba(139, 92, 246, 0.1); transform: scale(1.01); }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .animate-up { animation: slideUp 0.4s ease-out forwards; }
-        .status-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
-        .ad-slot { min-height: 100px; display: flex; justify-content: center; align-items: center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(59, 130, 246, 0.2); border-radius: 1rem; margin: 1rem 0; overflow: hidden; }
+        .gradient-text { background: linear-gradient(to right, #8b5cf6, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .magic-border { position: relative; overflow: hidden; }
+        .magic-border::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #8b5cf6, #ec4899, transparent); animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
     </style>
+<script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://esm.sh/@google/genai@^1.39.0"
+  }
+}
+</script>
 </head>
-<body class="bg-slate-50 text-slate-900 dark:bg-brand-dark dark:text-slate-100 min-h-screen pb-10">
-
-    <!-- Top Banner Ad (300x250) -->
-    <div class="max-w-4xl mx-auto px-6 pt-4">
-        <div class="ad-slot">
-            <script type="text/javascript">
-                atOptions = {
-                    'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-                    'format' : 'iframe',
-                    'height' : 250,
-                    'width' : 300,
-                    'params' : {}
-                };
-            </script>
-            <script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
-        </div>
-    </div>
+<body class="bg-slate-900 text-slate-100 min-h-screen pb-10">
 
     <!-- Header -->
-    <nav class="sticky top-0 z-50 glass px-6 py-4 mb-8">
+    <nav class="sticky top-0 z-50 glass px-6 py-4 mb-8 border-b border-white/5">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3 cursor-pointer" onclick="window.switchView('app')">
-                <div class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-primary/20">
-                    <i data-lucide="image" class="w-6 h-6"></i>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.reload()">
+                <div class="w-10 h-10 bg-gradient-to-br from-brand-primary to-brand-secondary rounded-xl flex items-center justify-center text-white shadow-lg shadow-brand-primary/20">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
                 </div>
-                <h1 class="text-2xl font-black tracking-tight">Stor<span class="text-brand-primary">Image</span></h1>
+                <h1 class="text-2xl font-black tracking-tight">Stor<span class="gradient-text">AI</span></h1>
             </div>
             
             <div class="flex items-center gap-3">
-                <button onclick="window.requestAdminAccess()" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 transition-all">
-                    <i data-lucide="settings" class="w-5 h-5"></i>
-                </button>
                 <button onclick="window.toggleTheme()" class="w-10 h-10 rounded-xl flex items-center justify-center bg-white/5 hover:bg-white/10 transition-all">
                     <i id="theme-icon" data-lucide="sun" class="w-5 h-5 text-amber-500"></i>
                 </button>
@@ -80,133 +66,49 @@
         </div>
     </nav>
 
-    <!-- Sidebar Ad (160x300) - Floating on Desktop -->
-    <div class="fixed left-4 top-1/2 -translate-y-1/2 hidden xl:block z-40">
-        <script type="text/javascript">
-            atOptions = {
-                'key' : 'deb441a26b7385b9111cbb19d72d8513',
-                'format' : 'iframe',
-                'height' : 300,
-                'width' : 160,
-                'params' : {}
-            };
-        </script>
-        <script type="text/javascript" src="https://bouncingbuzz.com/deb441a26b7385b9111cbb19d72d8513/invoke.js"></script>
-    </div>
-
     <!-- App View -->
     <main id="view-app" class="max-w-4xl mx-auto px-6">
         <div class="text-center mb-12 animate-up">
-            <h2 class="text-4xl md:text-5xl font-black mb-4 text-slate-900 dark:text-white">حول صورك بضغطة واحدة</h2>
-            <p class="text-slate-500 dark:text-slate-400 font-bold">أداة مجانية وسريعة لضغط الصور، تحويل الصيغ، والحصول على روابط مباشرة.</p>
+            <h2 class="text-4xl md:text-5xl font-black mb-4 text-white">حول صورك بلمسة <span class="gradient-text">سحرية</span></h2>
+            <p class="text-slate-400 font-bold text-lg">ارفع صورتك، صف ما تتخيله، واترك الذكاء الاصطناعي يبدع.</p>
         </div>
 
-        <div id="drop-zone" class="drop-area relative group border-4 border-dashed border-slate-200 dark:border-white/5 rounded-[3rem] p-12 text-center cursor-pointer transition-all hover:border-brand-primary mb-10 animate-up">
-            <input type="file" id="file-input" multiple accept="image/*" class="hidden">
-            <div class="w-24 h-24 bg-brand-primary/10 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
-                <i data-lucide="upload-cloud" class="w-12 h-12 text-brand-primary"></i>
+        <div id="drop-zone" class="drop-area relative group border-4 border-dashed border-slate-700 hover:border-brand-primary rounded-[3rem] p-12 text-center cursor-pointer transition-all mb-10 animate-up bg-slate-800/30">
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+            <div class="w-24 h-24 bg-gradient-to-br from-brand-primary/20 to-brand-secondary/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform shadow-inner shadow-white/5">
+                <i data-lucide="wand-2" class="w-12 h-12 text-brand-primary"></i>
             </div>
-            <h3 class="text-2xl font-black mb-2">اسحب الصور هنا أو انقر للاختيار</h3>
-            <p class="text-slate-400 font-bold text-sm">يدعم JPG, PNG, WebP وغيرها</p>
+            <h3 class="text-2xl font-black mb-2">اضغط هنا لرفع صورتك</h3>
+            <p class="text-slate-500 font-bold text-sm">JPG, PNG, WebP</p>
         </div>
 
         <section id="editor-section" class="hidden animate-up">
-            <div class="glass rounded-[2.5rem] p-8 mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <label class="block text-sm font-black mb-4 flex items-center gap-2">
-                            <i data-lucide="zap" class="text-brand-primary w-4 h-4"></i> قوة الضغط: <span id="quality-val" class="text-brand-primary">85%</span>
-                        </label>
-                        <input type="range" id="quality-slider" min="10" max="100" value="85" class="w-full h-2 bg-slate-200 dark:bg-white/5 rounded-lg appearance-none cursor-pointer accent-brand-primary">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-black mb-4 flex items-center gap-2">
-                            <i data-lucide="file-type" class="text-brand-primary w-4 h-4"></i> الصيغة المطلوبة:
-                        </label>
-                        <select id="format-select" class="w-full bg-slate-100 dark:bg-white/5 border border-white/5 rounded-2xl p-4 text-sm font-bold outline-none focus:ring-2 focus:ring-brand-primary">
-                            <option value="image/webp">WebP (موصى به)</option>
-                            <option value="image/png">PNG</option>
-                            <option value="image/jpeg">JPEG</option>
-                        </select>
-                    </div>
+            <div class="glass rounded-[2.5rem] p-8 mb-8 border border-brand-primary/20 shadow-2xl shadow-brand-primary/10 relative">
+                
+                <div class="mb-6">
+                    <label class="block text-lg font-black mb-3 flex items-center gap-2 text-white">
+                        <i data-lucide="message-square-dashed" class="text-brand-secondary w-6 h-6"></i> 
+                        ماذا تريد أن تفعل بالصورة؟
+                    </label>
+                    <textarea 
+                        id="prompt-input" 
+                        class="w-full bg-slate-950/50 border border-white/10 rounded-2xl p-5 text-base text-white placeholder-slate-500 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-all resize-none h-32"
+                        placeholder="مثال: حول الصورة إلى رسم زيتي، اجعل الخلفية في الفضاء، أضف نظارة شمسية، حول النمط إلى سايبر بانك..."
+                    ></textarea>
                 </div>
-                <button id="process-all" class="w-full mt-8 bg-brand-primary text-white py-5 rounded-2xl font-black text-lg shadow-xl shadow-brand-primary/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
-                    <i data-lucide="play" class="w-6 h-6"></i> معالجة جميع الصور
+
+                <button id="process-btn" class="magic-border w-full bg-gradient-to-r from-brand-primary to-brand-secondary text-white py-5 rounded-2xl font-black text-xl shadow-xl shadow-brand-primary/20 hover:scale-[1.01] hover:shadow-brand-primary/40 transition-all flex items-center justify-center gap-3">
+                    <i data-lucide="stars" class="w-6 h-6"></i> تنفيذ السحر
                 </button>
             </div>
 
-            <div id="image-queue" class="space-y-4"></div>
+            <div id="image-queue" class="space-y-6"></div>
         </section>
-
-        <!-- Bottom Ad Slot -->
-        <div class="mt-12 text-center">
-             <p class="text-[10px] font-bold text-slate-500 uppercase mb-4">إعلان ممول</p>
-             <div class="ad-slot">
-                 <script type="text/javascript">
-                    atOptions = {
-                        'key' : '0295263cf4ed8d9e3a97b6a2490864ee',
-                        'format' : 'iframe',
-                        'height' : 250,
-                        'width' : 300,
-                        'params' : {}
-                    };
-                </script>
-                <script type="text/javascript" src="https://bouncingbuzz.com/0295263cf4ed8d9e3a97b6a2490864ee/invoke.js"></script>
-             </div>
-        </div>
     </main>
 
-    <!-- Floating Ad Trigger -->
-    <div onclick="window.triggerAdDirect()" class="fixed bottom-6 right-6 z-[60] bg-brand-success text-brand-dark px-6 py-4 rounded-2xl font-black shadow-2xl flex items-center gap-3 cursor-pointer hover:scale-110 transition-all status-pulse">
-        <i data-lucide="award" class="w-6 h-6"></i>
-        <span>هدية لمستخدمينا!</span>
-    </div>
-
-    <!-- Admin View -->
-    <main id="view-admin" class="hidden max-w-2xl mx-auto px-6 pt-10">
-        <div class="glass rounded-[3rem] p-10 animate-up">
-            <div class="flex items-center justify-between mb-8">
-                <div class="flex flex-col">
-                    <h2 class="text-3xl font-black">إعدادات الإعلانات</h2>
-                    <div class="flex items-center gap-2 mt-2">
-                        <span class="w-3 h-3 bg-brand-success rounded-full status-pulse"></span>
-                        <span class="text-brand-success text-xs font-bold">النظام مفعل بأقصى قوة 💰</span>
-                    </div>
-                </div>
-                <button onclick="window.switchView('app')" class="w-10 h-10 bg-white/5 rounded-xl flex items-center justify-center">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-            
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-bold mb-3">معرفات Monetag:</label>
-                    <textarea id="monetag-ids" placeholder="ID..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-sm font-mono min-h-[80px] outline-none"></textarea>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold mb-3">روابط Adsterra المباشرة:</label>
-                    <textarea id="adsterra-links" placeholder="https://..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-sm font-mono min-h-[80px] outline-none"></textarea>
-                </div>
-                <button id="save-all-ads" class="w-full bg-brand-success text-brand-dark py-5 rounded-2xl font-black text-lg">حفظ التغييرات</button>
-            </div>
-        </div>
-    </main>
-
-    <!-- Admin Modal -->
-    <div id="password-modal" class="fixed inset-0 z-[100] hidden bg-black/80 backdrop-blur-md flex items-center justify-center p-6">
-        <div class="glass w-full max-w-md rounded-[2.5rem] p-10 shadow-2xl animate-up text-center">
-            <h3 class="text-2xl font-black mb-6 text-white">تحقق المدير</h3>
-            <input type="password" id="admin-pass-input" placeholder="كلمة المرور..." class="w-full bg-slate-100 dark:bg-brand-dark/50 border border-white/5 rounded-2xl p-4 text-center text-lg font-black outline-none mb-6">
-            <div class="flex gap-3">
-                <button onclick="window.verifyAdminPassword()" class="flex-grow bg-brand-primary text-white py-4 rounded-xl font-black">دخول</button>
-                <button onclick="window.closeAdminModal()" class="px-6 bg-white/5 rounded-xl font-black text-white">إلغاء</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast" class="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-32 opacity-0">
-        <div class="bg-brand-primary text-white px-8 py-4 rounded-full shadow-2xl font-black flex items-center gap-3">
-            <i data-lucide="info" class="w-5 h-5"></i>
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] transition-all duration-500 translate-y-32 opacity-0">
+        <div class="bg-slate-800 border border-brand-primary/50 text-white px-8 py-4 rounded-full shadow-2xl font-bold flex items-center gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-brand-primary"></i>
             <span id="toast-msg">تمت العملية بنجاح!</span>
         </div>
     </div>
