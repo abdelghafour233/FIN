@@ -1,20 +1,32 @@
 // StorAI Core Logic
 import { GoogleGenAI } from "@google/genai";
 
-// Initialize Gemini API
-// Ensure we don't crash if process is undefined in a raw browser environment
-const apiKey = typeof process !== "undefined" ? process.env.API_KEY : "";
-const ai = new GoogleGenAI({ apiKey: apiKey });
-
+let ai;
 let currentFile = null;
 
 const init = () => {
-  setupEventListeners();
-  initLucide();
-  setupTheme();
-  
-  // Expose reset function globally
-  window.resetApp = resetApp;
+  try {
+    // Attempt to initialize AI
+    const apiKey = typeof process !== "undefined" && process.env ? process.env.API_KEY : "";
+    
+    if (!apiKey) {
+        console.warn("API_KEY is missing. AI features will fail.");
+    }
+    
+    ai = new GoogleGenAI({ apiKey: apiKey });
+    
+    // Initialize UI
+    setupEventListeners();
+    initLucide();
+    setupTheme();
+    
+    // Expose reset function globally
+    window.resetApp = resetApp;
+    console.log("StorAI Initialized");
+  } catch (err) {
+    console.error("Initialization error:", err);
+    showToast("حدث خطأ في التهيئة. راجع وحدة التحكم (Console).");
+  }
 };
 
 const initLucide = () => {
@@ -104,6 +116,11 @@ const processCurrentFile = async () => {
       return;
   }
 
+  if (!ai) {
+      showToast("خطأ: لم يتم تهيئة الذكاء الاصطناعي.");
+      return;
+  }
+
   currentFile.status = 'processing';
   renderQueue(); // Update UI to show loading state
 
@@ -152,7 +169,7 @@ const processCurrentFile = async () => {
   } catch (error) {
     console.error(error);
     currentFile.status = 'error';
-    showToast("حدث خطأ أثناء المعالجة، حاول مرة أخرى.");
+    showToast("حدث خطأ أثناء المعالجة (تحقق من مفتاح API)");
   } finally {
       renderQueue();
   }
