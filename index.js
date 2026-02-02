@@ -4,274 +4,289 @@ import { GoogleGenAI } from "@google/genai";
 let ai;
 let currentFile = null;
 
+// Ensure DOM is ready before attaching listeners
+document.addEventListener("DOMContentLoaded", () => {
+    init();
+});
+
 const init = () => {
-  try {
-    // Attempt to initialize AI
-    const apiKey = typeof process !== "undefined" && process.env ? process.env.API_KEY : "";
-    
-    if (!apiKey) {
-        console.warn("API_KEY is missing. AI features will fail.");
+    try {
+        console.log("StorAI Starting...");
+        
+        // Setup UI first so buttons work even if API fails initially
+        setupEventListeners();
+        setupTheme();
+        initLucide();
+
+        // Attach global functions
+        window.resetApp = resetApp;
+        window.toggleTheme = toggleTheme;
+
+        // Initialize API
+        const apiKey = (typeof process !== "undefined" && process.env) ? process.env.API_KEY : "";
+        
+        if (!apiKey) {
+            console.warn("API Key Not Found");
+            showToast("⚠️ تنبيه: مفتاح API غير موجود، لن تعمل المعالجة.");
+        } else {
+            ai = new GoogleGenAI({ apiKey: apiKey });
+        }
+
+    } catch (err) {
+        console.error("Critical Init Error:", err);
+        showToast("حدث خطأ جسيم في تشغيل التطبيق");
     }
-    
-    ai = new GoogleGenAI({ apiKey: apiKey });
-    
-    // Initialize UI
-    setupEventListeners();
-    initLucide();
-    setupTheme();
-    
-    // Expose reset function globally
-    window.resetApp = resetApp;
-    console.log("StorAI Initialized");
-  } catch (err) {
-    console.error("Initialization error:", err);
-    showToast("حدث خطأ في التهيئة. راجع وحدة التحكم (Console).");
-  }
 };
 
 const initLucide = () => {
-  if (window.lucide) window.lucide.createIcons();
+    if (window.lucide) window.lucide.createIcons();
 };
 
-const setupTheme = () => {
-  window.toggleTheme = () => {
+const toggleTheme = () => {
     document.documentElement.classList.toggle('dark');
     initLucide();
-  };
 };
 
 const setupEventListeners = () => {
-  const fileInput = document.getElementById('file-input');
-  const dropZone = document.getElementById('drop-zone');
-  const processBtn = document.getElementById('process-btn');
+    const fileInput = document.getElementById('file-input');
+    const dropZone = document.getElementById('drop-zone');
+    const processBtn = document.getElementById('process-btn');
 
-  if (dropZone) dropZone.addEventListener('click', () => fileInput.click());
-  if (fileInput) {
-    fileInput.addEventListener('change', () => { 
-        if (fileInput.files && fileInput.files[0]) {
-            handleFile(fileInput.files[0]);
-        }
-    });
-  }
+    if (dropZone && fileInput) {
+        // Remove old listeners to be safe (cloning node is a quick way to clear listeners)
+        const newDropZone = dropZone.cloneNode(true);
+        dropZone.parentNode.replaceChild(newDropZone, dropZone);
+        
+        newDropZone.addEventListener('click', () => {
+             document.getElementById('file-input').click();
+        });
+        
+        // Re-attach file input listener
+        const newFileInput = fileInput.cloneNode(true);
+        fileInput.parentNode.replaceChild(newFileInput, fileInput);
+        
+        newFileInput.addEventListener('change', (e) => { 
+            if (e.target.files && e.target.files[0]) {
+                handleFile(e.target.files[0]);
+            }
+        });
+    }
 
-  if (processBtn) {
-    processBtn.addEventListener('click', () => {
-        processCurrentFile();
-    });
-  }
+    if (processBtn) {
+        processBtn.onclick = processCurrentFile; // Direct assignment to avoid duplicates
+    }
 };
 
 const resetApp = () => {
-  currentFile = null;
-  const fileInput = document.getElementById('file-input');
-  if (fileInput) fileInput.value = '';
-  
-  const promptInput = document.getElementById('prompt-input');
-  if (promptInput) promptInput.value = '';
-  
-  updateUI();
-  showToast("جاهز لمشروع جديد! 🚀");
+    console.log("Resetting App...");
+    currentFile = null;
+    
+    // Clear inputs
+    const fileInput = document.getElementById('file-input');
+    if (fileInput) fileInput.value = '';
+    
+    const promptInput = document.getElementById('prompt-input');
+    if (promptInput) promptInput.value = '';
+    
+    // Reset UI State
+    const dropZone = document.getElementById('drop-zone');
+    const editor = document.getElementById('editor-section');
+    const queue = document.getElementById('image-queue');
+    
+    if(dropZone) dropZone.classList.remove('hidden');
+    if(editor) editor.classList.add('hidden');
+    if(queue) queue.innerHTML = '';
+    
+    showToast("✨ جاهز لمشروع جديد!");
 };
 
 const handleFile = (file) => {
-  if (!file.type.startsWith('image/')) {
-      showToast("الرجاء اختيار صورة فقط");
-      return;
-  }
+    if (!file.type.startsWith('image/')) {
+        showToast("الرجاء اختيار صورة (JPG, PNG)");
+        return;
+    }
 
-  currentFile = {
-    id: Math.random().toString(36).substr(2, 9),
-    file: file,
-    preview: URL.createObjectURL(file),
-    status: 'idle',
-    originalSize: file.size
-  };
-  
-  updateUI();
-};
-
-const fileToBase64 = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => {
-        const result = reader.result;
-        // Remove the Data URL prefix (e.g., "data:image/png;base64,")
-        const base64Data = result.split(',')[1];
-        resolve(base64Data);
+    currentFile = {
+        id: Math.random().toString(36).substr(2, 9),
+        file: file,
+        preview: URL.createObjectURL(file),
+        status: 'idle'
     };
-    reader.onerror = error => reject(error);
-  });
-};
-
-const processCurrentFile = async () => {
-  if (!currentFile || currentFile.status === 'processing') return;
-
-  const promptInput = document.getElementById('prompt-input');
-  const promptText = promptInput.value.trim();
-
-  if (!promptText) {
-      showToast("الرجاء كتابة وصف للتعديل المطلوب! ✍️");
-      promptInput.focus();
-      return;
-  }
-
-  if (!ai) {
-      showToast("خطأ: لم يتم تهيئة الذكاء الاصطناعي.");
-      return;
-  }
-
-  currentFile.status = 'processing';
-  renderQueue(); // Update UI to show loading state
-
-  try {
-    const base64Image = await fileToBase64(currentFile.file);
-
-    // Call Gemini API
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash-image',
-        contents: {
-            parts: [
-                {
-                    inlineData: {
-                        mimeType: currentFile.file.type,
-                        data: base64Image
-                    }
-                },
-                {
-                    text: promptText + " (Return only the image)"
-                }
-            ]
-        }
-    });
-
-    let resultImageFound = false;
     
-    // Extract Image from response
-    if (response.candidates && response.candidates[0].content && response.candidates[0].content.parts) {
-        for (const part of response.candidates[0].content.parts) {
-            if (part.inlineData) {
-                const base64EncodeString = part.inlineData.data;
-                currentFile.resultDataUrl = `data:image/png;base64,${base64EncodeString}`;
-                resultImageFound = true;
-                break;
-            }
-        }
-    }
-
-    if (resultImageFound) {
-        currentFile.status = 'done';
-        showToast("تم تنفيذ السحر بنجاح! ✨");
-    } else {
-        throw new Error("لم يتم إرجاع صورة من النموذج.");
-    }
-
-  } catch (error) {
-    console.error(error);
-    currentFile.status = 'error';
-    showToast("حدث خطأ أثناء المعالجة (تحقق من مفتاح API)");
-  } finally {
-      renderQueue();
-  }
+    updateUI();
 };
 
 const updateUI = () => {
-  const dropZone = document.getElementById('drop-zone');
-  const editor = document.getElementById('editor-section');
-  
-  if (currentFile) {
-    dropZone?.classList.add('hidden');
-    editor?.classList.remove('hidden');
+    const dropZone = document.getElementById('drop-zone');
+    const editor = document.getElementById('editor-section');
+    
+    if (currentFile) {
+        dropZone?.classList.add('hidden');
+        editor?.classList.remove('hidden');
+        renderQueue();
+    } else {
+        dropZone?.classList.remove('hidden');
+        editor?.classList.add('hidden');
+    }
+    initLucide();
+};
+
+const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result.split(',')[1]);
+        reader.onerror = error => reject(error);
+    });
+};
+
+const processCurrentFile = async () => {
+    if (!currentFile || currentFile.status === 'processing') return;
+
+    const promptInput = document.getElementById('prompt-input');
+    const promptText = promptInput.value.trim();
+
+    if (!promptText) {
+        showToast("✍️ يرجى كتابة وصف للتعديل");
+        promptInput.focus();
+        return;
+    }
+
+    if (!ai) {
+        showToast("❌ خطأ: مفتاح API غير موجود أو لم يتم تحميل المكتبة.");
+        return;
+    }
+
+    currentFile.status = 'processing';
     renderQueue();
-  } else {
-    dropZone?.classList.remove('hidden');
-    editor?.classList.add('hidden');
-  }
+
+    try {
+        const base64Image = await fileToBase64(currentFile.file);
+        
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash-image',
+            contents: {
+                parts: [
+                    { inlineData: { mimeType: currentFile.file.type, data: base64Image } },
+                    { text: promptText + " (Return only the image)" }
+                ]
+            }
+        });
+
+        let resultDataUrl = null;
+        const parts = response.candidates?.[0]?.content?.parts || [];
+        
+        for (const part of parts) {
+            if (part.inlineData) {
+                resultDataUrl = `data:image/png;base64,${part.inlineData.data}`;
+                break;
+            }
+        }
+
+        if (resultDataUrl) {
+            currentFile.resultDataUrl = resultDataUrl;
+            currentFile.status = 'done';
+            showToast("✨ تم السحر بنجاح!");
+        } else {
+            throw new Error("No image returned");
+        }
+
+    } catch (error) {
+        console.error(error);
+        currentFile.status = 'error';
+        showToast("❌ فشلت العملية، حاول مرة أخرى.");
+    } finally {
+        renderQueue();
+    }
 };
 
 const renderQueue = () => {
-  const container = document.getElementById('image-queue');
-  if (!container || !currentFile) return;
+    const container = document.getElementById('image-queue');
+    if (!container || !currentFile) return;
 
-  const isProcessing = currentFile.status === 'processing';
-  const isDone = currentFile.status === 'done';
-  const isError = currentFile.status === 'error';
+    const isProcessing = currentFile.status === 'processing';
+    const isDone = currentFile.status === 'done';
+    const isError = currentFile.status === 'error';
 
-  let statusHtml = '';
-  if (isProcessing) {
-      statusHtml = `
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm flex flex-col items-center justify-center z-10 rounded-2xl">
-            <div class="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-3"></div>
-            <span class="text-white font-bold animate-pulse">جاري تحضير التعويذة...</span>
-        </div>`;
-  }
+    let contentHtml = '';
 
-  container.innerHTML = `
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-up">
-        <!-- Original Image -->
-        <div class="glass p-5 rounded-[2rem] border border-white/5 relative group">
-            <h4 class="text-slate-400 font-bold mb-3 text-sm text-center">الصورة الأصلية</h4>
-            <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-800">
-                <img src="${currentFile.preview}" class="w-full h-full object-contain">
+    if (isProcessing) {
+        contentHtml = `
+            <div class="absolute inset-0 z-10 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl animate-pulse">
+                <div class="w-16 h-16 border-4 border-brand-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div class="text-white font-bold text-lg">جاري التنفيذ...</div>
             </div>
-        </div>
+        `;
+    }
 
-        <!-- Result Image -->
-        <div class="glass p-5 rounded-[2rem] border ${isDone ? 'border-brand-primary' : 'border-white/5'} relative">
-            <h4 class="text-brand-primary font-bold mb-3 text-sm text-center flex items-center justify-center gap-2">
-                <i data-lucide="sparkles" class="w-4 h-4"></i> النتيجة السحرية
-            </h4>
-            
-            <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-slate-800 flex items-center justify-center">
-                ${statusHtml}
+    container.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 animate-up">
+            <!-- Original -->
+            <div class="glass p-4 rounded-3xl border border-white/5">
+                <div class="text-slate-400 text-sm font-bold text-center mb-2">الأصلية</div>
+                <div class="aspect-square bg-slate-800 rounded-2xl overflow-hidden relative">
+                    <img src="${currentFile.preview}" class="w-full h-full object-contain">
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="glass p-4 rounded-3xl border ${isDone ? 'border-brand-primary' : 'border-white/5'} relative overflow-hidden">
+                <div class="text-brand-primary text-sm font-bold text-center mb-2 flex items-center justify-center gap-2">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i> النتيجة
+                </div>
                 
-                ${isDone && currentFile.resultDataUrl ? `
-                    <img src="${currentFile.resultDataUrl}" class="w-full h-full object-contain z-0">
-                    <a href="${currentFile.resultDataUrl}" download="magic_storai_${currentFile.id}.png" class="absolute bottom-4 right-4 bg-brand-success text-white px-4 py-2 rounded-xl font-bold shadow-lg hover:scale-105 transition-transform flex items-center gap-2 z-20">
-                        <i data-lucide="download" class="w-4 h-4"></i> تحميل
-                    </a>
-                ` : isError ? `
-                    <div class="text-center text-red-400 p-4">
-                        <i data-lucide="alert-triangle" class="w-8 h-8 mx-auto mb-2"></i>
-                        فشلت العملية
-                    </div>
-                ` : `
-                    <div class="text-slate-600 text-center p-4">
-                        <i data-lucide="image-plus" class="w-12 h-12 mx-auto mb-2 opacity-50"></i>
-                        النتيجة ستظهر هنا
-                    </div>
-                `}
+                <div class="aspect-square bg-slate-800 rounded-2xl overflow-hidden relative flex items-center justify-center">
+                    ${contentHtml}
+                    
+                    ${isDone && currentFile.resultDataUrl ? `
+                        <img src="${currentFile.resultDataUrl}" class="w-full h-full object-contain relative z-0">
+                        <a href="${currentFile.resultDataUrl}" download="storai_magic.png" class="absolute bottom-4 right-4 bg-brand-success hover:bg-green-500 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg flex items-center gap-2 z-20 transition-transform hover:scale-105">
+                            <i data-lucide="download" class="w-4 h-4"></i> حفظ
+                        </a>
+                    ` : isError ? `
+                        <div class="text-red-400 flex flex-col items-center p-4 text-center">
+                            <i data-lucide="alert-circle" class="w-10 h-10 mb-2"></i>
+                            <p>عذراً، حدث خطأ.</p>
+                        </div>
+                    ` : `
+                        <div class="text-slate-600 flex flex-col items-center p-4">
+                            <i data-lucide="image" class="w-12 h-12 mb-2 opacity-20"></i>
+                            <p class="text-sm opacity-50">النتيجة هنا</p>
+                        </div>
+                    `}
+                </div>
             </div>
         </div>
-    </div>
+
+        ${isDone ? `
+            <div class="flex justify-center mt-8 animate-up">
+                <button onclick="window.resetApp()" class="bg-slate-800 hover:bg-slate-700 border border-white/10 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-xl flex items-center gap-3 group">
+                    <span class="bg-brand-primary/20 text-brand-primary p-2 rounded-lg group-hover:rotate-90 transition-transform duration-500">
+                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                    </span>
+                    <span>بدء مشروع جديد</span>
+                </button>
+            </div>
+        ` : ''}
+    `;
     
-    ${isDone ? `
-        <div class="flex justify-center mt-8 animate-up">
-             <button onclick="window.resetApp()" class="bg-slate-800 border border-white/10 hover:bg-slate-700 hover:border-brand-primary/50 text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-xl flex items-center gap-3 group">
-                <span class="bg-brand-primary/20 text-brand-primary p-2 rounded-lg group-hover:scale-110 transition-transform">
-                    <i data-lucide="plus" class="w-5 h-5"></i>
-                </span>
-                <span>بدء مشروع جديد</span>
-             </button>
-        </div>
-    ` : ''}
-  `;
-  
-  initLucide();
+    initLucide();
 };
 
 const showToast = (msg) => {
-  const t = document.getElementById('toast');
-  const m = document.getElementById('toast-msg');
-  if (t && m) {
-    m.innerText = msg;
-    t.classList.remove('translate-y-32', 'opacity-0');
-    t.classList.add('translate-y-0', 'opacity-100');
-    setTimeout(() => {
-      t.classList.add('translate-y-32', 'opacity-0');
-      t.classList.remove('translate-y-0', 'opacity-100');
-    }, 4000);
-  }
+    const t = document.getElementById('toast');
+    const m = document.getElementById('toast-msg');
+    if (t && m) {
+        m.innerText = msg;
+        t.classList.remove('translate-y-32', 'opacity-0');
+        t.classList.add('translate-y-0', 'opacity-100');
+        
+        // Clear previous timeout if exists to prevent weird jumping
+        if (window.toastTimeout) clearTimeout(window.toastTimeout);
+        
+        window.toastTimeout = setTimeout(() => {
+            t.classList.add('translate-y-32', 'opacity-0');
+            t.classList.remove('translate-y-0', 'opacity-100');
+        }, 4000);
+    }
 };
-
-init();
