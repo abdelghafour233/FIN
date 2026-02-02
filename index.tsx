@@ -21,6 +21,9 @@ const init = () => {
   setupEventListeners();
   initLucide();
   setupTheme();
+  
+  // Expose reset function globally
+  (window as any).resetApp = resetApp;
 };
 
 const initLucide = () => {
@@ -49,6 +52,18 @@ const setupEventListeners = () => {
   processBtn?.addEventListener('click', () => {
       processCurrentFile();
   });
+};
+
+const resetApp = () => {
+  currentFile = null;
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  if (fileInput) fileInput.value = '';
+  
+  const promptInput = document.getElementById('prompt-input') as HTMLTextAreaElement;
+  if (promptInput) promptInput.value = '';
+  
+  updateUI();
+  showToast("جاهز لمشروع جديد! 🚀");
 };
 
 const handleFile = (file: File) => {
@@ -219,8 +234,13 @@ const renderQueue = () => {
     </div>
     
     ${isDone ? `
-        <div class="text-center mt-6">
-             <button onclick="window.location.reload()" class="text-slate-400 hover:text-white underline decoration-dashed">بدء صورة جديدة</button>
+        <div class="flex justify-center mt-8 animate-up">
+             <button onclick="window.resetApp()" class="bg-slate-800 border border-white/10 hover:bg-slate-700 hover:border-brand-primary/50 text-white px-10 py-4 rounded-2xl font-bold transition-all shadow-xl flex items-center gap-3 group">
+                <span class="bg-brand-primary/20 text-brand-primary p-2 rounded-lg group-hover:scale-110 transition-transform">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                </span>
+                <span>بدء مشروع جديد</span>
+             </button>
         </div>
     ` : ''}
   `;
